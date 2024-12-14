@@ -6,7 +6,7 @@ public class Movimentos {
 
     }
 
-    public Movimentos(Utente utente, Livro livro) {
+    public Movimentos(Client utente, Livro livro) {
 
     }
 }
