@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.io.*;
 
-public class Client {
+public class Cliente {
 
     private int id;
     private String nome;
@@ -11,11 +11,11 @@ public class Client {
 
     private Scanner ler_id = new Scanner(System.in);
 
-    public Client() {
+    public Cliente() {
 
     }
 
-    public Client(int id, String nome, String genero, long nif, long contacto) {
+    public Cliente(int id, String nome, String genero, long nif, long contacto) {
         this.id = id;
         this.nome = nome;
         this.genero = genero;
@@ -63,7 +63,7 @@ public class Client {
         this.contacto = contacto;
     }
 
-    public void createClient(){
+    public void createCliente(){
         System.out.print("\nPor favor, insira o Id do Cliente: ");
         setId(ler_id.nextInt());
         ler_id.nextLine();
