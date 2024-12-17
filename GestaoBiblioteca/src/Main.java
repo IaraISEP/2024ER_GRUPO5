@@ -1,6 +1,7 @@
 public class Main {
 
     public static void main(String[] args) {
+
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
 
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Criar", () -> menuPrincipal.exibirSubmenu("Criar")));

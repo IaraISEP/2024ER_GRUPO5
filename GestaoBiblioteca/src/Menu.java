@@ -58,8 +58,9 @@ public class Menu {
 
         switch (tipo) {
         	case "Criar":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> { 
-                	System.out.println("Cliente criado...");
+                submenu.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
+                    Client cliente = new Client();
+                    cliente.createClient();
                 	keyPress();
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Criar Livros", () -> {
@@ -280,4 +281,5 @@ public class Menu {
 
         submenu.exibir();
     }
+
 }
