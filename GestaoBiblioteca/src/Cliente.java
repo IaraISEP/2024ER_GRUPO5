@@ -8,8 +8,10 @@ public class Cliente {
     private String genero;
     private long nif;
     private long contacto;
+    private int opcao;
+    private boolean status = true;
 
-    private Scanner ler_id = new Scanner(System.in);
+    private Scanner input = new Scanner(System.in);
 
     public Cliente() {
 
@@ -65,16 +67,32 @@ public class Cliente {
 
     public void createCliente(){
         System.out.print("\nPor favor, insira o Id do Cliente: ");
-        setId(ler_id.nextInt());
-        ler_id.nextLine();
+        setId(input.nextInt());
+        input.nextLine();
         System.out.print("\nPor favor, insira o nome do Cliente: ");
-        setNome(ler_id.nextLine());
-        System.out.print("\nPor favor, insira o Genero do Cliente: ");
-        setGenero(ler_id.nextLine());
+        setNome(input.nextLine());
+        while (status){
+        System.out.print("\nPor favor, insira o Genero do Cliente: (1-M | 2-F): )");
+        opcao = input.nextInt();
+            switch (opcao){
+                case 1:
+                    setGenero("Masculino");
+                    status = false;
+                    break;
+                case 2:
+                    setGenero("Feminino");
+                    status = false;
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    status = true;
+                    break;
+            }
+        }
         System.out.print("\nPor favor, insira o nif do Cliente: ");
-        setNif(ler_id.nextLong());
+        setNif(input.nextLong());
         System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-        setContacto(ler_id.nextLong());
+        setContacto(input.nextLong());
 
 
         String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
