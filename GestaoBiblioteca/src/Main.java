@@ -4,10 +4,11 @@ public class Main {
 
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
 
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Criar", () -> menuPrincipal.exibirSubmenu("Criar")));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Listar", () -> menuPrincipal.exibirSubmenu("Listar")));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Editar", () -> menuPrincipal.exibirSubmenu("Editar")));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Apagar", () -> menuPrincipal.exibirSubmenu("Apagar")));
+
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", () -> menuPrincipal.exibirSubmenu("Cliente")));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Itens Biblioteca", () -> menuPrincipal.exibirSubmenu("itens")));
+/*        menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", () -> menuPrincipal.exibirSubmenu("Reservas")));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", () -> menuPrincipal.exibirSubmenu("Emprestimos")));*/
 
         menuPrincipal.exibir();
     }
