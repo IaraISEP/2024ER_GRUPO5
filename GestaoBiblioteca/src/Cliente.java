@@ -65,6 +65,22 @@ public class Cliente {
         this.contacto = contacto;
     }
 
+    public void printFileCsv() throws IOException {
+        FileWriter fw = new FileWriter("clientes.csv", true);
+        fw.append(Integer.toString(this.getId()));
+        fw.append(";");
+        fw.append(this.getNome());
+        fw.append(";");
+        fw.append(getGenero());
+        fw.append(";");
+        fw.append(Long.toString(getNif()));
+        fw.append(";");
+        fw.append(Long.toString(getContacto()));
+        fw.append("\n");
+        fw.flush();
+        fw.close();
+    }
+
     public void createCliente(){
         System.out.print("\nPor favor, insira o Id do Cliente: ");
         setId(input.nextInt());
@@ -72,7 +88,7 @@ public class Cliente {
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         setNome(input.nextLine());
         while (status){
-        System.out.print("\nPor favor, insira o Genero do Cliente: (1-M | 2-F): )");
+        System.out.print("\nPor favor, insira o Genero do Cliente (1-M | 2-F): ");
         opcao = input.nextInt();
             switch (opcao){
                 case 1:
@@ -94,6 +110,11 @@ public class Cliente {
         System.out.print("\nPor favor, insira o Contacto do Cliente: ");
         setContacto(input.nextLong());
 
+        try {
+            printFileCsv();
+        } catch (IOException e) {
+            System.err.println("Erro ao criar Cliente" + e.getMessage());
+        }
 
         String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
                 getId(), getNome(), getGenero(),getNif(),getContacto());
