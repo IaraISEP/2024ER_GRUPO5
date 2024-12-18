@@ -56,16 +56,16 @@ public class Menu {
     
     public void exibirSubmenu(String tipo) {
         Menu submenu = new Menu(tipo);
+        Cliente cliente = new Cliente();
 
         switch (tipo) {
         	case "Cliente":
                 submenu.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-                    Cliente cliente = new Cliente();
                     cliente.createCliente();
                 	keyPress();
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-                	System.out.println("Listar Clientes...");
+                    cliente.readCliente();
                 	keyPress();
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {

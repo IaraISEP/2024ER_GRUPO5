@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
 
@@ -124,6 +125,27 @@ public class Cliente {
             System.out.println("Cliente criado com sucesso!");
         } catch (IOException e) {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
+        }
+    }
+
+    public void readCliente(){
+        String arquivo = "clientes.csv";
+        BufferedReader readFile = null;
+        String linha = null;
+        String csvDivisor = ";";
+        ArrayList<String> dados= new ArrayList<String>();
+
+        try{
+            readFile = new BufferedReader(new FileReader(arquivo));
+            while ((linha = readFile.readLine()) != null) {
+                dados.add(linha);
+            }
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        for (String dado : dados) {
+            System.out.println(dado);
         }
     }
 }

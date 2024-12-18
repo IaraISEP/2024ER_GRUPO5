@@ -9,7 +9,6 @@ public class OpcaoMenu {
         this.acao = acao;
     }
 
-    
     public String getDescricao() {
         return descricao;
     }
