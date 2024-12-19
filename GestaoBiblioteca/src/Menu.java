@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Menu {
     private String titulo;
     private List<OpcaoMenu> opcoes;
-    private boolean exit = true;
+    private boolean exit = true, numero = true;
     private Scanner input;
 
     public Menu(String titulo) {
@@ -31,7 +31,7 @@ public class Menu {
             System.out.println("0 - Sair");
 
             int escolha = input.nextInt();
-            input.nextLine();
+            input.nextLine(); // Limpar buffer da leitura do Inteiro
 
             if (escolha == 0) {
                 exit = false;
@@ -44,10 +44,9 @@ public class Menu {
         }
     }
 
-    public void setExit(boolean exit) {
-
+/*    public void setExit(boolean exit) {
         this.exit = exit;
-    }
+    }*/
     
     public void keyPress() {
         System.out.println("\nPressione Enter para continuar...");
@@ -57,6 +56,7 @@ public class Menu {
     public void exibirSubmenu(String tipo) {
         Menu submenu = new Menu(tipo);
         Cliente cliente = new Cliente();
+        tratamentoDados dados = new tratamentoDados();
 
         switch (tipo) {
         	case "Cliente":
@@ -65,7 +65,7 @@ public class Menu {
                 	keyPress();
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-                    cliente.readCliente();
+                    dados.readClientes("clientes.csv");
                 	keyPress();
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
@@ -88,6 +88,34 @@ public class Menu {
                 }));
                 submenu.adicionarOpcao(new OpcaoMenu("Revista", () -> {
                     exibirSubmenu("Revista");
+                }));
+                break;
+            case "Reservas":
+                submenu.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
+                    System.out.println("Reserva Criada...");
+                    keyPress();
+                }));
+                submenu.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
+                    System.out.println("Reserva Editada...");
+                    keyPress();
+                }));
+                submenu.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
+                    System.out.println("Reserva Concluida...");
+                    keyPress();
+                }));
+                break;
+            case "Emprestimos":
+                submenu.adicionarOpcao(new OpcaoMenu("Criar Emprestimo", () -> {
+                    System.out.println("Emprestimo Criado...");
+                    keyPress();
+                }));
+                submenu.adicionarOpcao(new OpcaoMenu("Editar Emprestimo", () -> {
+                    System.out.println("Emprestimo Editado...");
+                    keyPress();
+                }));
+                submenu.adicionarOpcao(new OpcaoMenu("Concluir Emprestimo", () -> {
+                    System.out.println("Emprestimo Concluido...");
+                    keyPress();
                 }));
                 break;
         	case "Livro":

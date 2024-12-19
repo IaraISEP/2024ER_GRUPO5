@@ -7,18 +7,20 @@ public class Cliente {
     private int id;
     private String nome;
     private String genero;
-    private long nif;
-    private long contacto;
+    private int nif;
+    private int contacto;
     private int opcao;
     private boolean status = true;
 
     private Scanner input = new Scanner(System.in);
 
+    private tratamentoDados dados = new tratamentoDados();
+
     public Cliente() {
 
     }
 
-    public Cliente(int id, String nome, String genero, long nif, long contacto) {
+    public Cliente(int id, String nome, String genero, int nif, int contacto) {
         this.id = id;
         this.nome = nome;
         this.genero = genero;
@@ -50,36 +52,20 @@ public class Cliente {
         this.genero = genero;
     }
 
-    public long getNif() {
+    public int getNif() {
         return nif;
     }
 
-    public void setNif(long nif) {
+    public void setNif(int nif) {
         this.nif = nif;
     }
 
-    public long getContacto() {
+    public int getContacto() {
         return contacto;
     }
 
-    public void setContacto(long contacto) {
+    public void setContacto(int contacto) {
         this.contacto = contacto;
-    }
-
-    public void printFileCsv() throws IOException {
-        FileWriter fw = new FileWriter("clientes.csv", true);
-        fw.append(Integer.toString(this.getId()));
-        fw.append(";");
-        fw.append(this.getNome());
-        fw.append(";");
-        fw.append(getGenero());
-        fw.append(";");
-        fw.append(Long.toString(getNif()));
-        fw.append(";");
-        fw.append(Long.toString(getContacto()));
-        fw.append("\n");
-        fw.flush();
-        fw.close();
     }
 
     public void createCliente(){
@@ -107,17 +93,17 @@ public class Cliente {
             }
         }
         System.out.print("\nPor favor, insira o nif do Cliente: ");
-        setNif(input.nextLong());
+        setNif(input.nextInt());
         System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-        setContacto(input.nextLong());
+        setContacto(input.nextInt());
 
         try {
-            printFileCsv();
+            dados.printFileCsv("clientes.csv", getId(), getNome(), getGenero(), getNif(), getContacto());
         } catch (IOException e) {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
         }
 
-        String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
+/*        String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
                 getId(), getNome(), getGenero(),getNif(),getContacto());
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("cliente_%d.json",getId())))) {
@@ -125,27 +111,7 @@ public class Cliente {
             System.out.println("Cliente criado com sucesso!");
         } catch (IOException e) {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
-        }
+        }*/
     }
 
-    public void readCliente(){
-        String arquivo = "clientes.csv";
-        BufferedReader readFile = null;
-        String linha = null;
-        String csvDivisor = ";";
-        ArrayList<String> dados= new ArrayList<String>();
-
-        try{
-            readFile = new BufferedReader(new FileReader(arquivo));
-            while ((linha = readFile.readLine()) != null) {
-                dados.add(linha);
-            }
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        for (String dado : dados) {
-            System.out.println(dado);
-        }
-    }
 }
