@@ -28,7 +28,7 @@ public class tratamentoDados {
         fw.close();
     }
 
-    public void readClientes(String ficheiro){
+    public void lerFicehiro(String ficheiro){
 
         String arquivo = ficheiro;
         BufferedReader readFile = null;

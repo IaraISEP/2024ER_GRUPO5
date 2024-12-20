@@ -1,196 +1,57 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
-    private String titulo;
-    private List<OpcaoMenu> opcoes;
-    private boolean exit = true, numero = true;
-    private Scanner input;
 
-    public Menu(String titulo) {
-        this.titulo = titulo;
-        this.opcoes = new ArrayList<>();
-        this.input = new Scanner(System.in);
+
+    private int opcao;
+    private Scanner input = new Scanner(System.in);
+    private boolean exit = false;
+
+    public Menu() {
+
     }
+    public void mainMenu() {
 
-    public void adicionarOpcao(OpcaoMenu opcao) {
-        opcoes.add(opcao);
-    }
-
-    public void exibir() {
-        while (exit) {
-            System.out.println("\n####################################");
-            System.out.println("########## " + titulo.toUpperCase() + " ##########");
-            System.out.println("####################################");
-            System.out.println("Por favor, escolha uma opção:");
-
-            for (int i = 0; i < opcoes.size(); i++) {
-                System.out.println((i + 1) + " - " + opcoes.get(i).getDescricao());
-            }
+        while(!exit) {
+            subMenu subMenu = new subMenu();
+            System.out.println("Escolha uma Opção: ");
+            System.out.println();
+            System.out.println("1 - Cliente");
+            System.out.println("2 - Livros");
+            System.out.println("3 - Jornais");
+            System.out.println("4 - Revistas");
+            System.out.println("5 - Reservas");
+            System.out.println("6 - Empréstimos");
             System.out.println("0 - Sair");
-
-            int escolha = input.nextInt();
-            input.nextLine(); // Limpar buffer da leitura do Inteiro
-
-            if (escolha == 0) {
-                exit = false;
-            } else if (escolha > 0 && escolha <= opcoes.size()) {
-                opcoes.get(escolha - 1).executarAcao();
-            } else {
-                System.out.println("Opção inválida. Tente novamente.");
-                keyPress();
+            opcao = input.nextInt();
+            input.nextLine();
+            switch(opcao) {
+                case 1:
+                    subMenu.subMenuSel("Cliente");
+                    break;
+                case 2:
+                    subMenu.subMenuSel("Livro");
+                    break;
+                case 3:
+                    subMenu.subMenuSel("Jornal");
+                    break;
+                case 4:
+                    subMenu.subMenuSel("Revista");
+                    break;
+                case 5:
+                    subMenu.subMenuSel("Reservas");
+                    break;
+                case 6:
+                    subMenu.subMenuSel("Emprestimos");
+                    break;
+                case 0:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Opção Inválida!");
+                    break;
             }
         }
-    }
-
-/*    public void setExit(boolean exit) {
-        this.exit = exit;
-    }*/
-    
-    public void keyPress() {
-        System.out.println("\nPressione Enter para continuar...");
-        input.nextLine();
-    }
-    
-    public void exibirSubmenu(String tipo) {
-        Menu submenu = new Menu(tipo);
-        Cliente cliente = new Cliente();
-        tratamentoDados dados = new tratamentoDados();
-
-        switch (tipo) {
-        	case "Cliente":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-                    cliente.createCliente();
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-                    dados.readClientes("clientes.csv");
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
-                	System.out.println("Editar Cliente...");
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Apagar Cliente", () -> {
-                	System.out.println("Apagar Cliente...");
-                	keyPress();
-                }));
-/*                submenu.adicionarOpcao(new OpcaoMenu("Criar Emprestimo", () -> exibirSubmenu("Criar Emprestimo")));
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> exibirSubmenu("Criar Reserva")));*/
-                break;
-        	case "itens":
-                submenu.adicionarOpcao(new OpcaoMenu("Livro", () -> {
-                    exibirSubmenu("Livro");
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Jornal", () -> {
-                    exibirSubmenu("Jornal");
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Revista", () -> {
-                    exibirSubmenu("Revista");
-                }));
-                break;
-            case "Reservas":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
-                    System.out.println("Reserva Criada...");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
-                    System.out.println("Reserva Editada...");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
-                    System.out.println("Reserva Concluida...");
-                    keyPress();
-                }));
-                break;
-            case "Emprestimos":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Emprestimo", () -> {
-                    System.out.println("Emprestimo Criado...");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Emprestimo", () -> {
-                    System.out.println("Emprestimo Editado...");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Concluir Emprestimo", () -> {
-                    System.out.println("Emprestimo Concluido...");
-                    keyPress();
-                }));
-                break;
-        	case "Livro":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
-                	System.out.println("Criar Livro ... ");
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
-                	System.out.println("Editar Livro ... ");
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
-                	System.out.println("Apagar Livro ... ");
-                	keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
-                    System.out.println("Reservar Livro ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Emprestimo Livro", () -> {
-                    System.out.println("Emprestimo Livro ... ");
-                    keyPress();
-                }));
-                break;
-            case "Jornal":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Jornal", () -> {
-                    System.out.println("Criar Jornal ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
-                    System.out.println("Editar Jornal ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
-                    System.out.println("Apagar Jornal ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Reservar Jornal", () -> {
-                    System.out.println("Reservar Jornal ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Emprestimo Jornal", () -> {
-                    System.out.println("Emprestimo Jornal ... ");
-                    keyPress();
-                }));
-                break;
-            case "Revista":
-                submenu.adicionarOpcao(new OpcaoMenu("Criar Revista", () -> {
-                    System.out.println("Criar Revista ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Editar Revista", () -> {
-                    System.out.println("Editar Revista ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
-                    System.out.println("Apagar Revista ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Reservar Revista", () -> {
-                    System.out.println("Reservar Revista ... ");
-                    keyPress();
-                }));
-                submenu.adicionarOpcao(new OpcaoMenu("Emprestimo Revista", () -> {
-                    System.out.println("Emprestimo Revista ... ");
-                    keyPress();
-                }));
-                break;
-            default:
-                System.out.println("Submenu desconhecido!");
-                keyPress();
-                return;
-        }
-
-        submenu.exibir();
     }
 
 }
