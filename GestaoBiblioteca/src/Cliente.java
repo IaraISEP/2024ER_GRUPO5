@@ -69,9 +69,19 @@ public class Cliente {
     }
 
     public void createCliente(){
+        int val = 0;
+
         System.out.print("\nPor favor, insira o Id do Cliente: ");
         setId(input.nextInt());
         input.nextLine();
+        do{
+            System.out.print("\nPor favor, insira o nif do Cliente: ");
+            val = input.nextInt();
+            input.nextLine();
+            if (Integer.toString(val).length() != 9) {
+                System.out.println("Contacto Errado"); }
+        }while (Integer.toString(val).length() != 9);
+        setNif(val);
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         setNome(input.nextLine());
         while (status){
@@ -92,10 +102,14 @@ public class Cliente {
                     break;
             }
         }
-        System.out.print("\nPor favor, insira o nif do Cliente: ");
-        setNif(input.nextInt());
-        System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-        setContacto(input.nextInt());
+        do{
+            System.out.print("\nPor favor, insira o Contacto do Cliente: ");
+            val = input.nextInt();
+            input.nextLine();
+            if (Integer.toString(val).length() != 9) {
+                System.out.println("NIF Errado"); }
+        }while (Integer.toString(val).length() != 9);
+        setContacto(val);
 
         try {
             dados.printFileCsv("clientes.csv", getId(), getNome(), getGenero(), getNif(), getContacto());
@@ -103,15 +117,6 @@ public class Cliente {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
         }
 
-/*        String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
-                getId(), getNome(), getGenero(),getNif(),getContacto());
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("cliente_%d.json",getId())))) {
-            writer.write(json);
-            System.out.println("Cliente criado com sucesso!");
-        } catch (IOException e) {
-            System.err.println("Erro ao criar Cliente" + e.getMessage());
-        }*/
     }
 
 }
