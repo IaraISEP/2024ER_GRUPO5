@@ -12,3 +12,5 @@
 1;Teste Validar NIF;Masculino;1;1
 20;Teste NIF 2;Masculino;123456789;123456789
 25;Teste NIF 3;Masculino;123456789;987654321
+30;;Masculino;123456789;987654321
+35;Rui Maia;Masculino;123465789;987654321
