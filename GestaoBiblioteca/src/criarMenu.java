@@ -25,7 +25,7 @@ public class criarMenu {
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-            dados.readClientes("clientes.csv");
+            dados.lerFicehiro("clientes.csv");
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
