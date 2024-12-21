@@ -56,9 +56,7 @@ public class Cliente {
         return nif;
     }
 
-    public void setNif(int nif) {
-        this.nif = nif;
-    }
+    public void setNif(int nif) { this.nif = nif; }
 
     public int getContacto() {
         return contacto;
@@ -68,12 +66,25 @@ public class Cliente {
         this.contacto = contacto;
     }
 
+
     public void createCliente(){
+
+        int val = 0;
         System.out.print("\nPor favor, insira o Id do Cliente: ");
-        setId(input.nextInt());
+        setId(validarInteiro());
+        input.nextLine();
+        do{
+            System.out.print("\nPor favor, insira o nif do Cliente: ");
+            val = validarInteiro();
+            if (Integer.toString(val).length() != 9) {
+                System.out.println("NIF Invalido ( 123456789 )"); }
+        }
+        while (Integer.toString(val).length() > 9 || Integer.toString(val).length() < 9);
+        setNif(val);
         input.nextLine();
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         setNome(input.nextLine());
+
         while (status){
         System.out.print("\nPor favor, insira o Genero do Cliente (1-M | 2-F): ");
         opcao = input.nextInt();
@@ -92,10 +103,14 @@ public class Cliente {
                     break;
             }
         }
-        System.out.print("\nPor favor, insira o nif do Cliente: ");
-        setNif(input.nextInt());
-        System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-        setContacto(input.nextInt());
+        do{
+            System.out.print("\nPor favor, insira o Contacto do Cliente: ");
+            val = validarInteiro();
+            input.nextLine();
+            if (Integer.toString(val).length() != 9) {
+                System.out.println("Contacto invalido! ( 123456789 )"); }
+        }while (Integer.toString(val).length() > 9 || Integer.toString(val).length() < 9);
+        setContacto(val);
 
         try {
             dados.printFileCsv("clientes.csv", getId(), getNome(), getGenero(), getNif(), getContacto());
@@ -103,15 +118,21 @@ public class Cliente {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
         }
 
-/*        String json = String.format("{\n  \"id\": %d,\n  \"nome\": \"%s\",\n  \"genero\": \"%s\",\n  \"nif\": \"%d\",\n  \"contacto\": \"%d\"\n}",
-                getId(), getNome(), getGenero(),getNif(),getContacto());
+    }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("cliente_%d.json",getId())))) {
-            writer.write(json);
-            System.out.println("Cliente criado com sucesso!");
-        } catch (IOException e) {
-            System.err.println("Erro ao criar Cliente" + e.getMessage());
-        }*/
+    public int validarInteiro(){
+        boolean isInt = false;
+        int isIntVal = 0;
+        while(!isInt){
+            try {
+                isIntVal = input.nextInt();
+                isInt = true;
+            } catch (Exception e) {
+                System.out.println("Por favor, insira um número inteiro.");
+                input.nextLine();
+            }
+        }
+        return isIntVal;
     }
 
 }
