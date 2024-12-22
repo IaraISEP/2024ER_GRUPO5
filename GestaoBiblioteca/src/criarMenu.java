@@ -4,12 +4,12 @@ public class criarMenu {
     private static Scanner input = new Scanner(System.in);
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", () -> menuCliente()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", () -> menuLivro()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", () -> menuJornal()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", () -> menuRevista()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", () -> menuReservas()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", () -> menuEmprestimos()));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", criarMenu::menuCliente));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", criarMenu::menuLivro));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", criarMenu::menuJornal));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", criarMenu::menuRevista));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", criarMenu::menuReservas));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", criarMenu::menuEmprestimos));
         menuPrincipal.exibir();
     }
 
@@ -17,6 +17,7 @@ public class criarMenu {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
     }
+
     private static void menuCliente(){
         Menu menuCliente = new Menu("Gestão Clientes");
         Cliente cliente = new Cliente();

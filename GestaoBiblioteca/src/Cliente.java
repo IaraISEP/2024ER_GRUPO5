@@ -70,8 +70,8 @@ public class Cliente {
     public void createCliente(){
 
         int val = 0;
-        System.out.print("\nPor favor, insira o Id do Cliente: ");
-        setId(dados.validarInteiro());
+        //System.out.print("\nPor favor, insira o Id do Cliente: ");
+        setId(dados.lerIdFicehiro("clientes.csv") + 1);
         do{
             System.out.print("\nPor favor, insira o nif do Cliente: ");
             val = dados.validarInteiro();

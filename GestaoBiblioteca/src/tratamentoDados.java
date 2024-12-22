@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
+
 public class tratamentoDados {
 
     private Scanner input = new Scanner(System.in);
@@ -12,6 +14,7 @@ public class tratamentoDados {
     public tratamentoDados() {
 
     }
+
     public int validarInteiro(){
         boolean isInt = false;
         int isIntVal = 0;
@@ -49,7 +52,6 @@ public class tratamentoDados {
         String arquivo = ficheiro;
         BufferedReader readFile = null;
         String linha = null;
-        String csvDivisor = ";";
         ArrayList<String> dados= new ArrayList<String>();
 
         try{
@@ -63,6 +65,33 @@ public class tratamentoDados {
         }
         for (String dado : dados) {
             System.out.println(dado);
+
         }
+    }
+
+    public int lerIdFicehiro(String ficheiro){
+
+        String arquivo = ficheiro;
+        BufferedReader readFile = null;
+        String linha = null;
+        String csvDivisor = ";";
+        ArrayList<String> dados= new ArrayList<String>();
+        int valor = 1;
+
+        try{
+            readFile = new BufferedReader(new FileReader(arquivo));
+            while ((linha = readFile.readLine()) != null) {
+                dados.add(linha.split(csvDivisor)[0]);
+            }
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        for (String dado : dados) {
+            if (Integer.parseInt(dado) > valor){
+                valor = Integer.parseInt(dado);
+            }
+        }
+        return valor;
     }
 }
