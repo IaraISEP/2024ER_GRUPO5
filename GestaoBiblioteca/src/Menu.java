@@ -1,57 +1,47 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
+    private String titulo;
+    private List<OpcaoMenu> opcoes;
+    private boolean exit = true, numero = true;
+    private Scanner input;
 
-
-    private int opcao;
-    private Scanner input = new Scanner(System.in);
-    private boolean exit = false;
-
-    public Menu() {
-
+    public Menu(String titulo) {
+        this.titulo = titulo;
+        this.opcoes = new ArrayList<>();
+        this.input = new Scanner(System.in);
     }
-    public void mainMenu() {
 
-        while(!exit) {
-            subMenu subMenu = new subMenu();
-            System.out.println("Escolha uma Opção: ");
-            System.out.println();
-            System.out.println("1 - Cliente");
-            System.out.println("2 - Livros");
-            System.out.println("3 - Jornais");
-            System.out.println("4 - Revistas");
-            System.out.println("5 - Reservas");
-            System.out.println("6 - Empréstimos");
+    public void adicionarOpcao(OpcaoMenu opcao) {
+        opcoes.add(opcao);
+    }
+
+    public void exibir() {
+        while (exit) {
+            System.out.println("\n####################################");
+            System.out.println("########## " + titulo.toUpperCase() + " ##########");
+            System.out.println("####################################");
+            System.out.println("Por favor, escolha uma opção:");
+
+            for (int i = 0; i < opcoes.size(); i++) {
+                System.out.println((i + 1) + " - " + opcoes.get(i).getDescricao());
+            }
             System.out.println("0 - Sair");
-            opcao = input.nextInt();
-            input.nextLine();
-            switch(opcao) {
-                case 1:
-                    subMenu.subMenuSel("Cliente");
-                    break;
-                case 2:
-                    subMenu.subMenuSel("Livro");
-                    break;
-                case 3:
-                    subMenu.subMenuSel("Jornal");
-                    break;
-                case 4:
-                    subMenu.subMenuSel("Revista");
-                    break;
-                case 5:
-                    subMenu.subMenuSel("Reservas");
-                    break;
-                case 6:
-                    subMenu.subMenuSel("Emprestimos");
-                    break;
-                case 0:
-                    exit = true;
-                    break;
-                default:
-                    System.out.println("Opção Inválida!");
-                    break;
+
+            int escolha = input.nextInt();
+            input.nextLine(); // Limpar buffer da leitura do Inteiro
+
+            if (escolha == 0) {
+                exit = false;
+            } else if (escolha > 0 && escolha <= opcoes.size()) {
+                opcoes.get(escolha - 1).executarAcao();
+            } else {
+                System.out.println("Opção inválida. Tente novamente.");
+                System.out.println("\nPressione Enter para continuar...");
+                input.nextLine();
             }
         }
     }
-
 }
