@@ -5,7 +5,9 @@ public class criarMenu {
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", () -> menuCliente()));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Itens Biblioteca", () -> menuItens()));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", () -> menuLivro()));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", () -> menuJornal()));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", () -> menuRevista()));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", () -> menuReservas()));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", () -> menuEmprestimos()));
         menuPrincipal.exibir();
@@ -37,16 +39,6 @@ public class criarMenu {
             keyPress();
         }));
         menuCliente.exibir();
-    }
-
-    private static void menuItens() {
-        Menu menuItens = new Menu("Gestão de Itens");
-
-        menuItens.adicionarOpcao(new OpcaoMenu("Livro", () -> menuLivro()));
-        menuItens.adicionarOpcao(new OpcaoMenu("Jornal", () -> menuJornal()));
-        menuItens.adicionarOpcao(new OpcaoMenu("Revista", () -> menuRevista()));
-
-        menuItens.exibir();
     }
 
     private static void menuReservas() {

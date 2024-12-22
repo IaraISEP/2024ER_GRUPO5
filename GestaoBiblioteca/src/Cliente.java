@@ -71,17 +71,15 @@ public class Cliente {
 
         int val = 0;
         System.out.print("\nPor favor, insira o Id do Cliente: ");
-        setId(validarInteiro());
-        input.nextLine();
+        setId(dados.validarInteiro());
         do{
             System.out.print("\nPor favor, insira o nif do Cliente: ");
-            val = validarInteiro();
+            val = dados.validarInteiro();
             if (Integer.toString(val).length() != 9) {
                 System.out.println("NIF Invalido ( 123456789 )"); }
         }
         while (Integer.toString(val).length() > 9 || Integer.toString(val).length() < 9);
         setNif(val);
-        input.nextLine();
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         setNome(input.nextLine());
 
@@ -105,8 +103,7 @@ public class Cliente {
         }
         do{
             System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-            val = validarInteiro();
-            input.nextLine();
+            val = dados.validarInteiro();
             if (Integer.toString(val).length() != 9) {
                 System.out.println("Contacto invalido! ( 123456789 )"); }
         }while (Integer.toString(val).length() > 9 || Integer.toString(val).length() < 9);
@@ -120,19 +117,6 @@ public class Cliente {
 
     }
 
-    public int validarInteiro(){
-        boolean isInt = false;
-        int isIntVal = 0;
-        while(!isInt){
-            try {
-                isIntVal = input.nextInt();
-                isInt = true;
-            } catch (Exception e) {
-                System.out.println("Por favor, insira um número inteiro.");
-                input.nextLine();
-            }
-        }
-        return isIntVal;
-    }
+
 
 }
