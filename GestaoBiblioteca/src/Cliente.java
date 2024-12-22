@@ -57,9 +57,4 @@ public class Cliente {
     public void setContacto(int contacto) {
         this.contacto = contacto;
     }
-
-
-
-
-
 }

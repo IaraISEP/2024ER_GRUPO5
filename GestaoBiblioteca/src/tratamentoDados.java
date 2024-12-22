@@ -4,16 +4,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * Classe responsavel pelo tratamento de dados
+ * Criação de novos objectos das classes
+ * Criação de toda a estrutura de ficheiros
+ * Edição e Leitura de ficheiros
+ * */
 public class tratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
+
+    /**
+     * Metodo para criar novo Cliente com validação de dados
+     * introduzidos como NIF e Contacto
+     * */
     public static void criarCliente() {
         int nif, id, contacto, opcao;
         String nome, genero="";
         boolean flag;
-        System.out.print("\nPor favor, insira o Id do Cliente: ");
-        id = validarInteiro();
+        //System.out.print("\nPor favor, insira o Id do Cliente: ");
+        id = (lerIdFicheiro("clientes.csv")+1);
         do {
             System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
             nif = validarInteiro();
@@ -29,7 +39,7 @@ public class tratamentoDados {
                 System.out.print("Contribuinte Inválido! ex: 123456789: ");
         }while (!flag);
         System.out.print("\nPor favor, insira o nome do Cliente: ");
-        nome=input.next();
+        nome=input.nextLine(); //Tem que ser next line para ler a String se tiver espaços
         do{
             System.out.print("\nPor favor, insira o Genero do Cliente (1-M | 2-F): ");
             opcao = validarInteiro();
@@ -45,18 +55,24 @@ public class tratamentoDados {
                     break;
             }
         }while(opcao<1||opcao>2);
+        Cliente cliente = new Cliente(id, nome,genero,nif,contacto);
         try {
-            printFileCsv("clientes.csv", id, nome, genero, nif, contacto);
+            createClientFileCsv("clientes.csv", cliente);
         } catch (IOException e) {
             System.err.println("Erro ao criar Cliente" + e.getMessage());
         }
     }
+    /**
+     * Metódo para validar se o User introduziu um
+     * valor inteiro
+     * */
     public static int validarInteiro(){
         boolean isInt = false;
         int valor = 0;
         while(!isInt){
             try {
                 valor = input.nextInt();
+                input.nextLine(); // necessário para limpar buffer
                 isInt = true;
             } catch (Exception e) {
                 System.out.print("Por favor, insira um número inteiro:");
@@ -65,20 +81,27 @@ public class tratamentoDados {
         }
         return valor;
     }
+    /**
+     * Função para validar tamanho
+     * */
     public static boolean validarTamanho(String valor, int tamanho){
         return valor.length()==tamanho;
     }
-    public static void printFileCsv(String ficheiro, int Id, String nome, String genero, int nif, int contacto) throws IOException {
+    /**
+     * Metódo para criar o ficehiro clientes.csv
+     * e adicionar conteúdo ao mesmo.
+     * */
+    public static void createClientFileCsv(String ficheiro, Cliente cliente) throws IOException {
         FileWriter fw = new FileWriter(ficheiro, true);
-        fw.append(Integer.toString(Id));
+        fw.append(Integer.toString(cliente.getId()));
         fw.append(";");
-        fw.append(nome);
+        fw.append(cliente.getNome());
         fw.append(";");
-        fw.append(genero);
+        fw.append(cliente.getGenero());
         fw.append(";");
-        fw.append(Long.toString(nif));
+        fw.append(Integer.toString(cliente.getNif()));
         fw.append(";");
-        fw.append(Long.toString(contacto));
+        fw.append(Integer.toString(cliente.getContacto()));
         fw.append("\n");
         fw.flush();
         fw.close();
@@ -98,10 +121,37 @@ public class tratamentoDados {
             }
         }
         catch (IOException e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            //e.printStackTrace(); //remover o erro do ecra
         }
         for (String dado : dados) {
             System.out.println(dado);
         }
+    }
+
+    public static int lerIdFicheiro(String ficheiro){
+
+        String arquivo = ficheiro;
+        BufferedReader readFile = null;
+        String linha = null;
+        String csvDivisor = ";";
+        ArrayList<String> dados= new ArrayList<String>();
+        int valor = 0;
+
+        try{
+            readFile = new BufferedReader(new FileReader(arquivo));
+            while ((linha = readFile.readLine()) != null) {
+                dados.add(linha.split(csvDivisor)[0]);
+            }
+        }
+        catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+        for (String dado : dados) {
+            if (Integer.parseInt(dado) > valor){
+                valor = Integer.parseInt(dado);
+            }
+        }
+        return valor;
     }
 }
