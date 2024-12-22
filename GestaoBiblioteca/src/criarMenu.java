@@ -20,15 +20,13 @@ public class criarMenu {
 
     private static void menuCliente(){
         Menu menuCliente = new Menu("Gestão Clientes");
-        Cliente cliente = new Cliente();
-        tratamentoDados dados = new tratamentoDados();
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-            cliente.createCliente();
+            tratamentoDados.criarCliente();
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-            dados.lerFicehiro("clientes.csv");
+            tratamentoDados.lerFicehiro("clientes.csv");
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
