@@ -23,10 +23,10 @@ public class criarMenu {
         Menu menuCliente = new Menu("Gestão Clientes");
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-            tratamentoDados.criarCliente();
+            tratamentoDadosClientes.criarCliente();
             keyPress();
             try {
-                tratamentoDados.gravarArrayClientes();
+                tratamentoDadosClientes.gravarArrayClientes();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -34,7 +34,7 @@ public class criarMenu {
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", criarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
             try {
-                tratamentoDados.editarClienteById();
+                tratamentoDadosClientes.editarClientePeloId();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -42,7 +42,7 @@ public class criarMenu {
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Apagar Cliente", () -> {
             try {
-                tratamentoDados.apagarClienteById();
+                tratamentoDadosClientes.apagarClientePeloId();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,11 +55,11 @@ public class criarMenu {
         Menu menuListarClientes = new Menu("Listar Clientes");
 
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Clientes",  () -> {
-            tratamentoDados.lerArrayClientes();
+            tratamentoDadosClientes.lerArrayClientes();
             keyPress();
         }));
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
-            tratamentoDados.pesquisarClientesByNif();
+            tratamentoDadosClientes.pesquisarClientesPeloNif();
             keyPress();
         }));
 
