@@ -31,10 +31,7 @@ public class criarMenu {
                 throw new RuntimeException(e);
             }
         }));
-        menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-            tratamentoDados.lerArrayClientes();
-            keyPress();
-        }));
+        menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", criarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
             try {
                 tratamentoDados.editarClienteById();
@@ -52,6 +49,21 @@ public class criarMenu {
             keyPress();
         }));
         menuCliente.exibir();
+    }
+
+    private static void menuListarClientes() {
+        Menu menuListarClientes = new Menu("Listar Clientes");
+
+        menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Clientes",  () -> {
+            tratamentoDados.lerArrayClientes();
+            keyPress();
+        }));
+        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
+            tratamentoDados.pesquisarClientesByNif();
+            keyPress();
+        }));
+
+        menuListarClientes.exibir();
     }
 
     private static void menuReservas() {

@@ -21,7 +21,6 @@ public class tratamentoDados {
         int nif, id, contacto, opcao;
         String nome, genero="";
         boolean flag;
-        //System.out.print("\nPor favor, insira o Id do Cliente: ");
         id = lerIdFicheiro();
         do {
             System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
@@ -58,19 +57,13 @@ public class tratamentoDados {
 
         Cliente cliente = new Cliente(id, nome,genero,nif,contacto);
         clientes.add(new Cliente(id, nome,genero,nif,contacto));
-/*        try {
-            createClientFileCsv("clientes.csv", cliente);
-        } catch (IOException e) {
-            System.err.println("Erro ao criar Cliente" + e.getMessage());
-        }*/
-        //clientes.add(new Cliente(id, nome,genero,nif,contacto));
-
     }
+
     public static Cliente editarCliente(int id) {
         int nif, contacto, opcao;
         String nome, genero="";
         boolean flag;
-        //System.out.print("\nPor favor, insira o Id do Cliente: ");
+
             do {
             System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
             nif = validarInteiro();
@@ -167,6 +160,34 @@ public class tratamentoDados {
         }
     }
 
+    public static void pesquisarClientesByNif(){
+        int idNif=0, index=0;
+        boolean idFound = false;
+        System.out.println("Escolha o ID do cliente que deseja apagar: ");
+        idNif = input.nextInt();
+        if(!clientes.isEmpty()){
+            for(int i = 0; i < clientes.size(); i++){
+                int idActual =  clientes.get(i).getNif();
+                if(idActual == idNif){
+                    idFound = true;
+                    index = i;
+                }
+            }
+            if(idFound){
+                System.out.println(
+                        "ID: " + clientes.get(index).getId() +" "+ clientes.get(index).getNome() +
+                                " " + clientes.get(index).getGenero() + " " + clientes.get(index).getNif() +
+                                " " + clientes.get(index).getContacto()
+                );
+            }
+            else{
+                System.out.println("ID não encontrado!");
+            }
+        }else {
+            System.out.println("Array vazio");
+        }
+    }
+
     public static void apagarClienteById() throws IOException {
         int idApagar;
         boolean idFound = false;
@@ -229,10 +250,10 @@ public class tratamentoDados {
                 Cliente cliente = clientes.get(i);
                 if (i==0) {
                     append = false;
-                    createClientFileCsv("clientes.csv", cliente, append);
+                    createClientFileCsv("Biblioteca_1/Clientes/clientes.csv", cliente, append);
                 }else {
                     append = true;
-                    createClientFileCsv("clientes.csv", cliente, append);
+                    createClientFileCsv("Biblioteca_1/Clientes/clientes.csv", cliente, append);
                 }
             }
         }else {
