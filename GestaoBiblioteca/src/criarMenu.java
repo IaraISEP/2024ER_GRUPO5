@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class criarMenu {
@@ -24,17 +25,30 @@ public class criarMenu {
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
             tratamentoDados.criarCliente();
             keyPress();
+            try {
+                tratamentoDados.gravarArrayClientes();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", () -> {
-            tratamentoDados.lerFicehiro("clientes.csv");
+            tratamentoDados.lerArrayClientes();
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
-            System.out.println("Editar Cliente...");
+            try {
+                tratamentoDados.editarClienteById();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Apagar Cliente", () -> {
-            System.out.println("Apagar Cliente...");
+            try {
+                tratamentoDados.apagarClienteById();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuCliente.exibir();
