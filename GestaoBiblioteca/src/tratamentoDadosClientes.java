@@ -8,50 +8,10 @@ import java.util.Scanner;
 
 public class tratamentoDadosClientes extends tratamentoDados{
 
-    private static Scanner input = new Scanner(System.in);
-    private static List<Cliente> clientes = new ArrayList<Cliente>();
+    private static final Scanner input = new Scanner(System.in);
+    private static final List<Cliente> clientes = new ArrayList<>();
 
-    public static void criarCliente() {
-        int nif, id, contacto, opcao;
-        String nome, genero="";
-        boolean flag;
-        id = pesquisarIdFicheiroCliente();
-        do {
-            System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
-            nif = validarInteiro();
-            flag=validarTamanho(String.valueOf(nif),9);
-            if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789: ");
-        }while (!flag);
-        do {
-            System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-            contacto = validarInteiro();
-            flag=validarTamanho(String.valueOf(contacto),9);
-            if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789: ");
-        }while (!flag);
-        System.out.print("\nPor favor, insira o nome do Cliente: ");
-        nome=input.nextLine(); //Tem que ser next line para ler a String se tiver espaços
-        do{
-            System.out.print("\nPor favor, insira o Genero do Cliente (1-M | 2-F): ");
-            opcao = validarInteiro();
-            switch (opcao){
-                case 1:
-                    genero="Masculino";
-                    break;
-                case 2:
-                    genero="Feminino";
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
-                    break;
-            }
-        }while(opcao<1||opcao>2);
-        //Cliente cliente = new Cliente(id, nome,genero,nif,contacto);
-        clientes.add(new Cliente(id, nome,genero,nif,contacto));
-    }
-
-    public static Cliente editarCliente(int id) {
+    public static Cliente inserirDadosCliente(int id){
         int nif, contacto, opcao;
         String nome, genero="";
         boolean flag;
@@ -86,9 +46,16 @@ public class tratamentoDadosClientes extends tratamentoDados{
                     break;
             }
         }while(opcao<1||opcao>2);
-        Cliente clienteEditado = new Cliente(id, nome,genero,nif,contacto);
 
-        return clienteEditado;
+        return new Cliente(id, nome,genero,nif,contacto);
+    }
+
+    public static void criarCliente() {
+        clientes.add(inserirDadosCliente(pesquisarIdFicheiroCliente()));
+    }
+
+    public static Cliente editarCliente(int id) {
+        return inserirDadosCliente(id);
     }
 
     /**
@@ -114,11 +81,11 @@ public class tratamentoDadosClientes extends tratamentoDados{
 
     public static void lerArrayClientes(){
         if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
+            for (Cliente cliente : clientes) {
                 System.out.println(
-                        "ID: " + clientes.get(i).getId() +" "+ clientes.get(i).getNome() +
-                                " " + clientes.get(i).getGenero() + " " + clientes.get(i).getNif() +
-                                " " + clientes.get(i).getContacto()
+                        "ID: " + cliente.getId() + " " + cliente.getNome() +
+                                " " + cliente.getGenero() + " " + cliente.getNif() +
+                                " " + cliente.getContacto()
                 );
             }
         }else {
@@ -127,7 +94,7 @@ public class tratamentoDadosClientes extends tratamentoDados{
     }
 
     public static void pesquisarClientesPeloNif(){
-        int idNif=0, index=0;
+        int idNif, index=0;
         boolean idFound = false;
         System.out.println("Digite o NIF do cliente que deseja encontrar: ");
         idNif = input.nextInt();
@@ -155,7 +122,7 @@ public class tratamentoDadosClientes extends tratamentoDados{
     }
 
     public static void apagarClientePeloId() throws IOException {
-        int idApagar;
+        int idApagar, index=0;
         boolean idFound = false;
         lerArrayClientes();
         System.out.println("Escolha o ID do cliente que deseja apagar: ");
@@ -165,11 +132,12 @@ public class tratamentoDadosClientes extends tratamentoDados{
             for(int i = 0; i < clientes.size(); i++){
                 int idActual =  clientes.get(i).getId();
                 if(idActual == idApagar){
-                    clientes.remove(i);
+                    index = i;
                     idFound = true;
                 }
             }
             if(idFound){
+                clientes.remove(index);
                 System.out.println("Cliente apagado com sucesso!");
             }
             else{
@@ -209,18 +177,11 @@ public class tratamentoDadosClientes extends tratamentoDados{
     }
 
     public static void gravarArrayClientes() throws IOException {
-        boolean append = true;
 
         if(!clientes.isEmpty()){
             for(int i = 0; i < clientes.size(); i++){
                 Cliente cliente = clientes.get(i);
-                if (i==0) {
-                    append = false;
-                    criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, append);
-                }else {
-                    append = true;
-                    criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, append);
-                }
+                criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, i != 0);
             }
         }else {
             System.out.println("Array vazio");
@@ -228,14 +189,14 @@ public class tratamentoDadosClientes extends tratamentoDados{
     }
 
     public static void lerFicheiroCsvClientes(String ficheiro){
-        String arquivo = ficheiro;
-        BufferedReader readFile = null;
-        String linha = null;
+
+        BufferedReader readFile;
+        String linha;
         String csvDivisor = ";";
         //ArrayList<String> dados= new ArrayList<String>();
 
         try{
-            readFile = new BufferedReader(new FileReader(arquivo));
+            readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
                 int id = Integer.parseInt(linha.split(csvDivisor)[0]);
                 String  nome =linha.split(csvDivisor)[1],
@@ -259,9 +220,9 @@ public class tratamentoDadosClientes extends tratamentoDados{
     public static int pesquisarIdFicheiroCliente(){
         int valor = 0;
         if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
-                if (clientes.get(i).getId() >= valor){
-                    valor = clientes.get(i).getId();
+            for (Cliente cliente : clientes) {
+                if (cliente.getId() >= valor) {
+                    valor = cliente.getId();
                     valor++;
                 }
             }
