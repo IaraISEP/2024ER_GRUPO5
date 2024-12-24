@@ -7,7 +7,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         TratamentoDados.criarSistemaFicheiros();
-
         TratamentoDados.lerFicheiroCsvClientes("Biblioteca_1/Clientes/clientes.csv");
         CriarMenu.menuPrincipal();
     }

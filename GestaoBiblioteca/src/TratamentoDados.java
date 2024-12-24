@@ -120,7 +120,7 @@ public class TratamentoDados {
             }
         }while(opcao<1||opcao>2);
 
-        return new Cliente(id, nome,genero,nif,contacto);
+        return new Cliente(id, nome,genero,nif,contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
@@ -283,7 +283,7 @@ public class TratamentoDados {
                 int nif = Integer.parseInt(linha.split(csvDivisor)[3]),
                         contacto = Integer.parseInt(linha.split(csvDivisor)[4]);
 
-                Cliente cliente = new Cliente(id, nome,genero,nif,contacto);
+                Cliente cliente = new Cliente(id, nome,genero,nif,contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
                 clientes.add(cliente);
             }
         }
