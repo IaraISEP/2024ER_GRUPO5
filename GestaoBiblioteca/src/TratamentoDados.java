@@ -111,7 +111,7 @@ public class TratamentoDados {
             System.out.print("\nPor favor, insira a sua resposta: ");
             opcao = validarInteiro();
         }while(opcao<1||opcao>Constantes.Genero.values().length);
-        return new Cliente(id, nome,Constantes.Genero.values()[opcao].toString(),nif,contacto,1);
+        return new Cliente(id, nome,Constantes.Genero.values()[opcao-1].toString(),nif,contacto,1);
     }
 
     /**
