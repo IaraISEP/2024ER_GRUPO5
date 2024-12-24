@@ -1,3 +1,4 @@
+
 public class Constantes {
 
     // Enum para Categorias
