@@ -120,7 +120,7 @@ public class CriarMenu {
             }
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", () -> {
-            System.out.println("Listar Livro...");
+            DadosLivro.lerArrayLivros();
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {

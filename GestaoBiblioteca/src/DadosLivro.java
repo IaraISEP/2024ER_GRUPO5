@@ -50,6 +50,21 @@ public class DadosLivro extends TratamentoDados{
         return inserirDadosCliente(id);
     }
 
+    public static void lerArrayLivros(){
+        if(!livros.isEmpty()){
+            for (Livro livro : livros) {
+                System.out.println(
+                        "ID: " + livro.getId() + " " + livro.getTitulo() +
+                                " " + livro.getEditora() + " " + livro.getCategoria() +
+                                " " + livro.getAnoEdicao() + " " + livro.getIsbn() +
+                                " " + livro.getAutor()
+                );
+            }
+        }else {
+            System.out.println("Array vazio");
+        }
+    }
+
     public static void criarFicheiroCsvlivro(String ficheiro, Livro livro, Boolean firstLine) throws IOException {
 
         FileWriter fw = new FileWriter(ficheiro, firstLine);
