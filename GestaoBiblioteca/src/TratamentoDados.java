@@ -10,7 +10,7 @@ import java.util.Scanner;
  * Criação de toda a estrutura de ficheiros
  * Edição e Leitura de ficheiros
  * */
-public class tratamentoDados {
+public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
 
