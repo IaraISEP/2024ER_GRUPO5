@@ -1,3 +1,7 @@
+/** Representa um Item da Biblioteca
+ * @author ER_GRUPO_5
+ * @since 2024
+ */
 public class ItemBiblioteca {
     private String titulo;
     private String categoria;

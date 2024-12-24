@@ -1,7 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+/** Representa um Menu
+ * @author ER_GRUPO_5
+ * @since 2024
+ */
 public class Menu {
     private String titulo;
     private List<OpcaoMenu> opcoes;

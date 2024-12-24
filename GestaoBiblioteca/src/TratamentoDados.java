@@ -1,16 +1,89 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+/**
+ * Representa Classe responsavel pelo tratamento de dados
+ * @author ER_GRUPO_5
+ * @since 2024
+ * Criação de novos objectos das classes
+ * Criação de toda a estrutura de ficheiros
+ * Edição e Leitura de ficheiros
+ * */
+public class TratamentoDados {
 
-public class tratamentoDadosClientes extends tratamentoDados{
+    private static Scanner input = new Scanner(System.in);
+    private static List<Cliente> clientes = new ArrayList<Cliente>();
 
-    private static final Scanner input = new Scanner(System.in);
-    private static final List<Cliente> clientes = new ArrayList<>();
+    /**
+     * Metodo para criar a estrutura de ficheiros para
+     * guardar os dados permanentemente
+     * Cria 7 Directorios com um ficheiro cada
+     * */
+    public static void criarSistemaFicheiros() throws IOException {
+        File[] dirs = new File[]{
+                new File("Biblioteca_1/Clientes"),
+                new File("Biblioteca_1/Livros"),
+                new File("Biblioteca_1/Jornais"),
+                new File("Biblioteca_1/Revistas"),
+                new File("Biblioteca_1/Emprestimos"),
+                new File("Biblioteca_1/Reseervas"),
+                new File("Biblioteca_1/Historico"),
+        };
+        for (File dir : dirs) {
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+        }
+        File[] files = new File[]{
+                new File("Biblioteca_1/Clientes/clientes.csv"),
+                new File("Biblioteca_1/Livros/livros.csv"),
+                new File("Biblioteca_1/Jornais/jornais.csv"),
+                new File("Biblioteca_1/Revistas/revistas.csv"),
+                new File("Biblioteca_1/Emprestimos/emprestimos.csv"),
+                new File("Biblioteca_1/Reseervas/reseervas.csv"),
+                new File("Biblioteca_1/Historico/historico.csv")
+        };
+        for (File file : files) {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        }
+    }
 
+    /**
+     * Metódo para validar se o User introduziu um
+     * valor inteiro
+     * */
+    public static int validarInteiro(){
+        boolean isInt = false;
+        int valor = 0;
+        while(!isInt){
+            try {
+                valor = input.nextInt();
+                input.nextLine(); // necessário para limpar buffer
+                isInt = true;
+            } catch (Exception e) {
+                System.out.print("Por favor, insira um número inteiro:");
+                input.nextLine();
+            }
+        }
+        return valor;
+    }
+
+    /**
+     * Função para validar tamanho
+     * @param valor valor introduzido pelo utilizador
+     * @param tamanho Tamanho pre definido
+     * */
+    public static boolean validarTamanho(String valor, int tamanho){
+        return valor.length()==tamanho;
+    }
+
+    /**
+     * Metodo para apresentar ao utilizador os dados
+     * que deve introduzir para criar ou editar um Cliente
+     * */
     public static Cliente inserirDadosCliente(int id){
         int nif, contacto, opcao;
         String nome, genero="";
@@ -50,10 +123,16 @@ public class tratamentoDadosClientes extends tratamentoDados{
         return new Cliente(id, nome,genero,nif,contacto);
     }
 
+    /**
+     * Metodo para criar novo Cliente
+     * */
     public static void criarCliente() {
         clientes.add(inserirDadosCliente(pesquisarIdFicheiroCliente()));
     }
 
+    /**
+     * Metodo para editar o Cliente
+     * */
     public static Cliente editarCliente(int id) {
         return inserirDadosCliente(id);
     }

@@ -1,16 +1,19 @@
 import java.io.IOException;
 import java.util.Scanner;
-
-public class criarMenu {
+/** Representa a criação de um menu
+ * @author ER_GRUPO_5
+ * @since 2024
+ */
+public class CriarMenu {
     private static Scanner input = new Scanner(System.in);
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", criarMenu::menuCliente));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", criarMenu::menuLivro));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", criarMenu::menuJornal));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", criarMenu::menuRevista));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", criarMenu::menuReservas));
-        menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", criarMenu::menuEmprestimos));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", CriarMenu::menuCliente));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", CriarMenu::menuLivro));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", CriarMenu::menuJornal));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", CriarMenu::menuRevista));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", CriarMenu::menuReservas));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", CriarMenu::menuEmprestimos));
         menuPrincipal.exibir();
     }
 
@@ -23,18 +26,18 @@ public class criarMenu {
         Menu menuCliente = new Menu("Gestão Clientes");
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-            tratamentoDadosClientes.criarCliente();
+            TratamentoDados.criarCliente();
             keyPress();
             try {
-                tratamentoDadosClientes.gravarArrayClientes();
+                TratamentoDados.gravarArrayClientes();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
-        menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", criarMenu::menuListarClientes));
+        menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", CriarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
             try {
-                tratamentoDadosClientes.editarClientePeloId();
+                TratamentoDados.editarClientePeloId();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -42,7 +45,7 @@ public class criarMenu {
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Apagar Cliente", () -> {
             try {
-                tratamentoDadosClientes.apagarClientePeloId();
+                TratamentoDados.apagarClientePeloId();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,11 +58,11 @@ public class criarMenu {
         Menu menuListarClientes = new Menu("Listar Clientes");
 
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Clientes",  () -> {
-            tratamentoDadosClientes.lerArrayClientes();
+            TratamentoDados.lerArrayClientes();
             keyPress();
         }));
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
-            tratamentoDadosClientes.pesquisarClientesPeloNif();
+            TratamentoDados.pesquisarClientesPeloNif();
             keyPress();
         }));
 
