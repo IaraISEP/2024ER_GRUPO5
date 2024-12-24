@@ -104,23 +104,14 @@ public class TratamentoDados {
         }while (!flag);
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         nome=input.nextLine(); //Tem que ser next line para ler a String se tiver espaços
+        for (int i = 0; i < Constantes.Genero.values().length; i++) {
+            System.out.println((i+1)+"- "+Constantes.Genero.values()[i]);
+        }
         do{
-            System.out.print("\nPor favor, insira o Genero do Cliente (1-M | 2-F): ");
+            System.out.print("\nPor favor, insira a sua resposta: ");
             opcao = validarInteiro();
-            switch (opcao){
-                case 1:
-                    genero="Masculino";
-                    break;
-                case 2:
-                    genero="Feminino";
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
-                    break;
-            }
-        }while(opcao<1||opcao>2);
-
-        return new Cliente(id, nome,genero,nif,contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
+        }while(opcao<1||opcao>Constantes.Genero.values().length);
+        return new Cliente(id, nome,Constantes.Genero.values()[opcao].toString(),nif,contacto,1);
     }
 
     /**
