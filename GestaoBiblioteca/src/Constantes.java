@@ -1,7 +1,6 @@
 public class Constantes {
 
     // Enum para Categorias
-    // TODO : Servem de placeholder. A definir as Categorias
     public enum Categoria {
         LIVRO(1),
         REVISTA(2),
@@ -27,10 +26,5 @@ public class Constantes {
         EMPRESTADO,
         ATRASADO,
         RESERVADO
-    }
-
-    public enum Genero {
-        MASCULINO,
-        FEMININO
     }
 }

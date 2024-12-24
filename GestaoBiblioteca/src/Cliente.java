@@ -5,6 +5,7 @@ import java.io.*;
 public class Cliente {
 
     private int id;
+    private int codBiblioteca;
     private String nome;
     private String genero;
     private int nif;
@@ -20,12 +21,13 @@ public class Cliente {
 
     }
 
-    public Cliente(int id, String nome, String genero, int nif, int contacto) {
+    public Cliente(int id, String nome, String genero, int nif, int contacto, int codBiblioteca) {
         this.id = id;
         this.nome = nome;
         this.genero = genero;
         this.nif = nif;
         this.contacto = contacto;
+        this.codBiblioteca = codBiblioteca;
     }
 
     public int getId() {
@@ -65,7 +67,6 @@ public class Cliente {
     public void setContacto(int contacto) {
         this.contacto = contacto;
     }
-
 
     public void createCliente(){
 
@@ -135,4 +136,7 @@ public class Cliente {
         return isIntVal;
     }
 
+    public int getCodBiblioteca() {
+        return codBiblioteca;
+    }
 }

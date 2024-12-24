@@ -3,8 +3,8 @@ public class Livro extends ItemBiblioteca{
     private String isbn;
     private String autor;
 
-    public Livro(String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor) {
-        super(titulo, editora, categoria);
+    public Livro(String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor, int codBiblioteca) {
+        super(titulo, editora, categoria, codBiblioteca);
         this.anoEdicao = anoEdicao;
         this.isbn = isbn;
         this.autor = autor;

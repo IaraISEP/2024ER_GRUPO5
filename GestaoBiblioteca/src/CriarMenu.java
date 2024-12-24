@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class criarMenu {
+public class CriarMenu {
     private static Scanner input = new Scanner(System.in);
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
@@ -18,7 +18,7 @@ public class criarMenu {
     private static void menuCliente(){
         Menu menuCliente = new Menu("Gestão Clientes");
         Cliente cliente = new Cliente();
-        tratamentoDados dados = new tratamentoDados();
+        TratamentoDados dados = new TratamentoDados();
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
             cliente.createCliente();
