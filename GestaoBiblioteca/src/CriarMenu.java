@@ -111,7 +111,16 @@ public class CriarMenu {
         Menu menuLivro = new Menu("Gestão de Livros");
 
         menuLivro.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
-            System.out.println("Criar Livro...");
+            DadosLivro.criarLivro();
+            keyPress();
+            try {
+                DadosLivro.gravarArraylivros();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", () -> {
+            System.out.println("Listar Livro...");
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {

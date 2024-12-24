@@ -1,4 +1,5 @@
 import java.io.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,7 +14,9 @@ import java.util.Scanner;
 public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
-    private static List<Cliente> clientes = new ArrayList<Cliente>();
+    private static List<Cliente> clientes = new ArrayList<>();
+    private static List<Reserva> reservas = new ArrayList<>();
+
 
     /**
      * Metodo para criar a estrutura de ficheiros para
@@ -27,7 +30,7 @@ public class TratamentoDados {
                 new File("Biblioteca_1/Jornais"),
                 new File("Biblioteca_1/Revistas"),
                 new File("Biblioteca_1/Emprestimos"),
-                new File("Biblioteca_1/Reseervas"),
+                new File("Biblioteca_1/Reservas"),
                 new File("Biblioteca_1/Historico"),
         };
         for (File dir : dirs) {
@@ -41,7 +44,7 @@ public class TratamentoDados {
                 new File("Biblioteca_1/Jornais/jornais.csv"),
                 new File("Biblioteca_1/Revistas/revistas.csv"),
                 new File("Biblioteca_1/Emprestimos/emprestimos.csv"),
-                new File("Biblioteca_1/Reseervas/reseervas.csv"),
+                new File("Biblioteca_1/Reservas/reservas.csv"),
                 new File("Biblioteca_1/Historico/historico.csv")
         };
         for (File file : files) {
@@ -91,6 +94,7 @@ public class TratamentoDados {
         do {
             System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
             nif = validarInteiro();
+            nif = pesquisarNifArrayCliente(nif);
             flag=validarTamanho(String.valueOf(nif),9);
             if(!flag)
                 System.out.print("Contribuinte Inválido! ex: 123456789: ");
@@ -104,10 +108,12 @@ public class TratamentoDados {
         }while (!flag);
         System.out.print("\nPor favor, insira o nome do Cliente: ");
         nome=input.nextLine(); //Tem que ser next line para ler a String se tiver espaços
+        System.out.println("\nPor favor, insira o Genero do Cliente: ");
         for (int i = 0; i < Constantes.Genero.values().length; i++) {
             System.out.println((i+1)+"- "+Constantes.Genero.values()[i]);
         }
         do{
+
             System.out.print("\nPor favor, insira a sua resposta: ");
             opcao = validarInteiro();
         }while(opcao<1||opcao>Constantes.Genero.values().length);
@@ -118,7 +124,7 @@ public class TratamentoDados {
      * Metodo para criar novo Cliente
      * */
     public static void criarCliente() {
-        clientes.add(inserirDadosCliente(pesquisarIdFicheiroCliente()));
+        clientes.add(inserirDadosCliente(pesquisarIdArrayCliente()));
     }
 
     /**
@@ -192,7 +198,7 @@ public class TratamentoDados {
     }
 
     public static void apagarClientePeloId() throws IOException {
-        int idApagar, index=0;
+        int idApagar, index=0, nif=0;
         boolean idFound = false;
         lerArrayClientes();
         System.out.println("Escolha o ID do cliente que deseja apagar: ");
@@ -204,11 +210,17 @@ public class TratamentoDados {
                 if(idActual == idApagar){
                     index = i;
                     idFound = true;
+                    nif = clientes.get(index).getNif();
                 }
             }
             if(idFound){
-                clientes.remove(index);
-                System.out.println("Cliente apagado com sucesso!");
+                int nifReserva = clientes.getFirst().getNif();
+                if (nif != nifReserva){
+                    clientes.remove(index);
+                    System.out.println("Cliente apagado com sucesso!");
+                }else{
+                    System.out.println("Reserva activa não pode apagar");
+                }
             }
             else{
                 System.out.println("ID não encontrado!");
@@ -286,8 +298,10 @@ public class TratamentoDados {
             System.out.println(cliente);
         }
     }
-
-    public static int pesquisarIdFicheiroCliente(){
+    /**
+     * Metodo para atribuir ID automaticamente ao Cliente
+     * */
+    public static int pesquisarIdArrayCliente(){
         int valor = 0;
         if(!clientes.isEmpty()){
             for (Cliente cliente : clientes) {
@@ -301,4 +315,45 @@ public class TratamentoDados {
         }
         return valor;
     }
+    /**
+     * Metodo para verificar se o NIF já se encontra
+     * atribuido a algum Cliente
+     * @param valor Recebe o valor introduzido pelo utilizador
+     * */
+    public static int pesquisarNifArrayCliente(int valor){
+        if(!clientes.isEmpty()){
+            for (Cliente cliente : clientes) {
+                if (cliente.getNif() == valor) {
+                    System.out.println("Nif existente!");
+                    valor = 0;
+                }
+            }
+        }
+        return valor;
+    }
+
+    public static void lerFicheiroCsvReservas(String ficheiro){
+
+        BufferedReader readFile;
+        String linha;
+        String csvDivisor = ";";
+        //ArrayList<String> dados= new ArrayList<String>();
+
+        try{
+            readFile = new BufferedReader(new FileReader(ficheiro));
+            while ((linha = readFile.readLine()) != null) {
+                int nif = Integer.parseInt(linha.split(csvDivisor)[0]);
+                Reserva reserva = new Reserva(nif);
+                reservas.add(reserva);
+            }
+        }
+        catch (IOException e){
+            System.out.println(e.getMessage());
+            //e.printStackTrace(); //remover o erro do ecra
+        }
+        for (Reserva reserva : reservas) {
+            System.out.println(reserva);
+        }
+    }
+
 }
