@@ -14,7 +14,7 @@ public class Cliente {
 
     private Scanner input = new Scanner(System.in);
 
-    private tratamentoDados dados = new tratamentoDados();
+    private TratamentoDados dados = new TratamentoDados();
 
     public Cliente() {
 
