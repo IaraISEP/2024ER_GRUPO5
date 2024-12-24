@@ -28,4 +28,8 @@ public class Constantes {
         ATRASADO,
         RESERVADO
     }
+    public enum Genero {
+        MASCULINO,
+        FEMININO
+    }
 }
