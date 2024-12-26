@@ -28,7 +28,4 @@ public class Reserva extends Movimentos{
         return isbn;
     }
 
-    public void setNif(int nif) {
-        this.nif = nif;
-    }
 }
