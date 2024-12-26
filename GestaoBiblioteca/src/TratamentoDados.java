@@ -1,5 +1,6 @@
 import java.io.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -599,7 +600,18 @@ public class TratamentoDados {
             while ((linha = readFile.readLine()) != null) {
                 int nif = Integer.parseInt(linha.split(csvDivisor)[0]);
                 String isbn = linha.split(csvDivisor)[1];
-                Reserva reserva = new Reserva(nif,isbn);
+
+                //TODO : Alterar a maneira como constroi o objeto para adicionar à lista de reservas assim que o resto da lógica estiver completa
+                LocalDateTime dataInicio = LocalDateTime.now();
+                LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
+                LocalDateTime dataRegisto = LocalDateTime.now();
+                Cliente cliente = null;
+                List<Livro> livros = new ArrayList<>();
+                List<Jornal> jornais = new ArrayList<>();
+                List<Revista> revistas = new ArrayList<>();
+
+                Reserva reserva = new Reserva(1, 1, dataInicio, dataFim, cliente, livros, jornais, revistas, dataRegisto, nif, isbn);
+
                 reservas.add(reserva);
             }
         }
