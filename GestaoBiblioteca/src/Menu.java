@@ -11,16 +11,29 @@ public class Menu {
     private boolean exit = true, numero = true;
     private Scanner input;
 
+    /**
+     * Construtor para criar um menu.
+     *
+     * @param titulo O título do menu.
+     */
     public Menu(String titulo) {
         this.titulo = titulo;
         this.opcoes = new ArrayList<>();
         this.input = new Scanner(System.in);
     }
 
+    /**
+     * Adiciona uma opção ao menu.
+     *
+     * @param opcao A opção a ser adicionada.
+     */
     public void adicionarOpcao(OpcaoMenu opcao) {
         opcoes.add(opcao);
     }
 
+    /**
+     * Exibe o menu e processa a seleção do usuário.
+     */
     public void exibir() {
         while (exit) {
             System.out.println("\n####################################");
