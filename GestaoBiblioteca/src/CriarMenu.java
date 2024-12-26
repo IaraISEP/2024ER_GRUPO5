@@ -132,7 +132,11 @@ public class CriarMenu {
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
-            System.out.println("Apagar Livro...");
+            try {
+                DadosLivro.apagarClientePeloId();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {

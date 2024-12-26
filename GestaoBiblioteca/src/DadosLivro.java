@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -65,6 +62,41 @@ public class DadosLivro extends TratamentoDados{
         }
     }
 
+    public static void apagarClientePeloId() throws IOException {
+        int idApagar, index=0;
+        String isbn="";
+        boolean idFound = false;
+        lerArrayLivros();
+        System.out.println("Escolha o ID do livro que deseja apagar: ");
+        idApagar = input.nextInt();
+        input.nextLine(); //Limpar buffer
+        if(!livros.isEmpty()){
+            for(int i = 0; i < livros.size(); i++){
+                int idActual =  livros.get(i).getId();
+                if(idActual == idApagar){
+                    index = i;
+                    idFound = true;
+                    isbn = livros.get(index).getIsbn();
+                }
+            }
+            if(idFound){
+                String isbnReserva = livros.getFirst().getIsbn();
+                if (isbn.equals(isbnReserva)){
+                    livros.remove(index);
+                    System.out.println("Livro apagado com sucesso!");
+                }else{
+                    System.out.println("Reserva activa não pode apagar");
+                }
+            }
+            else{
+                System.out.println("ID não encontrado!");
+            }
+        }else {
+            System.out.println("Array vazio");
+        }
+        gravarArraylivros();
+    }
+
     public static void criarFicheiroCsvlivro(String ficheiro, Livro livro, Boolean firstLine) throws IOException {
 
         FileWriter fw = new FileWriter(ficheiro, firstLine);
@@ -98,6 +130,8 @@ public class DadosLivro extends TratamentoDados{
                 criarFicheiroCsvlivro("Biblioteca_1/Livros/livros.csv", livro, i != 0);
             }
         }else {
+            File file = new File("Biblioteca_1/Livros/livros.csv");
+            file.delete();
             System.out.println("Array vazio");
         }
     }

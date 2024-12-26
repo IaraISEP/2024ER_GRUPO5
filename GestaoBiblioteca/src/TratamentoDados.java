@@ -15,6 +15,7 @@ public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
     private static List<Cliente> clientes = new ArrayList<>();
+    private static List<Livro> livros = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
 
 
@@ -82,6 +83,10 @@ public class TratamentoDados {
     public static boolean validarTamanho(String valor, int tamanho){
         return valor.length()==tamanho;
     }
+
+    /*
+     * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
+     * */
 
     /**
      * Metodo para apresentar ao utilizador os dados
@@ -266,6 +271,8 @@ public class TratamentoDados {
                 criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, i != 0);
             }
         }else {
+            File file = new File("Biblioteca_1/Clientes/clientes.csv");
+            file.delete();
             System.out.println("Array vazio");
         }
     }
@@ -275,8 +282,6 @@ public class TratamentoDados {
         BufferedReader readFile;
         String linha;
         String csvDivisor = ";";
-        //ArrayList<String> dados= new ArrayList<String>();
-
         try{
             readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
@@ -292,7 +297,6 @@ public class TratamentoDados {
         }
         catch (IOException e){
             System.out.println(e.getMessage());
-            //e.printStackTrace(); //remover o erro do ecra
         }
         for (Cliente cliente : clientes) {
             System.out.println(cliente);
@@ -332,6 +336,23 @@ public class TratamentoDados {
         return valor;
     }
 
+
+    /*
+     * ########################### TRATAMENTO DE DADOS CLIENTE - FIM #################################################
+     * */
+
+    /*
+    * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
+    * */
+    //  todo
+    /*
+     * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
+     * */
+
+    /*
+     * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
+     * */
+
     public static void lerFicheiroCsvReservas(String ficheiro){
 
         BufferedReader readFile;
@@ -356,4 +377,7 @@ public class TratamentoDados {
         }
     }
 
+    /*
+     * ########################### TRATAMENTO DE DADOS RESERVAS - FIM #################################################
+     * */
 }
