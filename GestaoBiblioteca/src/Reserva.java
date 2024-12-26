@@ -9,17 +9,23 @@ public class Reserva extends Movimentos{
     private Date dataInicio;
     private Date dataFim;
     private int nif;
+    private String isbn;
 
     public Reserva () {
         super();
     }
 
-    public Reserva (int nif){
+    public Reserva (int nif, String isbn){
         this.nif = nif;
+        this.isbn = isbn;
     }
 
     public int getNif() {
         return nif;
+    }
+
+    public String getIsbn() {
+        return isbn;
     }
 
     public void setNif(int nif) {

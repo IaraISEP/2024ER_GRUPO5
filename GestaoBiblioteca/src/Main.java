@@ -9,7 +9,7 @@ public class Main {
         TratamentoDados.criarSistemaFicheiros();
         TratamentoDados.lerFicheiroCsvClientes("Biblioteca_1/Clientes/clientes.csv");
         TratamentoDados.lerFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv");
-        DadosLivro.lerFicheiroCsvLivros("Biblioteca_1/Livros/livros.csv");
+        TratamentoDados.lerFicheiroCsvLivros("Biblioteca_1/Livros/livros.csv");
         CriarMenu.menuPrincipal();
     }
 
