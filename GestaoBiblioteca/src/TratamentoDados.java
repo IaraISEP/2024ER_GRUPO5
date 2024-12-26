@@ -204,7 +204,7 @@ public class TratamentoDados {
     }
 
     public static void apagarClientePeloId() throws IOException {
-        int idApagar, index=0, nif=0;
+        int idApagar, index=0, nif=0, nifReserva=0;
         boolean idFound = false;
         lerArrayClientes();
         System.out.println("Escolha o ID do cliente que deseja apagar: ");
@@ -220,7 +220,9 @@ public class TratamentoDados {
                 }
             }
             if(idFound){
-                int nifReserva = reservas.getFirst().getNif();
+                if(!reservas.isEmpty()){
+                    nifReserva = reservas.getFirst().getNif();
+                }
                 if (nif != nifReserva){
                     clientes.remove(index);
                     System.out.println("Cliente apagado com sucesso!");
@@ -350,6 +352,14 @@ public class TratamentoDados {
         int anoEdicao = 0;
         String titulo = "", editora = "", categoria = "", isbn = "", autor = "";
         boolean flag;
+        do {
+            System.out.print("\nPor favor, insira o ISBN do Livro: ");
+            isbn = input.nextLine();
+            isbn = pesquisarIsbnArrayLivro(isbn);
+            flag=validarTamanho((isbn),9);
+            if(!flag)
+                System.out.print("ISBN Inválido! ex: 1234-5678: ");
+        }while (!flag);
         System.out.print("\nPor favor, insira o Titulo do Livro: ");
         titulo = input.nextLine();
         System.out.print("\nPor favor, insira o Editora do Livro: ");
@@ -358,13 +368,6 @@ public class TratamentoDados {
         categoria = input.nextLine();
         System.out.print("\nPor favor, insira o Autor do Livro: ");
         autor = input.nextLine();
-        do {
-            System.out.print("\nPor favor, insira o ISBN do Livro: ");
-            isbn = input.nextLine();
-            flag=validarTamanho((isbn),9);
-            if(!flag)
-                System.out.print("ISBN Inválido! ex: 1234-5678: ");
-        }while (!flag);
         System.out.print("\nPor favor, insira o Ano edição do Livro: ");
         anoEdicao = input.nextInt();
 
@@ -434,7 +437,7 @@ public class TratamentoDados {
 
     public static void apagarLivroPeloIsbn() throws IOException {
         int idApagar, index=0;
-        String isbn="";
+        String isbn="", isbnReserva="";
         boolean idFound = false;
         lerArrayLivros();
         System.out.println("Escolha o ID do livro que deseja apagar: ");
@@ -450,7 +453,9 @@ public class TratamentoDados {
                 }
             }
             if(idFound){
-                String isbnReserva = reservas.getFirst().getIsbn();
+                if (!reservas.isEmpty()) {
+                    isbnReserva = reservas.getFirst().getIsbn();
+                }
                 if (!isbn.equals(isbnReserva)){
                     livros.remove(index);
                     System.out.println("Livro apagado com sucesso!");
@@ -462,6 +467,8 @@ public class TratamentoDados {
                 System.out.println("ID não encontrado!");
             }
         }else {
+            File file = new File("Biblioteca_1/Livros/livros.csv");
+            file.delete();
             System.out.println("Array vazio");
         }
         gravarArraylivros();
@@ -546,6 +553,18 @@ public class TratamentoDados {
             System.out.println("Array vazio");
         }
         gravarArraylivros();
+    }
+
+    public static String pesquisarIsbnArrayLivro(String isbn){
+        if(!livros.isEmpty()){
+            for (Livro livro : livros) {
+                if (livro.getIsbn().equals(isbn)) {
+                    System.out.println("ISBN já existe!");
+                    isbn = "";
+                }
+            }
+        }
+        return isbn;
     }
 
     public static void lerFicheiroCsvLivros(String ficheiro){
