@@ -46,8 +46,8 @@ public class DadosLivro extends TratamentoDados{
     /**
      * Metodo para editar o Livro
      * */
-    public static Cliente editarLivro(int id) {
-        return inserirDadosCliente(id);
+    public static Livro editarLivro(int id) {
+        return inserirDadosLivro(id);
     }
 
     public static void lerArrayLivros(){
@@ -117,6 +117,33 @@ public class DadosLivro extends TratamentoDados{
         return valor;
     }
 
+    public static void editarLivroPeloId() throws IOException {
+        int idEditar;
+        boolean idFound = false;
+        lerArrayLivros();
+        System.out.println("Escolha o ID do Livro que deseja editar: ");
+        idEditar = input.nextInt();
+        input.nextLine(); //Limpar buffer
+        if(!livros.isEmpty()){
+            for(int i = 0; i < livros.size(); i++){
+                int idActual =  livros.get(i).getId();
+                if(idActual == idEditar){
+                    livros.set(i,editarLivro(i+1));
+                    idFound = true;
+                }
+            }
+            if(idFound){
+                System.out.println("Livro editado com sucesso!");
+            }
+            else{
+                System.out.println("ID não encontrado!");
+            }
+        }else {
+            System.out.println("Array vazio");
+        }
+        gravarArraylivros();
+    }
+
     public static void lerFicheiroCsvLivros(String ficheiro){
 
         BufferedReader readFile;
@@ -128,9 +155,9 @@ public class DadosLivro extends TratamentoDados{
             readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
                 int     id = Integer.parseInt(linha.split(csvDivisor)[0]);
-                String  titulo =linha.split(csvDivisor)[0],
-                        editora = linha.split(csvDivisor)[1],
-                        categoria = linha.split(csvDivisor)[2];
+                String  titulo =linha.split(csvDivisor)[1],
+                        editora = linha.split(csvDivisor)[2],
+                        categoria = linha.split(csvDivisor)[3];
 
                 int        anoEdicao = Integer.parseInt(linha.split(csvDivisor)[4]);
                 String  isbn = linha.split(csvDivisor)[5],
