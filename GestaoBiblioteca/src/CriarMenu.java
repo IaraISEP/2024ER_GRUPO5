@@ -1,11 +1,16 @@
 import java.io.IOException;
 import java.util.Scanner;
+
 /** Representa a criação de um menu
  * @author ER_GRUPO_5
  * @since 2024
  */
 public class CriarMenu {
     private static Scanner input = new Scanner(System.in);
+
+    /**
+     * Exibe o menu principal da gestão da biblioteca.
+     */
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", CriarMenu::menuCliente));
@@ -17,11 +22,17 @@ public class CriarMenu {
         menuPrincipal.exibir();
     }
 
+    /**
+     * Aguarda que se pressione a tecla Enter.
+     */
     private static void keyPress() {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
     }
 
+    /**
+     * Exibe o menu de gestão de clientes.
+     */
     private static void menuCliente(){
         Menu menuCliente = new Menu("Gestão Clientes");
 
@@ -54,6 +65,9 @@ public class CriarMenu {
         menuCliente.exibir();
     }
 
+    /**
+     * Exibe o menu de listagem de clientes.
+     */
     private static void menuListarClientes() {
         Menu menuListarClientes = new Menu("Listar Clientes");
 
@@ -69,6 +83,9 @@ public class CriarMenu {
         menuListarClientes.exibir();
     }
 
+    /**
+     * Exibe o menu de gestão de reservas.
+     */
     private static void menuReservas() {
         Menu menuReservas = new Menu("Gestão de Reservas");
 
@@ -88,6 +105,9 @@ public class CriarMenu {
         menuReservas.exibir();
     }
 
+    /**
+     * Exibe o menu de gestão de empréstimos.
+     */
     private static void menuEmprestimos() {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
 
@@ -107,6 +127,9 @@ public class CriarMenu {
         menuEmprestimos.exibir();
     }
 
+    /**
+     * Exibe o menu de gestão de livros.
+     */
     private static void menuLivro() {
         Menu menuLivro = new Menu("Gestão de Livros");
 
@@ -148,6 +171,9 @@ public class CriarMenu {
         menuLivro.exibir();
     }
 
+    /**
+     * Exibe o menu de listagem de livros.
+     */
     private static void menuListarLivros() {
         Menu menuListarClientes = new Menu("Listar Livros");
 
@@ -163,6 +189,9 @@ public class CriarMenu {
         menuListarClientes.exibir();
     }
 
+    /**
+     * Exibe o menu de gestão de jornais.
+     */
     private static void menuJornal() {
         Menu menuJornal = new Menu("Gestão de Jornais");
 
@@ -190,6 +219,9 @@ public class CriarMenu {
         menuJornal.exibir();
     }
 
+    /**
+     * Exibe o menu de gestão de revistas.
+     */
     private static void menuRevista() {
         Menu menuRevista = new Menu("Gestão de Revistas");
 
@@ -216,5 +248,4 @@ public class CriarMenu {
 
         menuRevista.exibir();
     }
-
 }
