@@ -111,21 +111,18 @@ public class CriarMenu {
         Menu menuLivro = new Menu("Gestão de Livros");
 
         menuLivro.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
-            DadosLivro.criarLivro();
+            TratamentoDados.criarLivro();
             keyPress();
             try {
-                DadosLivro.gravarArraylivros();
+                TratamentoDados.gravarArraylivros();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", () -> {
-            DadosLivro.lerArrayLivros();
-            keyPress();
-        }));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", CriarMenu::menuListarLivros));
         menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
             try {
-                DadosLivro.editarLivroPeloId();
+                TratamentoDados.editarLivroPeloId();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -133,7 +130,7 @@ public class CriarMenu {
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
             try {
-                DadosLivro.apagarClientePeloId();
+                TratamentoDados.apagarLivroPeloIsbn();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -149,6 +146,21 @@ public class CriarMenu {
         }));
 
         menuLivro.exibir();
+    }
+
+    private static void menuListarLivros() {
+        Menu menuListarClientes = new Menu("Listar Livros");
+
+        menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
+            TratamentoDados.lerArrayLivros();
+            keyPress();
+        }));
+        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
+            TratamentoDados.pesquisarLivrosPeloIsbn();
+            keyPress();
+        }));
+
+        menuListarClientes.exibir();
     }
 
     private static void menuJornal() {
