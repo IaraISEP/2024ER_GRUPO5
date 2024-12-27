@@ -22,7 +22,6 @@ public class TratamentoDados {
     private static List<Jornal> jornais = new ArrayList<>();
     private static List<Revista> revistas = new ArrayList<>();
 
-
     /**
      * Metodo para criar a estrutura de ficheiros para
      * guardar os dados permanentemente
@@ -59,35 +58,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Metódo para validar se o User introduziu um
-     * valor inteiro
-     * */
-    public static int validarInteiro(){
-        boolean isInt = false;
-        int valor = 0;
-        while(!isInt){
-            try {
-                valor = input.nextInt();
-                input.nextLine(); // necessário para limpar buffer
-                isInt = true;
-            } catch (Exception e) {
-                System.out.print("Por favor, insira um número inteiro:");
-                input.nextLine();
-            }
-        }
-        return valor;
-    }
-
-    /**
-     * Função para validar tamanho
-     * @param valor valor introduzido pelo utilizador
-     * @param tamanho Tamanho pre definido
-     * */
-    public static boolean validarTamanho(String valor, int tamanho){
-        return valor.length()==tamanho;
-    }
-
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
      * */
@@ -98,34 +68,33 @@ public class TratamentoDados {
      * */
     public static Cliente inserirDadosCliente(int id){
         int nif, contacto, opcao;
-        String nome, genero="";
+        String nome, genero = "";
         boolean flag;
         do {
-            System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
-            nif = validarInteiro();
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
             nif = pesquisarNifArrayCliente(nif);
-            flag=validarTamanho(String.valueOf(nif),9);
+            flag = validarTamanho(String.valueOf(nif),9);
             if(!flag)
                 System.out.print("Contribuinte Inválido! ex: 123456789: ");
         }while (!flag);
         do {
-            System.out.print("\nPor favor, insira o Contacto do Cliente: ");
-            contacto = validarInteiro();
+            contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false);
             flag=validarTamanho(String.valueOf(contacto),9);
             if(!flag)
                 System.out.print("Contribuinte Inválido! ex: 123456789: ");
         }while (!flag);
-        System.out.print("\nPor favor, insira o nome do Cliente: ");
-        nome=input.nextLine(); //Tem que ser next line para ler a String se tiver espaços
+
+        nome=lerString("\nPor favor, insira o nome do Cliente: ");
+
         System.out.println("\nPor favor, insira o Genero do Cliente: ");
         for (int i = 0; i < Constantes.Genero.values().length; i++) {
             System.out.println((i+1)+"- "+Constantes.Genero.values()[i]);
         }
-        do{
 
-            System.out.print("\nPor favor, insira a sua resposta: ");
-            opcao = validarInteiro();
+        do{
+            opcao = lerInt("\nPor favor, insira a sua resposta: ", false);
         }while(opcao<1||opcao>Constantes.Genero.values().length);
+
         return new Cliente(id, nome,Constantes.Genero.values()[opcao-1].toString(),nif,contacto,1);
     }
 
@@ -339,28 +308,24 @@ public class TratamentoDados {
     * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
     * */
 
-    public static Livro inserirDadosLivro(int id){
-        int anoEdicao = 0;
-        String titulo = "", editora = "", categoria = "", isbn = "", autor = "";
+    public static Livro inserirDadosLivro(int id)
+    {
+        String isbn = "";
         boolean flag;
+
         do {
-            System.out.print("\nPor favor, insira o ISBN do Livro: ");
-            isbn = input.nextLine();
+            isbn = lerString("\nPor favor, insira o ISBN do Livro: ");
             isbn = pesquisarIsbnArrayLivro(isbn);
             flag=validarTamanho((isbn),9);
             if(!flag)
                 System.out.print("ISBN Inválido! ex: 1234-5678: ");
         }while (!flag);
-        System.out.print("\nPor favor, insira o Titulo do Livro: ");
-        titulo = input.nextLine();
-        System.out.print("\nPor favor, insira o Editora do Livro: ");
-        editora = input.nextLine();
-        System.out.print("\nPor favor, insira o Categoria do Livro: ");
-        categoria = input.nextLine();
-        System.out.print("\nPor favor, insira o Autor do Livro: ");
-        autor = input.nextLine();
-        System.out.print("\nPor favor, insira o Ano edição do Livro: ");
-        anoEdicao = input.nextInt();
+
+        String titulo = lerString("\nPor favor, insira o Titulo do Livro: ");
+        String editora = lerString("\nPor favor, insira o Editora do Livro: ");
+        String categoria = lerString("\nPor favor, insira o Categoria do Livro: ");
+        String autor = lerString("\nPor favor, insira o Autor do Livro: ");
+        int anoEdicao = lerInt("\nPor favor, insira o Ano edição do Livro: ", false);
 
         return new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor,1);
     }
@@ -591,8 +556,7 @@ public class TratamentoDados {
         boolean flag;
         numMovimento = id;
         do {
-            System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
-            nif = validarInteiro();
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
             nif = pesquisarNifArrayCliente(nif);
             flag=validarTamanho(String.valueOf(nif),9);
             if(!flag)
@@ -676,11 +640,11 @@ public class TratamentoDados {
     }
 
     /*
-     * ########################### TRATAMENTO DE DADOS RESERVAS - FIM #################################################
+     * ############################### TRATAMENTO DE DADOS RESERVAS - FIM ##############################################
      * */
 
     /*
-     * ############################################# HELPERS ###########################################################
+     * ######################################## HELPERS - INICIO #######################################################
      * */
 
     /**
@@ -736,6 +700,62 @@ public class TratamentoDados {
         }
 
         return valor;
+    }
+
+    /**
+     * Mostra uma mensagem antes de ler uma string.
+     *
+     * @param mensagem A mensagem a ser mostrada antes de ler a entrada.
+     * @return A string introduzida pelo utilizador.
+     */
+    public static String lerString(String mensagem) {
+        System.out.print(mensagem);
+        return input.nextLine();
+    }
+
+    /**
+     * Lê e valida um número inteiro a partir da entrada do usuário.
+     *
+     * @param mensagem A mensagem a ser exibida ao usuário antes de ler a entrada.
+     * @return O número inteiro digitado pelo usuário.
+     */
+    public static int lerInt(String mensagem, Boolean isDate)
+    {
+        if (isDate == null)
+            isDate = false;
+
+        int valor = 0;
+        boolean isInt = false;
+        while (!isInt) {
+            System.out.print(mensagem);
+            try {
+                valor = input.nextInt();
+                input.nextLine(); // necessário para limpar buffer
+                if (isDate) {
+                    if (valor >= 1000 && valor <= 9999) {
+                        isInt = true;
+                    } else {
+                        System.out.print("Por favor, insira um ano válido (yyyy): ");
+                    }
+                } else {
+                    isInt = true;
+                }
+            } catch (Exception e) {
+                System.out.print("Por favor, insira um número inteiro: ");
+                input.nextLine(); // necessário para limpar buffer
+            }
+        }
+
+        return valor;
+    }
+
+    /**
+     * Função para validar tamanho
+     * @param valor valor introduzido pelo utilizador
+     * @param tamanho Tamanho pre definido
+     * */
+    public static boolean validarTamanho(String valor, int tamanho){
+        return valor.length()==tamanho;
     }
 
     /*
