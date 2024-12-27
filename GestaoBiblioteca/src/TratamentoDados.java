@@ -149,14 +149,22 @@ public class TratamentoDados {
             mostraTabelaClientes(clientes);
     }
 
+    /**
+     * Lista um cliente pelo NIF fornecido.
+     * Se o cliente for encontrado, exibe os detalhes do cliente.
+     * Caso contrário, exibe uma mensagem a informar que o NIF não existe.
+     */
     public static void listaClientePorNif(){
+        // Lê o NIF do cliente a ser encontrado
         int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false);
 
+        // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
             System.out.println("Array vazio");
             return;
         }
 
+        // Procura o cliente pelo NIF
         for(Cliente cliente : clientes) {
             if (cliente.getNif() == idNif) {
                 List<Cliente> clienteComNif = new ArrayList<>();
@@ -169,109 +177,134 @@ public class TratamentoDados {
         System.out.println("O NIF que inseriu não existe.");
     }
 
+    /**
+     * Apaga um cliente pelo ID fornecido.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+     */
     public static void apagarClientePeloId() throws IOException {
-        int idApagar, index = 0, nif = 0, nifReserva = 0;
-        boolean idFound;
-
-            listaTodosClientes();
-            System.out.println("Escolha o ID do cliente que deseja apagar: ");
-            idApagar = input.nextInt();
-            input.nextLine(); //Limpar buffer
-            //do {
-            if (!clientes.isEmpty()) {
-                idFound = false;
-                for (int i = 0; i < clientes.size(); i++) {
-                    int idActual = clientes.get(i).getId();
-                    if (idActual == idApagar) {
-                        index = i;
-                        idFound = true;
-                        nif = clientes.get(index).getNif();
-                    }
-                }
-                if (idFound) {
-                    if (!reservas.isEmpty()) {
-                        for (int i = 0; i < reservas.size(); i++) {
-                            nifReserva = reservas.get(i).getNif();
-                        }
-                    }
-                    if (nif != nifReserva) {
-                        clientes.remove(index);
-                        System.out.println("Cliente apagado com sucesso!");
-
-                    } else {
-                        System.out.println("Reserva activa não pode apagar");
-                    }
-                } else {
-                    System.out.println("ID não encontrado!");
-                }
-            } else {
-                System.out.println("Array vazio");
-            }
-            gravarArrayClientes();
-        //}while (idFound);
-    }
-    public static void editarClientePeloId() throws IOException {
-        int idEditar;
-        boolean idFound = false;
-        listaTodosClientes();
-        System.out.println("Escolha o ID do cliente que deseja editar: ");
-        idEditar = input.nextInt();
-        input.nextLine(); //Limpar buffer
-        if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
-                int idActual =  clientes.get(i).getId();
-                if(idActual == idEditar){
-                    clientes.set(i,editarCliente(i+1));
-                    idFound = true;
-                }
-            }
-            if(idFound){
-                System.out.println("Cliente editado com sucesso!");
-            }
-            else{
-                System.out.println("ID não encontrado!");
-            }
-        }else {
-            System.out.println("Array vazio");
+        // Verifica se a lista de clientes está vazia
+        if(clientes.isEmpty()) {
+            System.out.println("Não há clientes nesta biblioteca.");
+            return;
         }
+
+        // Lista todos os clientes
+        listaTodosClientes();
+
+        // Lê o ID do cliente a ser apagado
+        int idApagar = lerInt("Escolha o ID do cliente que deseja apagar: ", false);
+
+        Cliente clienteApagar = null;
+
+        // Procura o cliente pelo ID e obtém o objeto a apagar
+        for(Cliente cliente : clientes) {
+            if (cliente.getId() == idApagar) {
+                clienteApagar = cliente;
+                break;
+            }
+        }
+
+        // Verifica se o cliente foi encontrado
+        if(clienteApagar == null) {
+            System.out.println("ID não encontrado!");
+            return;
+        }
+
+        // Verifica se o cliente possui reservas ativas, caso tenha, o programa salta fora e não apaga cliente
+        for (Reserva reserva : reservas) {
+            if (reserva.getNif() == clienteApagar.getNif()) {
+                System.out.println("Não pode apagar um cliente com reservas ativas.");
+                return;
+            }
+        }
+
+        // Remove o cliente da lista e grava no ficheiro
+        clientes.remove(clienteApagar);
+        System.out.println("Cliente apagado com sucesso!");
         gravarArrayClientes();
     }
 
-    public static void gravarArrayClientes() throws IOException {
+    /**
+     * Edita um cliente pelo ID fornecido.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+     */
+    public static void editarClientePeloId() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(clientes.isEmpty()) {
+            System.out.println("Não há clientes nesta biblioteca.");
+            return;
+        }
 
-        if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
-                Cliente cliente = clientes.get(i);
-                criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, i != 0);
+        // Lista todos os clientes
+        listaTodosClientes();
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
+
+        // Procura o cliente pelo ID e, caso encontre, edita o cliente
+        for(Cliente cliente : clientes) {
+            if (cliente.getId() == idEditar) {
+                editarCliente(idEditar);
+                System.out.println("Cliente editado com sucesso!");
+                gravarArrayClientes();
+                return;
             }
-        }else {
+        }
+
+        System.out.println("ID não encontrado!");
+    }
+
+    /**
+     * Grava a lista de clientes em ficheiro.
+     * Se a lista estiver vazia, apaga o ficheiro e mostra uma mensagem a informar.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
+     */
+    public static void gravarArrayClientes() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(clientes.isEmpty()){
             File file = new File("Biblioteca_1/Clientes/clientes.csv");
             file.delete();
             System.out.println("Array vazio");
         }
+
+        // Itera pela lista de clientes e grava cada um no ficheiro
+        for(int i = 0; i < clientes.size(); i++) {
+            Cliente cliente = clientes.get(i);
+            criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, i != 0);
+        }
     }
 
+    /**
+     * Lê os dados dos clientes a partir de um ficheiro e popula a lista de clientes.
+     *
+     * @param ficheiro O caminho para o ficheiro que contém os dados dos clientes.
+     */
     public static void lerFicheiroCsvClientes(String ficheiro){
-
-        BufferedReader readFile;
-        String linha;
-        String csvDivisor = ";";
-        try{
-            readFile = new BufferedReader(new FileReader(ficheiro));
+        try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha;
+            String csvDivisor = ";";
+            // Lê cada linha do ficheiro
             while ((linha = readFile.readLine()) != null) {
-                int id = Integer.parseInt(linha.split(csvDivisor)[0]);
-                String nome =linha.split(csvDivisor)[1];
-                Constantes.Genero genero = Constantes.Genero.fromGenero(linha.split(csvDivisor)[2].charAt(0));
-                int nif = Integer.parseInt(linha.split(csvDivisor)[3]),
-                        contacto = Integer.parseInt(linha.split(csvDivisor)[4]);
+                // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
+                String[] dados = linha.split(csvDivisor);
+                int id = Integer.parseInt(dados[0]);
+                String nome = dados[1];
+                Constantes.Genero genero = Constantes.Genero.fromGenero(dados[2].charAt(0));
+                int nif = Integer.parseInt(dados[3]);
+                int contacto = Integer.parseInt(dados[4]);
 
-                Cliente cliente = new Cliente(id, nome,genero,nif,contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
+                // Cria um novo objeto Cliente e adiciona à lista
+                Cliente cliente = new Cliente(id, nome, genero, nif, contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
                 clientes.add(cliente);
             }
-        }
-        catch (IOException e){
+        } catch (IOException e){
             System.out.println(e.getMessage());
         }
+
+        // Imprime todos os clientes
         for (Cliente cliente : clientes) {
             System.out.println(cliente);
         }
@@ -283,14 +316,13 @@ public class TratamentoDados {
      * @param valor Recebe o valor introduzido pelo utilizador
      * */
     public static int pesquisarNifArrayCliente(int valor){
-        if(!clientes.isEmpty()){
-            for (Cliente cliente : clientes) {
-                if (cliente.getNif() == valor) {
-                    System.out.println("Nif existente!");
-                    valor = 0;
-                }
+        for (Cliente cliente : clientes) {
+            if (cliente.getNif() == valor) {
+                System.out.println("Nif existente!");
+                return 0;
             }
         }
+
         return valor;
     }
 
