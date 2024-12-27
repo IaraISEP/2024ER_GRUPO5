@@ -66,7 +66,7 @@ public class TratamentoDados {
      * Metodo para apresentar ao utilizador os dados
      * que deve introduzir para criar ou editar um Cliente
      * */
-    public static Cliente inserirDadosCliente(int id)
+    public static Cliente inserirDadosCliente(int id, Constantes.Etapa etapa)
     {
         int nif, contacto;
         boolean flag;
@@ -74,7 +74,7 @@ public class TratamentoDados {
 
         do {
             nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
-            nif = pesquisarNifArrayCliente(nif);
+            nif = pesquisarNifArrayCliente(nif, etapa, id);
             flag = validarTamanho(String.valueOf(nif),9);
 
             if(!flag)
@@ -108,14 +108,38 @@ public class TratamentoDados {
      * Metodo para criar novo Cliente
      * */
     public static void criarCliente() {
-        clientes.add(inserirDadosCliente(pesquisarIdArray(Constantes.TipoItem.CLIENTE)));
+        clientes.add(inserirDadosCliente(pesquisarIdArray(Constantes.TipoItem.CLIENTE), Constantes.Etapa.CRIAR));
     }
 
     /**
-     * Metodo para editar o Cliente
-     * */
-    public static Cliente editarCliente(int id) {
-        return inserirDadosCliente(id);
+     * Edita um cliente pelo ID fornecido.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+     */
+    public static void editarCliente() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(clientes.isEmpty()) {
+            System.out.println("Não há clientes nesta biblioteca.");
+            return;
+        }
+
+        // Lista todos os clientes
+        listaTodosClientes();
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
+
+        // Procura o cliente pelo ID e, caso encontre, edita o cliente
+        for(Cliente cliente : clientes) {
+            if (cliente.getId() == idEditar) {
+                inserirDadosCliente(idEditar, Constantes.Etapa.EDITAR);
+                System.out.println("Cliente editado com sucesso!");
+                gravarArrayClientes();
+                return;
+            }
+        }
+
+        System.out.println("ID não encontrado!");
     }
 
     /**
@@ -226,37 +250,6 @@ public class TratamentoDados {
     }
 
     /**
-     * Edita um cliente pelo ID fornecido.
-     *
-     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
-     */
-    public static void editarClientePeloId() throws IOException {
-        // Verifica se a lista de clientes está vazia
-        if(clientes.isEmpty()) {
-            System.out.println("Não há clientes nesta biblioteca.");
-            return;
-        }
-
-        // Lista todos os clientes
-        listaTodosClientes();
-
-        // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
-
-        // Procura o cliente pelo ID e, caso encontre, edita o cliente
-        for(Cliente cliente : clientes) {
-            if (cliente.getId() == idEditar) {
-                editarCliente(idEditar);
-                System.out.println("Cliente editado com sucesso!");
-                gravarArrayClientes();
-                return;
-            }
-        }
-
-        System.out.println("ID não encontrado!");
-    }
-
-    /**
      * Grava a lista de clientes em ficheiro.
      * Se a lista estiver vazia, apaga o ficheiro e mostra uma mensagem a informar.
      *
@@ -313,17 +306,23 @@ public class TratamentoDados {
     /**
      * Metodo para verificar se o NIF já se encontra
      * atribuido a algum Cliente
-     * @param valor Recebe o valor introduzido pelo utilizador
+     * @param nif Recebe o valor introduzido pelo utilizador
+     * @param etapa Recebe o enum da etapa em questão (criação ou edição de utilizador)
+     * @param idCliente Recebe o id do cliente, para validar se ao editar está a repetir o ID dele mesmo ou a colocar um já existente mas de outro cliente
      * */
-    public static int pesquisarNifArrayCliente(int valor){
+    public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
         for (Cliente cliente : clientes) {
-            if (cliente.getNif() == valor) {
-                System.out.println("Nif existente!");
-                return 0;
+            if (cliente.getNif() == nif) {
+                //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
+                //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
+                if(etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
+                    System.out.println("Nif existente!");
+                    return 0;
+                }
             }
         }
 
-        return valor;
+        return nif;
     }
 
     /*
@@ -583,8 +582,8 @@ public class TratamentoDados {
         numMovimento = id;
         do {
             nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
-            nif = pesquisarNifArrayCliente(nif);
-            flag=validarTamanho(String.valueOf(nif),9);
+            nif = pesquisarNifArrayCliente(nif, null, -1);
+            flag = validarTamanho(String.valueOf(nif),9);
             if(!flag)
                 System.out.print("Contribuinte Inválido! ex: 123456789");
         }while (!flag);
