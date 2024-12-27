@@ -732,7 +732,12 @@ public class TratamentoDados {
                 valor = input.nextInt();
                 input.nextLine(); // necessário para limpar buffer
                 if (isDate) {
-                    if (valor >= 1000 && valor <= 9999) {
+                    //TODO :
+                    //Podemos criar um easter egg aqui, com base no tipo de item (livro, revista, jornal)
+                    //Primeiro livro impresso, assim como os conhecemos, em 1455 em Mainz, foi a A Bíblia de Gutenberg
+                    //Primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605 em Strasbourg.
+                    //Primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731 em Londres.
+                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear()) {
                         isInt = true;
                     } else {
                         System.out.print("Por favor, insira um ano válido (yyyy): ");
@@ -741,7 +746,7 @@ public class TratamentoDados {
                     isInt = true;
                 }
             } catch (Exception e) {
-                System.out.print("Por favor, insira um número inteiro: ");
+                System.out.print("Número inserido não é válido.");
                 input.nextLine(); // necessário para limpar buffer
             }
         }
