@@ -11,7 +11,7 @@ public class Movimentos {
     private int codBiblioteca;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
-    private Cliente cliente;
+    private List<Cliente> clientes;
     private List<Livro> livros;
     private List<Jornal> jornais;
     private List<Revista> revistas;
@@ -23,17 +23,17 @@ public class Movimentos {
      * @param codBiblioteca O código da biblioteca.
      * @param dataInicio A data de início do movimento.
      * @param dataFim A data de fim do movimento.
-     * @param cliente O cliente associado ao movimento.
+     * @param clientes O cliente associado ao movimento.
      * @param livros A lista de livros associados ao movimento.
      * @param jornais A lista de jornais associados ao movimento.
      * @param revistas A lista de revistas associadas ao movimento.
      */
-    public Movimentos(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,Cliente cliente, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
+    public Movimentos(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
-        this.cliente = cliente;
+        this.clientes = clientes;
         this.livros = livros;
         this.jornais = jornais;
         this.revistas = revistas;
@@ -116,17 +116,17 @@ public class Movimentos {
      *
      * @return O cliente associado ao movimento.
      */
-    public Cliente getCliente() {
-        return cliente;
+    public List<Cliente> getCliente() {
+        return clientes;
     }
 
     /**
      * Define o cliente associado ao movimento.
      *
-     * @param cliente O cliente associado ao movimento.
+     * @param clientes O cliente associado ao movimento.
      */
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setCliente(List<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     /**

@@ -90,8 +90,13 @@ public class CriarMenu {
         Menu menuReservas = new Menu("Gestão de Reservas");
 
         menuReservas.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
-            System.out.println("Reserva Criada...");
+            TratamentoDados.criarReserva();
             keyPress();
+            try {
+                TratamentoDados.gravarArrayReservas();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             System.out.println("Reserva Editada...");

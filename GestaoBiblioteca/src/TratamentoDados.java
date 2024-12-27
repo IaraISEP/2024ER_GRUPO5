@@ -18,6 +18,8 @@ public class TratamentoDados {
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
+    private static List<Jornal> jornais = new ArrayList<>();
+    private static List<Revista> revistas = new ArrayList<>();
 
 
     /**
@@ -204,41 +206,46 @@ public class TratamentoDados {
     }
 
     public static void apagarClientePeloId() throws IOException {
-        int idApagar, index=0, nif=0, nifReserva=0;
-        boolean idFound = false;
-        lerArrayClientes();
-        System.out.println("Escolha o ID do cliente que deseja apagar: ");
-        idApagar = input.nextInt();
-        input.nextLine(); //Limpar buffer
-        if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
-                int idActual =  clientes.get(i).getId();
-                if(idActual == idApagar){
-                    index = i;
-                    idFound = true;
-                    nif = clientes.get(index).getNif();
-                }
-            }
-            if(idFound){
-                if(!reservas.isEmpty()){
-                    nifReserva = reservas.getFirst().getNif();
-                }
-                if (nif != nifReserva){
-                    clientes.remove(index);
-                    System.out.println("Cliente apagado com sucesso!");
-                }else{
-                    System.out.println("Reserva activa não pode apagar");
-                }
-            }
-            else{
-                System.out.println("ID não encontrado!");
-            }
-        }else {
-            System.out.println("Array vazio");
-        }
-        gravarArrayClientes();
-    }
+        int idApagar, index = 0, nif = 0, nifReserva = 0;
+        boolean idFound;
 
+            lerArrayClientes();
+            System.out.println("Escolha o ID do cliente que deseja apagar: ");
+            idApagar = input.nextInt();
+            input.nextLine(); //Limpar buffer
+            //do {
+            if (!clientes.isEmpty()) {
+                idFound = false;
+                for (int i = 0; i < clientes.size(); i++) {
+                    int idActual = clientes.get(i).getId();
+                    if (idActual == idApagar) {
+                        index = i;
+                        idFound = true;
+                        nif = clientes.get(index).getNif();
+                    }
+                }
+                if (idFound) {
+                    if (!reservas.isEmpty()) {
+                        for (int i = 0; i < reservas.size(); i++) {
+                            nifReserva = reservas.get(i).getNif();
+                        }
+                    }
+                    if (nif != nifReserva) {
+                        clientes.remove(index);
+                        System.out.println("Cliente apagado com sucesso!");
+
+                    } else {
+                        System.out.println("Reserva activa não pode apagar");
+                    }
+                } else {
+                    System.out.println("ID não encontrado!");
+                }
+            } else {
+                System.out.println("Array vazio");
+            }
+            gravarArrayClientes();
+        //}while (idFound);
+    }
     public static void editarClientePeloId() throws IOException {
         int idEditar;
         boolean idFound = false;
@@ -438,12 +445,13 @@ public class TratamentoDados {
     public static void apagarLivroPeloIsbn() throws IOException {
         int idApagar, index=0;
         String isbn="", isbnReserva="";
-        boolean idFound = false;
+        boolean idFound;
         lerArrayLivros();
         System.out.println("Escolha o ID do livro que deseja apagar: ");
         idApagar = input.nextInt();
         input.nextLine(); //Limpar buffer
         if(!livros.isEmpty()){
+            idFound = false;
             for(int i = 0; i < livros.size(); i++){
                 int idActual =  livros.get(i).getId();
                 if(idActual == idApagar){
@@ -607,39 +615,109 @@ public class TratamentoDados {
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
      * */
 
+    public static Reserva inserirDadosReserva(int id){
+        int anoEdicao = 0,numMovimento=0,codBiblioteca=1, nif=0;
+        LocalDateTime dataInicio = null, dataFim = null, dataRegisto=null;
+        String titulo = "", editora = "", categoria = "", isbn = "", autor = "";
+        boolean flag;
+        numMovimento = id;
+        do {
+            System.out.print("\nPor favor, insira o Contribuinte do Cliente: ");
+            nif = validarInteiro();
+            nif = pesquisarNifArrayCliente(nif);
+            flag=validarTamanho(String.valueOf(nif),9);
+            if(!flag)
+                System.out.print("Contribuinte Inválido! ex: 123456789: ");
+        }while (!flag);
+
+
+        return new Reserva(numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
+    }
+
+    /**
+     * Metodo para criar nova Reserva
+     * */
+    public static void criarReserva() {
+        reservas.add(inserirDadosReserva(pesquisarIdArrayReservas()));
+    }
+
+    public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
+
+        FileWriter fw = new FileWriter(ficheiro, firstLine);
+
+        fw.append(Integer.toString(reserva.getNumMovimento()));
+        fw.append(";");
+        fw.append(Integer.toString(reserva.getCodBiblioteca()));
+        fw.append(";");
+        fw.append(Integer.toString(reserva.getNif()));
+        fw.append(";");
+        fw.append("\n");
+        fw.flush();
+        fw.close();
+    }
     public static void lerFicheiroCsvReservas(String ficheiro){
 
         BufferedReader readFile;
         String linha;
-        String csvDivisor = ";";
+        String csvDivisor = ";", isbn="";
         //ArrayList<String> dados= new ArrayList<String>();
 
         try{
             readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
-                int nif = Integer.parseInt(linha.split(csvDivisor)[0]);
-                String isbn = linha.split(csvDivisor)[1];
+                int codMovimento = Integer.parseInt(linha.split(csvDivisor)[0]),
+                    codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[1]),
+                    nif = Integer.parseInt(linha.split(csvDivisor)[2]);
 
                 //TODO : Alterar a maneira como constroi o objeto para adicionar à lista de reservas assim que o resto da lógica estiver completa
                 LocalDateTime dataInicio = LocalDateTime.now();
                 LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
                 LocalDateTime dataRegisto = LocalDateTime.now();
+                /*
                 Cliente cliente = null;
                 List<Livro> livros = new ArrayList<>();
                 List<Jornal> jornais = new ArrayList<>();
                 List<Revista> revistas = new ArrayList<>();
+                */
 
-                Reserva reserva = new Reserva(1, 1, dataInicio, dataFim, cliente, livros, jornais, revistas, dataRegisto, nif, isbn);
+                Reserva reserva = new Reserva(codMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
 
                 reservas.add(reserva);
             }
         }
         catch (IOException e){
             System.out.println(e.getMessage());
-            //e.printStackTrace(); //remover o erro do ecra
         }
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
+        }
+    }
+
+    public static int pesquisarIdArrayReservas(){
+        int valor = 0;
+        if(!reservas.isEmpty()){
+            for (Reserva reserva : reservas) {
+                if (reserva.getNumMovimento() >= valor) {
+                    valor = reserva.getNumMovimento();
+                    valor++;
+                }
+            }
+        }else {
+            valor = 1;
+        }
+        return valor;
+    }
+
+    public static void gravarArrayReservas() throws IOException {
+        if(!reservas.isEmpty()){
+            for(int i = 0; i < reservas.size(); i++){
+                Reserva reserva = reservas.get(i);
+                criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reserva, i != 0);
+            }
+        }else {
+            File file = new File("Biblioteca_1/Reservas/reservas.csv");
+            file.delete();
+            System.out.println("Array vazio");
         }
     }
 
