@@ -35,6 +35,7 @@ public class Menu {
      * Exibe o menu e processa a seleção do usuário.
      */
     public void exibir() {
+        int escolha=0;
         while (exit) {
             System.out.println("\n####################################");
             System.out.println("########## " + titulo.toUpperCase() + " ##########");
@@ -45,10 +46,12 @@ public class Menu {
                 System.out.println((i + 1) + " - " + opcoes.get(i).getDescricao());
             }
             System.out.println("0 - Sair");
-
-            int escolha = input.nextInt();
+            try {
+                escolha = input.nextInt();
+            }catch (Exception e) {
+                escolha = -1;
+            }
             input.nextLine(); // Limpar buffer da leitura do Inteiro
-
             if (escolha == 0) {
                 exit = false;
             } else if (escolha > 0 && escolha <= opcoes.size()) {
