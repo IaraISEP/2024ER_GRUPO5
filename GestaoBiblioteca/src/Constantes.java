@@ -28,9 +28,29 @@ public class Constantes {
         ATRASADO,
         RESERVADO
     }
+
     public enum Genero {
-        MASCULINO,
-        FEMININO
+        MASCULINO('M'),
+        FEMININO('F');
+
+        private final char genero;
+
+        Genero(char genero) {
+            this.genero = genero;
+        }
+
+        public char getGenero() {
+            return genero;
+        }
+
+        public static Genero fromGenero(char genero) {
+            for (Genero codigo : values()) {
+                if (codigo.getGenero() == genero) {
+                    return codigo;
+                }
+            }
+            throw new IllegalArgumentException("Código de gênero inválido: " + genero);
+        }
     }
 
     public enum TipoItem {

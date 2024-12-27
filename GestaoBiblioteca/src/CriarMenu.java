@@ -72,11 +72,11 @@ public class CriarMenu {
         Menu menuListarClientes = new Menu("Listar Clientes");
 
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Clientes",  () -> {
-            TratamentoDados.lerArrayClientes();
+            TratamentoDados.listaTodosClientes();
             keyPress();
         }));
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
-            TratamentoDados.pesquisarClientesPeloNif();
+            TratamentoDados.listaClientePorNif();
             keyPress();
         }));
 

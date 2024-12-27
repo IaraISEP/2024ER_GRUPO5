@@ -66,36 +66,42 @@ public class TratamentoDados {
      * Metodo para apresentar ao utilizador os dados
      * que deve introduzir para criar ou editar um Cliente
      * */
-    public static Cliente inserirDadosCliente(int id){
-        int nif, contacto, opcao;
-        String nome, genero = "";
+    public static Cliente inserirDadosCliente(int id)
+    {
+        int nif, contacto;
         boolean flag;
+        Constantes.Genero genero = null;
+
         do {
             nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
             nif = pesquisarNifArrayCliente(nif);
             flag = validarTamanho(String.valueOf(nif),9);
+
             if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789: ");
-        }while (!flag);
+                System.out.print("Contribuinte Inválido! ex: 123456789");
+        } while (!flag);
+
+        String nome = lerString("\nPor favor, insira o nome do Cliente: ");
+
+        do {
+            char gen = lerChar("\nPor favor, insira o Genero do Cliente (M/F): ");
+            flag = (gen == 'M' || gen == 'F');
+            if (flag)
+                genero = Constantes.Genero.fromGenero(gen);
+            else
+                System.out.print("O gênero introduzido não é válido!");
+
+        } while (!flag);
+
         do {
             contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false);
             flag=validarTamanho(String.valueOf(contacto),9);
+
             if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789: ");
-        }while (!flag);
+                System.out.print("Número de contacto com formato inválido! ex: 912345678");
+        } while (!flag);
 
-        nome=lerString("\nPor favor, insira o nome do Cliente: ");
-
-        System.out.println("\nPor favor, insira o Genero do Cliente: ");
-        for (int i = 0; i < Constantes.Genero.values().length; i++) {
-            System.out.println((i+1)+"- "+Constantes.Genero.values()[i]);
-        }
-
-        do{
-            opcao = lerInt("\nPor favor, insira a sua resposta: ", false);
-        }while(opcao<1||opcao>Constantes.Genero.values().length);
-
-        return new Cliente(id, nome,Constantes.Genero.values()[opcao-1].toString(),nif,contacto,1);
+        return new Cliente(id, nome, genero, nif,contacto,1);
     }
 
     /**
@@ -123,7 +129,7 @@ public class TratamentoDados {
         fw.append(";");
         fw.append(cliente.getNome());
         fw.append(";");
-        fw.append(cliente.getGenero());
+        fw.append(String.valueOf(cliente.getGenero()));
         fw.append(";");
         fw.append(Integer.toString(cliente.getNif()));
         fw.append(";");
@@ -133,53 +139,41 @@ public class TratamentoDados {
         fw.close();
     }
 
-    public static void lerArrayClientes(){
-        if(!clientes.isEmpty()){
-            for (Cliente cliente : clientes) {
-                System.out.println(
-                        "ID: " + cliente.getId() + " " + cliente.getNome() +
-                                " " + cliente.getGenero() + " " + cliente.getNif() +
-                                " " + cliente.getContacto()
-                );
-            }
-        }else {
-            System.out.println("Array vazio");
-        }
+    /**
+     * Metódo que lista todos os Clientes existentes na biblioteca
+     * */
+    public static void listaTodosClientes(){
+        if (clientes.isEmpty())
+            System.out.println("Não existem clientes para mostrar.");
+        else
+            mostraTabelaClientes(clientes);
     }
 
-    public static void pesquisarClientesPeloNif(){
-        int idNif, index=0;
-        boolean idFound = false;
-        System.out.println("Digite o NIF do cliente que deseja encontrar: ");
-        idNif = input.nextInt();
-        if(!clientes.isEmpty()){
-            for(int i = 0; i < clientes.size(); i++){
-                int idActual =  clientes.get(i).getNif();
-                if(idActual == idNif){
-                    idFound = true;
-                    index = i;
-                }
-            }
-            if(idFound){
-                System.out.println(
-                        "ID: " + clientes.get(index).getId() +" "+ clientes.get(index).getNome() +
-                                " " + clientes.get(index).getGenero() + " " + clientes.get(index).getNif() +
-                                " " + clientes.get(index).getContacto()
-                );
-            }
-            else{
-                System.out.println("ID não encontrado!");
-            }
-        }else {
+    public static void listaClientePorNif(){
+        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false);
+
+        if(clientes.isEmpty()){
             System.out.println("Array vazio");
+            return;
         }
+
+        for(Cliente cliente : clientes) {
+            if (cliente.getNif() == idNif) {
+                List<Cliente> clienteComNif = new ArrayList<>();
+                clienteComNif.add(cliente);
+                mostraTabelaClientes(clienteComNif);
+                return;
+            }
+        }
+
+        System.out.println("O NIF que inseriu não existe.");
     }
 
     public static void apagarClientePeloId() throws IOException {
         int idApagar, index = 0, nif = 0, nifReserva = 0;
         boolean idFound;
 
-            lerArrayClientes();
+            listaTodosClientes();
             System.out.println("Escolha o ID do cliente que deseja apagar: ");
             idApagar = input.nextInt();
             input.nextLine(); //Limpar buffer
@@ -219,7 +213,7 @@ public class TratamentoDados {
     public static void editarClientePeloId() throws IOException {
         int idEditar;
         boolean idFound = false;
-        lerArrayClientes();
+        listaTodosClientes();
         System.out.println("Escolha o ID do cliente que deseja editar: ");
         idEditar = input.nextInt();
         input.nextLine(); //Limpar buffer
@@ -266,8 +260,8 @@ public class TratamentoDados {
             readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
                 int id = Integer.parseInt(linha.split(csvDivisor)[0]);
-                String  nome =linha.split(csvDivisor)[1],
-                        genero = linha.split(csvDivisor)[2];
+                String nome =linha.split(csvDivisor)[1];
+                Constantes.Genero genero = Constantes.Genero.fromGenero(linha.split(csvDivisor)[2].charAt(0));
                 int nif = Integer.parseInt(linha.split(csvDivisor)[3]),
                         contacto = Integer.parseInt(linha.split(csvDivisor)[4]);
 
@@ -560,7 +554,7 @@ public class TratamentoDados {
             nif = pesquisarNifArrayCliente(nif);
             flag=validarTamanho(String.valueOf(nif),9);
             if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789: ");
+                System.out.print("Contribuinte Inválido! ex: 123456789");
         }while (!flag);
 
 
@@ -755,12 +749,64 @@ public class TratamentoDados {
     }
 
     /**
+     * Lê e valida um número inteiro a partir da entrada do usuário.
+     *
+     * @param mensagem A mensagem a ser exibida ao usuário antes de ler a entrada.
+     * @return O char introduzido pelo utilizador, colocando de seguida em maiúsculo.
+     */
+    public static char lerChar(String mensagem) {
+        System.out.print(mensagem);
+        return Character.toUpperCase(input.next().charAt(0));
+    }
+
+    /**
      * Função para validar tamanho
      * @param valor valor introduzido pelo utilizador
      * @param tamanho Tamanho pre definido
      * */
     public static boolean validarTamanho(String valor, int tamanho){
         return valor.length()==tamanho;
+    }
+
+    /**
+     * Função para mostrar a lista de clientes da biblioteca
+     * @param listaClientes Recebe a lista de clientes, que pode ser inteira, ou apenas uma parte dela
+     * */
+    public static void mostraTabelaClientes(List<Cliente> listaClientes)
+    {
+        int idMaxLen = "Id".length();
+        int nifMaxLen = "NIF".length();
+        int nomeMaxLen = "Nome".length();
+        int generoMaxLen = "Genero".length();
+        int contactoMaxLen = "Contacto".length();
+
+        //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
+        for (Cliente cliente : listaClientes) {
+            idMaxLen = Math.max(idMaxLen, String.valueOf(cliente.getId()).length());
+            nifMaxLen = Math.max(nifMaxLen, String.valueOf(cliente.getNif()).length());
+            nomeMaxLen = Math.max(nomeMaxLen, cliente.getNome().length());
+            generoMaxLen = Math.max(generoMaxLen, String.valueOf(Constantes.Genero.fromGenero(cliente.getGenero())).length());
+            contactoMaxLen = Math.max(contactoMaxLen, String.valueOf(cliente.getContacto()).length());
+        }
+
+        //Esta string cria as linhas baseado no tamanho máximo de cada coluna
+        String formato = "| %-" + idMaxLen + "s | %-" + nifMaxLen  + "s | %-" + nomeMaxLen  + "s | %-" + generoMaxLen + "s | %-" + contactoMaxLen + "s |\n";
+        //Esta string cria a linha de separação
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(nifMaxLen) + "-+-" + "-".repeat(nomeMaxLen) + "-+-" + "-".repeat(generoMaxLen) + "-+-" + "-".repeat(contactoMaxLen) + "-+";
+
+        //Imprime a linha de separação (+---+---+ ...)
+        System.out.println(separador);
+        //Imprime o cabeçalho da tabela
+        System.out.printf(formato, "Id", "NIF", "Nome", "Genero", "Contacto");
+        //Imprime a linha de separação
+        System.out.println(separador);
+
+        //Imprime os dados dos clientes
+        for (Cliente cliente : listaClientes) {
+            System.out.printf(formato, cliente.getId(), cliente.getNif(), cliente.getNome(), Constantes.Genero.fromGenero(cliente.getGenero()), cliente.getContacto());
+        }
+
+        System.out.println(separador);
     }
 
     /*
