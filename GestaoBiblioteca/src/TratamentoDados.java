@@ -147,20 +147,9 @@ public class TratamentoDados {
      * e adicionar conteúdo ao mesmo.
      * */
     public static void criarFicheiroCsvCliente(String ficheiro, Cliente cliente, Boolean firstLine) throws IOException {
-
-        FileWriter fw = new FileWriter(ficheiro, firstLine);
-        fw.append(Integer.toString(cliente.getId()));
-        fw.append(";");
-        fw.append(cliente.getNome());
-        fw.append(";");
-        fw.append(String.valueOf(cliente.getGenero()));
-        fw.append(";");
-        fw.append(Integer.toString(cliente.getNif()));
-        fw.append(";");
-        fw.append(Integer.toString(cliente.getContacto()));
-        fw.append("\n");
-        fw.flush();
-        fw.close();
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(cliente.getId() + ";" + cliente.getNome() + ";" + cliente.getGenero() + ";" + cliente.getNif() + ";" + cliente.getContacto() + "\n");
+        }
     }
 
     /**
@@ -457,28 +446,17 @@ public class TratamentoDados {
     }
 
     public static void criarFicheiroCsvlivro(String ficheiro, Livro livro, Boolean firstLine) throws IOException {
-
-        FileWriter fw = new FileWriter(ficheiro, firstLine);
-
-        fw.append(Integer.toString(livro.getId()));
-        fw.append(";");
-        fw.append(livro.getTitulo());
-        fw.append(";");
-        fw.append(livro.getEditora());
-        fw.append(";");
-        fw.append(livro.getCategoria());
-        fw.append(";");
-        fw.append(Integer.toString(livro.getAnoEdicao()));
-        fw.append(";");
-        fw.append(livro.getAutor());
-        fw.append(";");
-        fw.append(livro.getIsbn());
-        fw.append(";");
-        fw.append(Integer.toString(1));
-        fw.append(";");
-        fw.append("\n");
-        fw.flush();
-        fw.close();
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(String.join(";",
+                    Integer.toString(livro.getId()),
+                    livro.getTitulo(),
+                    livro.getEditora(),
+                    livro.getCategoria(),
+                    Integer.toString(livro.getAnoEdicao()),
+                    livro.getAutor(),
+                    livro.getIsbn(),
+                    Integer.toString(1)) + "\n");
+        }
     }
 
     public static void gravarArraylivros() throws IOException {
@@ -600,19 +578,14 @@ public class TratamentoDados {
     }
 
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
-
-        FileWriter fw = new FileWriter(ficheiro, firstLine);
-
-        fw.append(Integer.toString(reserva.getNumMovimento()));
-        fw.append(";");
-        fw.append(Integer.toString(reserva.getCodBiblioteca()));
-        fw.append(";");
-        fw.append(Integer.toString(reserva.getNif()));
-        fw.append(";");
-        fw.append("\n");
-        fw.flush();
-        fw.close();
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(String.join(";",
+                    Integer.toString(reserva.getNumMovimento()),
+                    Integer.toString(reserva.getCodBiblioteca()),
+                    Integer.toString(reserva.getNif())) + "\n");
+        }
     }
+
     public static void lerFicheiroCsvReservas(String ficheiro){
 
         BufferedReader readFile;
