@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
  * @since 2024
  */
 public class JornalRevista extends ItemBiblioteca {
+    private int id;
     private String issn;
     private LocalDateTime dataPublicacao;
 
@@ -22,6 +23,15 @@ public class JornalRevista extends ItemBiblioteca {
         super(titulo, editora, categoria, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
+    }
+
+    /**
+     * Obtém o ID do jornal/revista.
+     *
+     * @return O ID do jornal/revista.
+     */
+    public int getId() {
+        return id;
     }
 
     /**

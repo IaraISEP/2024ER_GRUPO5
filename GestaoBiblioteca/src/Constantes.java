@@ -32,4 +32,13 @@ public class Constantes {
         MASCULINO,
         FEMININO
     }
+
+    public enum TipoItem {
+        CLIENTE,
+        LIVRO,
+        JORNAL,
+        REVISTA,
+        EMPRESTIMO,
+        RESERVA
+    }
 }

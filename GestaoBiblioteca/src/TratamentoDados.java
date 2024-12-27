@@ -17,6 +17,7 @@ public class TratamentoDados {
     private static Scanner input = new Scanner(System.in);
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
+    private static List<Emprestimo> emprestimos = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<Jornal> jornais = new ArrayList<>();
     private static List<Revista> revistas = new ArrayList<>();
@@ -132,7 +133,7 @@ public class TratamentoDados {
      * Metodo para criar novo Cliente
      * */
     public static void criarCliente() {
-        clientes.add(inserirDadosCliente(pesquisarIdArrayCliente()));
+        clientes.add(inserirDadosCliente(pesquisarIdArray(Constantes.TipoItem.CLIENTE)));
     }
 
     /**
@@ -312,23 +313,7 @@ public class TratamentoDados {
             System.out.println(cliente);
         }
     }
-    /**
-     * Metodo para atribuir ID automaticamente ao Cliente
-     * */
-    public static int pesquisarIdArrayCliente(){
-        int valor = 0;
-        if(!clientes.isEmpty()){
-            for (Cliente cliente : clientes) {
-                if (cliente.getId() >= valor) {
-                    valor = cliente.getId();
-                    valor++;
-                }
-            }
-        }else {
-            valor = 1;
-        }
-        return valor;
-    }
+
     /**
      * Metodo para verificar se o NIF já se encontra
      * atribuido a algum Cliente
@@ -345,7 +330,6 @@ public class TratamentoDados {
         }
         return valor;
     }
-
 
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - FIM #################################################
@@ -385,7 +369,7 @@ public class TratamentoDados {
      * Metodo para criar novo Livro
      * */
     public static void criarLivro() {
-        livros.add(inserirDadosLivro(pesquisarIdArrayLivro()));
+        livros.add(inserirDadosLivro(pesquisarIdArray(Constantes.TipoItem.LIVRO)));
     }
 
     /**
@@ -521,21 +505,6 @@ public class TratamentoDados {
         }
     }
 
-    public static int pesquisarIdArrayLivro(){
-        int valor = 0;
-        if(!livros.isEmpty()){
-            for (Livro livro : livros) {
-                if (livro.getId() >= valor) {
-                    valor = livro.getId();
-                    valor++;
-                }
-            }
-        }else {
-            valor = 1;
-        }
-        return valor;
-    }
-
     public static void editarLivroPeloId() throws IOException {
         int idEditar;
         boolean idFound = false;
@@ -638,7 +607,7 @@ public class TratamentoDados {
      * Metodo para criar nova Reserva
      * */
     public static void criarReserva() {
-        reservas.add(inserirDadosReserva(pesquisarIdArrayReservas()));
+        reservas.add(inserirDadosReserva(pesquisarIdArray(Constantes.TipoItem.RESERVA)));
     }
 
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
@@ -693,21 +662,6 @@ public class TratamentoDados {
         }
     }
 
-    public static int pesquisarIdArrayReservas(){
-        int valor = 0;
-        if(!reservas.isEmpty()){
-            for (Reserva reserva : reservas) {
-                if (reserva.getNumMovimento() >= valor) {
-                    valor = reserva.getNumMovimento();
-                    valor++;
-                }
-            }
-        }else {
-            valor = 1;
-        }
-        return valor;
-    }
-
     public static void gravarArrayReservas() throws IOException {
         if(!reservas.isEmpty()){
             for(int i = 0; i < reservas.size(); i++){
@@ -723,5 +677,68 @@ public class TratamentoDados {
 
     /*
      * ########################### TRATAMENTO DE DADOS RESERVAS - FIM #################################################
+     * */
+
+    /*
+     * ############################################# HELPERS ###########################################################
+     * */
+
+    /**
+     * Método para atribuir automaticamente um ID com base no tipo de função.
+     *
+     * @param tipoItem O tipo de item para o qual o ID está sendo pesquisado.
+     * @return O próximo ID disponível para o tipo de item especificado.
+     */
+    public static int pesquisarIdArray(Constantes.TipoItem tipoItem)
+    {
+        int valor = 1;
+
+        switch (tipoItem) {
+            case CLIENTE:
+                for (Cliente cliente : clientes) {
+                    if (cliente.getId() >= valor)
+                        valor = cliente.getId() + 1;
+                }
+                break;
+            case LIVRO:
+                for (Livro livro : livros) {
+                    if (livro.getId() >= valor)
+                        valor = livro.getId() + 1;
+                }
+                break;
+            case JORNAL:
+                for (Jornal jornal : jornais) {
+                    if (jornal.getId() >= valor)
+                        valor = jornal.getId() + 1;
+                }
+                break;
+            case REVISTA:
+                for (Revista revista : revistas) {
+                    if (revista.getId() >= valor)
+                        valor = revista.getId() + 1;
+                }
+                break;
+            case EMPRESTIMO:
+                for (Emprestimo emprestimo : emprestimos) {
+                    if (emprestimo.getNumMovimento() >= valor)
+                        valor = emprestimo.getNumMovimento() + 1;
+                }
+                break;
+            case RESERVA:
+                for (Reserva reserva : reservas) {
+                    if (reserva.getNumMovimento() >= valor)
+                        valor = reserva.getNumMovimento() + 1;
+                }
+                break;
+            default:
+                // TODO: Mensagem de erro/evitar que a app crashe quando se passa algo errado para aqui
+                break;
+        }
+
+        return valor;
+    }
+
+    /*
+     * ########################################## HELPERS - FIM ########################################################
      * */
 }
