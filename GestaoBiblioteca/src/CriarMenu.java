@@ -48,7 +48,7 @@ public class CriarMenu {
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", CriarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
             try {
-                TratamentoDados.editarClientePeloId();
+                TratamentoDados.editarCliente();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
