@@ -1,9 +1,7 @@
 import java.io.*;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+
 /**
  * Representa Classe responsavel pelo tratamento de dados
  * @author ER_GRUPO_5
@@ -657,9 +655,18 @@ public class TratamentoDados {
 
         switch (tipoItem) {
             case CLIENTE:
+                List<Integer> ids = new ArrayList<>();
+
                 for (Cliente cliente : clientes) {
-                    if (cliente.getId() >= valor)
-                        valor = cliente.getId() + 1;
+                    ids.add(cliente.getId());
+                }
+
+                Collections.sort(ids);
+                for (int id : ids) {
+                    if (id == valor)
+                        valor++;
+                    else if (id > valor)
+                        break;
                 }
                 break;
             case LIVRO:
