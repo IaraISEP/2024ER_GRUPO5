@@ -10,7 +10,7 @@ public class Cliente {
 
     private int id;
     private String nome;
-    private String genero;
+    private Constantes.Genero genero;
     private int nif;
     private int contacto;
     private int codBiblioteca;
@@ -27,7 +27,7 @@ public class Cliente {
      * @param contacto O contacto do cliente.
      * @param codBiblioteca O código da biblioteca associada ao cliente.
      */
-    public Cliente(int id, String nome, String genero, int nif, int contacto, int codBiblioteca) {
+    public Cliente(int id, String nome, Constantes.Genero genero, int nif, int contacto, int codBiblioteca) {
         this.id = id;
         this.nome = nome;
         this.genero = genero;
@@ -77,8 +77,8 @@ public class Cliente {
      *
      * @return O gênero do cliente.
      */
-    public String getGenero() {
-        return genero;
+    public char getGenero() {
+        return genero.getGenero();
     }
 
     /**
@@ -86,7 +86,7 @@ public class Cliente {
      *
      * @param genero O gênero do cliente.
      */
-    public void setGenero(String genero) {
+    public void setGenero(Constantes.Genero genero) {
         this.genero = genero;
     }
 

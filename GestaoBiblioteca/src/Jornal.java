@@ -16,7 +16,7 @@ public class Jornal extends JornalRevista {
      * @param dataPublicacao A data de publicação do jornal.
      * @param codBiblioteca O código da biblioteca.
      */
-    public Jornal(String titulo, String editora, String categoria, String issn, LocalDateTime dataPublicacao, int codBiblioteca) {
+    public Jornal(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
         super(titulo, editora, categoria, issn, dataPublicacao, codBiblioteca);
     }
 }

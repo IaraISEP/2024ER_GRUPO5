@@ -17,7 +17,7 @@ public class Reserva extends Movimentos {
      * @param codBiblioteca O código da biblioteca.
      * @param dataInicio A data de início do movimento.
      * @param dataFim A data limite da reserva.
-     * @param cliente O cliente associado ao movimento.
+     * @param clientes O cliente associado ao movimento.
      * @param livros A lista de livros associados ao movimento.
      * @param jornais A lista de jornais associados ao movimento.
      * @param revistas A lista de revistas associadas ao movimento.
@@ -26,9 +26,9 @@ public class Reserva extends Movimentos {
      * @param isbn O ISBN do livro.
      */
     public Reserva(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,
-                   Cliente cliente, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
+                   List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
                    LocalDateTime dataRegisto, int nif, String isbn) {
-        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente, livros, jornais, revistas);
+        super(numMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas);
         this.dataRegisto = dataRegisto;
         this.nif = nif;
         this.isbn = isbn;
