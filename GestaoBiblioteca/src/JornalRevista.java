@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
  * @since 2024
  */
 public class JornalRevista extends ItemBiblioteca {
+    private int id;
     private String issn;
-    private LocalDateTime dataPublicacao;
+    private int dataPublicacao;
 
     /**
      * Construtor para criar um Jornal/Revista.
@@ -18,10 +19,19 @@ public class JornalRevista extends ItemBiblioteca {
      * @param dataPublicacao A data de publicação do jornal/revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public JornalRevista(String titulo, String editora, String categoria, String issn, LocalDateTime dataPublicacao, int codBiblioteca) {
+    public JornalRevista(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
         super(titulo, editora, categoria, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
+    }
+
+    /**
+     * Obtém o ID do jornal/revista.
+     *
+     * @return O ID do jornal/revista.
+     */
+    public int getId() {
+        return id;
     }
 
     /**
@@ -38,7 +48,7 @@ public class JornalRevista extends ItemBiblioteca {
      *
      * @return A data de publicação do jornal/revista.
      */
-    public LocalDateTime getDataPublicacao() {
+    public int getDataPublicacao() {
         return dataPublicacao;
     }
 }

@@ -48,7 +48,7 @@ public class CriarMenu {
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", CriarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
             try {
-                TratamentoDados.editarClientePeloId();
+                TratamentoDados.editarCliente();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -72,11 +72,11 @@ public class CriarMenu {
         Menu menuListarClientes = new Menu("Listar Clientes");
 
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Clientes",  () -> {
-            TratamentoDados.lerArrayClientes();
+            TratamentoDados.listaTodosClientes();
             keyPress();
         }));
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
-            TratamentoDados.pesquisarClientesPeloNif();
+            TratamentoDados.listaClientePorNif();
             keyPress();
         }));
 
@@ -90,8 +90,13 @@ public class CriarMenu {
         Menu menuReservas = new Menu("Gestão de Reservas");
 
         menuReservas.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
-            System.out.println("Reserva Criada...");
+            TratamentoDados.criarReserva();
             keyPress();
+            try {
+                TratamentoDados.gravarArrayReservas();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             System.out.println("Reserva Editada...");

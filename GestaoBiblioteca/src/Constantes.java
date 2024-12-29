@@ -1,7 +1,6 @@
 
 public class Constantes {
 
-    // Enum para Categorias
     public enum Categoria {
         LIVRO(1),
         REVISTA(2),
@@ -9,12 +8,10 @@ public class Constantes {
 
         private final int categoria;
 
-        // Construtor do enum
         Categoria(int categoria) {
             this.categoria = categoria;
         }
 
-        // Método para obter o valor
         public int getCategoria() {
             return categoria;
         }
@@ -28,8 +25,42 @@ public class Constantes {
         ATRASADO,
         RESERVADO
     }
+
     public enum Genero {
-        MASCULINO,
-        FEMININO
+        MASCULINO('M'),
+        FEMININO('F');
+
+        private final char genero;
+
+        Genero(char genero) {
+            this.genero = genero;
+        }
+
+        public char getGenero() {
+            return genero;
+        }
+
+        public static Genero fromGenero(char genero) {
+            for (Genero codigo : values()) {
+                if (codigo.getGenero() == genero) {
+                    return codigo;
+                }
+            }
+            throw new IllegalArgumentException("Código de gênero inválido: " + genero);
+        }
+    }
+
+    public enum TipoItem {
+        CLIENTE,
+        LIVRO,
+        JORNAL,
+        REVISTA,
+        EMPRESTIMO,
+        RESERVA
+    }
+
+    public enum Etapa {
+        CRIAR,
+        EDITAR;
     }
 }
