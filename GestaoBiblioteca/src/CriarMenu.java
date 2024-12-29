@@ -142,26 +142,18 @@ public class CriarMenu {
             TratamentoDados.criarLivro();
             keyPress();
             try {
-                TratamentoDados.gravarArraylivros();
+                TratamentoDados.gravarArrayLivros();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", CriarMenu::menuListarLivros));
         menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
-            try {
-                TratamentoDados.editarLivroPeloId();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            TratamentoDados.editarLivro();
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
-            try {
-                TratamentoDados.apagarLivroPeloIsbn();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            TratamentoDados.apagarLivroPeloId();
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
@@ -183,11 +175,11 @@ public class CriarMenu {
         Menu menuListarClientes = new Menu("Listar Livros");
 
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
-            TratamentoDados.lerArrayLivros();
+            TratamentoDados.listaTodosLivros();
             keyPress();
         }));
         menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
-            TratamentoDados.pesquisarLivrosPeloIsbn();
+            TratamentoDados.listaLivroPorIsbn();
             keyPress();
         }));
 
