@@ -323,7 +323,25 @@ public class TratamentoDados {
      * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
      */
 
+    /**
+     * Adiciona um novo livro ao sistema.
+     */
+    public static void criarLivro() {
+        Livro novoLivro = inserirDadosLivro(pesquisarProximoId());
+        livros.add(novoLivro);
+        System.out.println("Livro criado com sucesso!");
+    }
 
+    /**
+     * Lista todos os livros cadastrados no sistema.
+     */
+    public static void listaTodosLivros() {
+        if (livros.isEmpty()) {
+            System.out.println("Não existem livros para mostrar.");
+        } else {
+            mostraTabelaLivros(livros);
+        }
+    }
 
     /**
      * Lista um livro pelo ISBN fornecido.
