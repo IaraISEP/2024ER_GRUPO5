@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 
 import java.time.LocalDateTime;
@@ -419,7 +417,7 @@ public class TratamentoDados {
     /**
      * Cria um arquivo CSV para armazenar os dados dos livros.
      */
-    public static void criarFicheiroCsvLivro(String ficheiro, @NotNull Livro livro, boolean append) throws IOException {
+    public static void criarFicheiroCsvLivro(String ficheiro, /*@NotNull*/ Livro livro, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
             fw.write(String.join(";",
                     Integer.toString(livro.getCodBiblioteca()),
@@ -442,14 +440,14 @@ public class TratamentoDados {
             String csvDivisor = ";";
             while ((linha = readFile.readLine()) != null) {
                 String[] dados = linha.split(csvDivisor);
-                int codBiblioteca = Integer.parseInt(dados[0]);
-                int id = Integer.parseInt(dados[1]);
-                String titulo = dados[2];
-                String editora = dados[3];
-                String categoria = dados[4];
-                int anoEdicao = Integer.parseInt(dados[5]);
-                String autor = dados[6];
-                String isbn = dados[7];
+                int id = Integer.parseInt(dados[0]);
+                String titulo = dados[1];
+                String editora = dados[2];
+                String categoria = dados[3];
+                int anoEdicao = Integer.parseInt(dados[4]);
+                String autor = dados[5];
+                String isbn = dados[6];
+                int codBiblioteca = Integer.parseInt(dados[7]);
                 Livro livro = new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor, codBiblioteca);
                 livros.add(livro);
             }
@@ -502,23 +500,6 @@ public class TratamentoDados {
             }
         }
         return maiorId + 1;
-    }
-
-    /**
-     * Exibe a lista de livros em formato de tabela.
-     */
-    private static void mostraTabelaLivros(List<Livro> livros) {
-        System.out.printf("%-10s%-20s%-20s%-15s%-10s%-20s%-15s\n", "ID", "Título", "Editora", "Categoria", "Ano", "Autor", "ISBN");
-        for (Livro livro : livros) {
-            System.out.printf("%-10d%-20s%-20s%-15s%-10d%-20s%-15s\n",
-                    livro.getId(),
-                    livro.getTitulo(),
-                    livro.getEditora(),
-                    livro.getCategoria(),
-                    livro.getAnoEdicao(),
-                    livro.getAutor(),
-                    livro.getIsbn());
-        }
     }
 
     /*
@@ -788,6 +769,64 @@ public class TratamentoDados {
         }
 
         System.out.println(separador);
+    }
+
+    /**
+     * Exibe a lista de livros em formato de tabela.
+     */
+    private static void mostraTabelaLivros(List<Livro> listaLivros)
+    {
+        int idMaxLen = "Id".length();
+        int editoraMaxLen = "Editora".length();
+        int categoriaMaxLen = "Categoria".length();
+        int anoEdicaoMaxLen = "Ano Edicao".length();
+        int isbnMaxLen = "ISBN".length();
+        int autorMaxLen = "Autor".length();
+
+        //Livro(int id, String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor, int codBiblioteca)
+
+        //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
+        for (Livro livro : listaLivros) {
+            idMaxLen = Math.max(idMaxLen, String.valueOf(livro.getId()).length());
+            editoraMaxLen = Math.max(editoraMaxLen, String.valueOf(livro.getEditora()).length());
+            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().length());
+            anoEdicaoMaxLen = Math.max(anoEdicaoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
+            isbnMaxLen = Math.max(isbnMaxLen, String.valueOf(livro.getIsbn()).length());
+            autorMaxLen = Math.max(autorMaxLen, String.valueOf(livro.getAutor()).length());
+        }
+
+        //Esta string cria as linhas baseado no tamanho máximo de cada coluna
+        String formato = "| %-" + idMaxLen + "s | %-" + editoraMaxLen  + "s | %-" + categoriaMaxLen  + "s | %-" + anoEdicaoMaxLen + "s | %-" + autorMaxLen + "s | %-" + isbnMaxLen + "s |\n";
+        //Esta string cria a linha de separação
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(editoraMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-" + "-".repeat(anoEdicaoMaxLen) + "-+-" + "-".repeat(autorMaxLen) + "-+-" + "-".repeat(isbnMaxLen) + "-+";
+
+        //Imprime a linha de separação (+---+---+ ...)
+        System.out.println(separador);
+        //Imprime o cabeçalho da tabela
+        System.out.printf(formato, "Id", "Editora", "Categoria", "Ano Edição", "Autor", "ISBN");
+        //Imprime a linha de separação
+        System.out.println(separador);
+
+        //Imprime os dados dos clientes
+        for (Livro livro : listaLivros) {
+            System.out.printf(formato, livro.getId(), livro.getEditora(), livro.getCategoria(), livro.getAnoEdicao(), livro.getAutor(), livro.getIsbn());
+        }
+
+        System.out.println(separador);
+
+
+        /*        System.out.printf("%-15s%-10s%-20s%-20s%-15s%-10s%-20s%-15s\n", "Biblioteca", "ID", "Título", "Editora", "Categoria", "Ano", "Autor", "ISBN");
+        for (Livro livro : livros) {
+            System.out.printf("%-15d%-10d%-20s%-20s%-15s%-10d%-20s%-15s\n",
+                    livro.getCodBiblioteca(),
+                    livro.getId(),
+                    livro.getTitulo(),
+                    livro.getEditora(),
+                    livro.getCategoria(),
+                    livro.getAnoEdicao(),
+                    livro.getAutor(),
+                    livro.getIsbn());
+        }*/
     }
 
     /*
