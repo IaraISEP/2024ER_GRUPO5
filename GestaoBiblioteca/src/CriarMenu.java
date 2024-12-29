@@ -99,7 +99,11 @@ public class CriarMenu {
             }
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
-            System.out.println("Reserva Editada...");
+            try {
+                TratamentoDados.editarReserva();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {

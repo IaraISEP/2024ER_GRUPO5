@@ -309,6 +309,8 @@ public class TratamentoDados {
                     return 0;
                 }
             }
+            // TODO caso o NIF não exista dar erro ao utilizador ao criar uma Reserva/Empréstimo
+
         }
 
         return nif;
@@ -417,7 +419,7 @@ public class TratamentoDados {
     /**
      * Cria um arquivo CSV para armazenar os dados dos livros.
      */
-    public static void criarFicheiroCsvLivro(String ficheiro, /*@NotNull*/ Livro livro, boolean append) throws IOException {
+    public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
             fw.write(String.join(";",
                     Integer.toString(livro.getCodBiblioteca()),
@@ -535,11 +537,38 @@ public class TratamentoDados {
         reservas.add(inserirDadosReserva(pesquisarIdArray(Constantes.TipoItem.RESERVA)));
     }
 
+    public static void editarReserva() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(reservas.isEmpty()) {
+            System.out.println("Não há reservas nesta biblioteca.");
+            return;
+        }
+
+        // Lista todos os clientes
+        listaTodasReservas();
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false);
+
+        // Procura o cliente pelo ID e, caso encontre, edita o cliente
+        for(Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idEditar) {
+                inserirDadosReserva(idEditar/*, Constantes.Etapa.EDITAR*/);
+                //TODO : Verificar o que está errado com este metodo. Não está a gravar as alterações
+                System.out.println("Reserva editada com sucesso!");
+                gravarArrayReservas();
+                return;
+            }
+        }
+
+        System.out.println("ID não encontrado!");
+    }
+
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
-                    Integer.toString(reserva.getNumMovimento()),
                     Integer.toString(reserva.getCodBiblioteca()),
+                    Integer.toString(reserva.getNumMovimento()),
                     Integer.toString(reserva.getNif())) + "\n");
         }
     }
@@ -554,8 +583,8 @@ public class TratamentoDados {
         try{
             readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
-                int codMovimento = Integer.parseInt(linha.split(csvDivisor)[0]),
-                    codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[1]),
+                int codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[0]),
+                    codMovimento = Integer.parseInt(linha.split(csvDivisor)[1]),
                     nif = Integer.parseInt(linha.split(csvDivisor)[2]);
 
                 //TODO : Alterar a maneira como constroi o objeto para adicionar à lista de reservas assim que o resto da lógica estiver completa
@@ -569,7 +598,7 @@ public class TratamentoDados {
                 List<Revista> revistas = new ArrayList<>();
                 */
 
-                Reserva reserva = new Reserva(codMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
+                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
 
                 reservas.add(reserva);
             }
@@ -579,6 +608,16 @@ public class TratamentoDados {
         }
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
+        }
+    }
+
+
+
+    public static void listaTodasReservas() {
+        if (reservas.isEmpty()) {
+            System.out.println("Não existem livros para mostrar.");
+        } else {
+            mostraTabelaReservas(reservas);
         }
     }
 
@@ -783,8 +822,6 @@ public class TratamentoDados {
         int isbnMaxLen = "ISBN".length();
         int autorMaxLen = "Autor".length();
 
-        //Livro(int id, String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor, int codBiblioteca)
-
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Livro livro : listaLivros) {
             idMaxLen = Math.max(idMaxLen, String.valueOf(livro.getId()).length());
@@ -807,26 +844,45 @@ public class TratamentoDados {
         //Imprime a linha de separação
         System.out.println(separador);
 
-        //Imprime os dados dos clientes
+        //Imprime os dados dos livros
         for (Livro livro : listaLivros) {
             System.out.printf(formato, livro.getId(), livro.getEditora(), livro.getCategoria(), livro.getAnoEdicao(), livro.getAutor(), livro.getIsbn());
         }
 
         System.out.println(separador);
+    }
 
+    public static void mostraTabelaReservas(List<Reserva> listaReservas)
+    {
+        int bibliotecaMaxLen = "Biblioteca".length();
+        int idMaxLen = "Id".length();
+        int nifMaxLen = "NIF".length();
 
-        /*        System.out.printf("%-15s%-10s%-20s%-20s%-15s%-10s%-20s%-15s\n", "Biblioteca", "ID", "Título", "Editora", "Categoria", "Ano", "Autor", "ISBN");
-        for (Livro livro : livros) {
-            System.out.printf("%-15d%-10d%-20s%-20s%-15s%-10d%-20s%-15s\n",
-                    livro.getCodBiblioteca(),
-                    livro.getId(),
-                    livro.getTitulo(),
-                    livro.getEditora(),
-                    livro.getCategoria(),
-                    livro.getAnoEdicao(),
-                    livro.getAutor(),
-                    livro.getIsbn());
-        }*/
+        //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
+        for (Reserva reservas : listaReservas) {
+            bibliotecaMaxLen = Math.max(bibliotecaMaxLen, String.valueOf(reservas.getCodBiblioteca()).length());
+            idMaxLen = Math.max(idMaxLen, String.valueOf(reservas.getNumMovimento()).length());
+            nifMaxLen = Math.max(nifMaxLen, String.valueOf(reservas.getNif()).length());
+        }
+
+        //Esta string cria as linhas baseado no tamanho máximo de cada coluna
+        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + nifMaxLen + "s |\n";
+        //Esta string cria a linha de separação
+        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(nifMaxLen) + "-+";
+
+        //Imprime a linha de separação (+---+---+ ...)
+        System.out.println(separador);
+        //Imprime o cabeçalho da tabela
+        System.out.printf(formato, "Biblioteca", "Id", "NIF");
+        //Imprime a linha de separação
+        System.out.println(separador);
+
+        //Imprime os dados dos clientes
+        for (Reserva reserva : listaReservas) {
+            System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getNif());
+        }
+
+        System.out.println(separador);
     }
 
     /*
