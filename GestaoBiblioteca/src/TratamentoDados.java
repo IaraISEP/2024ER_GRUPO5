@@ -314,12 +314,10 @@ public class TratamentoDados {
                         return 0;
                     } else if (cliente.getNif() == nif) {
                         return nif;
-                    } else {
-                        System.out.println("cliente nao existente!");
-                        return 0;
                     }
                 }
             }
+            System.out.println("Cliente nao existe nesta Biblioteca!");
             return 0;
         }else{
             System.out.println("Não existem Clientes nesta Biblioteca.");
