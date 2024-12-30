@@ -37,13 +37,12 @@ public class CriarMenu {
         Menu menuCliente = new Menu("Gestão Clientes");
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-            TratamentoDados.criarCliente();
-            keyPress();
             try {
-                TratamentoDados.gravarArrayClientes();
+                TratamentoDados.criarCliente();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", CriarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
@@ -90,13 +89,16 @@ public class CriarMenu {
         Menu menuReservas = new Menu("Gestão de Reservas");
 
         menuReservas.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
-            TratamentoDados.criarReserva();
-            keyPress();
             try {
-                TratamentoDados.gravarArrayReservas();
+                TratamentoDados.criarReserva();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            keyPress();
+        }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", () -> {
+            TratamentoDados.listaTodasReservas();
+            keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             try {
@@ -143,21 +145,28 @@ public class CriarMenu {
         Menu menuLivro = new Menu("Gestão de Livros");
 
         menuLivro.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
-            TratamentoDados.criarLivro();
-            keyPress();
             try {
-                TratamentoDados.gravarArrayLivros();
+                TratamentoDados.criarLivro();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", CriarMenu::menuListarLivros));
         menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
-            TratamentoDados.editarLivro();
+            try {
+                TratamentoDados.editarLivro();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
-            TratamentoDados.apagarLivroPeloId();
+            try {
+                TratamentoDados.apagarLivroPeloId();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
