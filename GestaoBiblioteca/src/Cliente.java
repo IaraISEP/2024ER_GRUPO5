@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.io.*;
-
 /** Representa um Cliente
  * @author ER_GRUPO_5
  * @since 2024

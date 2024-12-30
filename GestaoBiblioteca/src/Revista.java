@@ -1,5 +1,3 @@
-import java.time.LocalDateTime;
-
 /** Representa uma Revista
  * @author ER_GRUPO_5
  * @since 2024

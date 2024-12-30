@@ -101,7 +101,7 @@ public class TratamentoDados {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
         } while (!flag);
 
-        return new Cliente(id, nome, genero, nif,contacto,1);
+        return new Cliente(id, nome, genero, nif, contacto,1);
     }
 
     /**
@@ -130,9 +130,11 @@ public class TratamentoDados {
         int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
 
         // Procura o cliente pelo ID e, caso encontre, edita o cliente
-        for(Cliente cliente : clientes) {
-            if (cliente.getId() == idEditar) {
-                inserirDadosCliente(idEditar, Constantes.Etapa.EDITAR);
+        for(int index = 0; index < clientes.size(); index++) {
+            if (clientes.get(index).getId() == idEditar) {
+                Cliente cliente = inserirDadosCliente(idEditar, Constantes.Etapa.EDITAR);
+                // Grava as alterações na Array dos clientes
+                clientes.set(index, cliente);
                 System.out.println("Cliente editado com sucesso!");
                 gravarArrayClientes();
                 return;
@@ -247,8 +249,8 @@ public class TratamentoDados {
     public static void gravarArrayClientes() throws IOException {
         // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
-            File file = new File("Biblioteca_1/Clientes/clientes.csv");
-            file.delete();
+/*            File file = new File("Biblioteca_1/Clientes/clientes.csv");
+            file.delete();*/
             System.out.println("Array vazio");
         }
 
@@ -300,15 +302,20 @@ public class TratamentoDados {
      * @param idCliente Recebe o id do cliente, para validar se ao editar está a repetir o ID dele mesmo ou a colocar um já existente mas de outro cliente
      * */
     public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
-        for (Cliente cliente : clientes) {
-            if (cliente.getNif() == nif) {
-                //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
-                //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
-                if(etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
-                    System.out.println("Nif existente!");
-                    return 0;
+        if (!clientes.isEmpty()) {
+            for (Cliente cliente : clientes) {
+
+                if (cliente.getNif() == nif) {
+                    //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
+                    //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
+                    if (etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
+                        System.out.println("Nif existente!");
+                        return 0;
+                    }
                 }
             }
+        }else{
+            System.out.println("Não existem Clientes nesta Biblioteca.");
             // TODO caso o NIF não exista dar erro ao utilizador ao criar uma Reserva/Empréstimo
 
         }
@@ -520,6 +527,7 @@ public class TratamentoDados {
         numMovimento = id;
         do {
             nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
+            int idCliente;
             nif = pesquisarNifArrayCliente(nif, null, -1);
             flag = validarTamanho(String.valueOf(nif),9);
             if(!flag)
@@ -550,10 +558,10 @@ public class TratamentoDados {
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false);
 
-        // Procura o cliente pelo ID e, caso encontre, edita o cliente
+        // Procura a reserva pelo ID e, caso encontre, edita o cliente
         for(Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idEditar) {
-                inserirDadosReserva(idEditar/*, Constantes.Etapa.EDITAR*/);
+                reservas.set(1, inserirDadosReserva(idEditar/*, Constantes.Etapa.EDITAR*/));
                 //TODO : Verificar o que está errado com este metodo. Não está a gravar as alterações
                 System.out.println("Reserva editada com sucesso!");
                 gravarArrayReservas();
