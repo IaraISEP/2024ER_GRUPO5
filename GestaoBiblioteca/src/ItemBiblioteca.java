@@ -11,12 +11,12 @@ public class ItemBiblioteca {
     /**
      * Construtor para criar um item da biblioteca.
      *
-     * @param titulo O título do item.
-     * @param categoria A categoria do item.
-     * @param editora A editora do item.
+     * @param titulo        O título do item.
+     * @param editora       A editora do item.
+     * @param categoria     A categoria do item.
      * @param codBiblioteca O código da biblioteca.
      */
-    public ItemBiblioteca(String titulo, String categoria, String editora, int codBiblioteca) {
+    public ItemBiblioteca(String titulo, String editora, String categoria, int codBiblioteca) {
         this.titulo = titulo;
         this.categoria = categoria;
         this.editora = editora;
