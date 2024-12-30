@@ -563,10 +563,21 @@ public class TratamentoDados {
 
     /**
      * Metodo para criar nova Reserva
+     * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
-        reservas.add(inserirDadosReserva(pesquisarIdArray(Constantes.TipoItem.RESERVA)));
-        gravarArrayReservas();
+        if (!clientes.isEmpty()){
+            reservas.add(inserirDadosReserva(pesquisarIdArray(Constantes.TipoItem.RESERVA)));
+            /*
+            * TODO:
+            *   Ao criar a reserva abrir a opção para editar os detalhes da reserva
+            *   Escolher livro revista ou jornal
+            *   selecionar as datas
+            */
+            gravarArrayReservas();
+        }else {
+            System.out.println("Não existm clientes nesta Biblioteca");
+        }
     }
 
     public static void editarReserva() throws IOException {
@@ -586,7 +597,6 @@ public class TratamentoDados {
         for(Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idEditar) {
                 reservas.set(1, inserirDadosReserva(idEditar/*, Constantes.Etapa.EDITAR*/));
-                //TODO : Verificar o que está errado com este metodo. Não está a gravar as alterações
                 System.out.println("Reserva editada com sucesso!");
                 gravarArrayReservas();
                 return;
@@ -596,6 +606,13 @@ public class TratamentoDados {
         System.out.println("ID não encontrado!");
     }
 
+    /*
+     * TODO:
+     *   Criar metodo para editar os detalhes da reserva
+     *   Escolher livro revista ou jornal
+     *   selecionar as datas
+     */
+
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
@@ -604,6 +621,11 @@ public class TratamentoDados {
                     Integer.toString(reserva.getNif())) + "\n");
         }
     }
+
+    /*
+     * TODO:
+     *   Criar metodo para ler ficheiro de detalhes da reserva
+     */
 
     public static void lerFicheiroCsvReservas(String ficheiro){
 

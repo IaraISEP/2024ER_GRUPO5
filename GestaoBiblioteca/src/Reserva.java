@@ -10,6 +10,14 @@ public class Reserva extends Movimentos {
     private int nif;
     private String isbn;
 
+    /*
+     * TODO:
+     *   Alterar o construtor e passar os parametros para a
+     *   nova classe ReservasDtl onde vai ficar guradado todos os
+     *   livros, revistas, jornais e datas
+     *   de cada reserva.
+     */
+
     /**
      * Construtor para criar uma reserva.
      *
