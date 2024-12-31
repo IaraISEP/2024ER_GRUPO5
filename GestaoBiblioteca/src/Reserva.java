@@ -51,6 +51,10 @@ public class Reserva extends Movimentos {
         return nif;
     }
 
+    public LocalDateTime getDataRegisto() {
+        return dataRegisto;
+    }
+
     /**
      * Define o NIF do cliente.
      *
