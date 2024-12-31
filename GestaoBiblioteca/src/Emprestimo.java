@@ -24,7 +24,7 @@ public class Emprestimo extends Movimentos{
     public Emprestimo(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,
                       List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
                       LocalDateTime dataPrevFim) {
-        super(numMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas);
+        super(codBiblioteca, numMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas);
         this.dataPrevFim = dataPrevFim;
     }
 

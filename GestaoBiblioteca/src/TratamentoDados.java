@@ -53,7 +53,8 @@ public class TratamentoDados {
                 new File("Biblioteca_1/Emprestimos/emprestimos.csv"),
                 new File("Biblioteca_1/Reservas/reservas.csv"),
                 new File("Biblioteca_1/Reservas/Details/reservadtl.csv"),
-                new File("Biblioteca_1/Historico/historico.csv")
+                new File("Biblioteca_1/Historico/reservas_h.csv"),
+                new File("Biblioteca_1/Historico/emprestimos_h.csv")
         };
         for (File file : files) {
             if (!file.exists()) {
@@ -563,7 +564,7 @@ public class TratamentoDados {
 
         System.out.println("Reserva criada com sucesso!");
 
-        return new Reserva(numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
+        return new Reserva(codBiblioteca, numMovimento, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }
 
     /**
@@ -571,6 +572,7 @@ public class TratamentoDados {
      * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
+        boolean exit;
         if (!clientes.isEmpty()){
             int idAuto = pesquisarIdArray(Constantes.TipoItem.RESERVA);
             reservas.add(inserirDadosReserva(idAuto));
@@ -581,12 +583,28 @@ public class TratamentoDados {
              *   Escolher livro revista ou jornal
              *   selecionar as datas
              */
-            reservasdtl.add(inserirDetalhesReserva(reserva));
-            gravarArrayReservas();
-            gravarArrayReservasDtl();
+
+            do{
+                reservasdtl.add(inserirDetalhesReserva(reserva));
+                gravarArrayReservasDtl();
+                ReservaDtl reservaDtl = reservasdtl.getLast();
+                System.out.println("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)");
+                int opcao = input.nextInt();
+                input.nextLine();
+                if (opcao == 1){
+                    exit = false;
+                }else {
+                    exit = true;
+                }
+                // Criar o historico dos movimentos
+                criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
+                reservas.add(reserva);
+            }while(!exit);
+
         }else {
             System.out.println("Não existm clientes nesta Biblioteca");
         }
+        gravarArrayReservas();
     }
 
     public static void editarReserva() throws IOException {
@@ -719,15 +737,45 @@ public class TratamentoDados {
         LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
         LocalDateTime dataRegisto = LocalDateTime.now();
 
-
         String isbn ="";
         if (!livros.isEmpty()) {
             listaTodosLivros();
-            isbn = livros.getLast().getIsbn();
+            do{
+                isbn="teste";
+            System.out.println("Escolha o(s) livro(s) que deseja adicionar a reserva: ");
+            int idLivro = input.nextInt();
+
+            /*
+                TODO:
+                    Percorre o array para encontrar o ISBN do Livro escolhido
+                    Verificar se o Livro existe
+                        Se existir verificar se está disponivel para reserva
+            */
+            for (Livro livro : livros) {
+                if (livro.getId()==idLivro){
+                    if (!reservasdtl.isEmpty()) {
+                        for (ReservaDtl reservaDtl : reservasdtl){
+                            if (reservaDtl.getIsbn().equals(livro.getIsbn())){
+                                System.out.println("Livro já se econtra reservado");
+                                isbn=null;
+                                break;
+                            }else {
+                                isbn = livro.getIsbn();
+                            }
+                        }
+                    }else {isbn = livro.getIsbn(); break;}
+                }else {
+                    System.out.println("ID não encontrado");
+                    isbn=null;
+                }
+                if (isbn==null){break;}
+            }
+            }while (isbn==null);
         }else{
             System.out.println("Não existem livros nesta Biblioteca não pode reservar");
             return null;
         }
+
 
         return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }

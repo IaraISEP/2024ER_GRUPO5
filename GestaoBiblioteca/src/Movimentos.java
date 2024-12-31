@@ -19,16 +19,16 @@ public class Movimentos {
     /**
      * Construtor para criar um movimento.
      *
-     * @param numMovimento O número do movimento.
      * @param codBiblioteca O código da biblioteca.
-     * @param dataInicio A data de início do movimento.
-     * @param dataFim A data de fim do movimento.
-     * @param clientes O cliente associado ao movimento.
-     * @param livros A lista de livros associados ao movimento.
-     * @param jornais A lista de jornais associados ao movimento.
-     * @param revistas A lista de revistas associadas ao movimento.
+     * @param numMovimento  O número do movimento.
+     * @param dataInicio    A data de início do movimento.
+     * @param dataFim       A data de fim do movimento.
+     * @param clientes      O cliente associado ao movimento.
+     * @param livros        A lista de livros associados ao movimento.
+     * @param jornais       A lista de jornais associados ao movimento.
+     * @param revistas      A lista de revistas associadas ao movimento.
      */
-    public Movimentos(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
+    public Movimentos(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;
