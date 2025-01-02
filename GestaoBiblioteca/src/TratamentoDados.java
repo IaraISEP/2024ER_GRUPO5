@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.Scanner;
 /**
  * Representa Classe responsavel pelo tratamento de dados
@@ -53,7 +54,8 @@ public class TratamentoDados {
                 new File("Biblioteca_1/Emprestimos/emprestimos.csv"),
                 new File("Biblioteca_1/Reservas/reservas.csv"),
                 new File("Biblioteca_1/Reservas/Details/reservadtl.csv"),
-                new File("Biblioteca_1/Historico/historico.csv")
+                new File("Biblioteca_1/Historico/reservas_h.csv"),
+                new File("Biblioteca_1/Historico/emprestimos_h.csv")
         };
         for (File file : files) {
             if (!file.exists()) {
@@ -343,8 +345,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        Livro novoLivro = inserirDadosLivro(pesquisarProximoId());
-        livros.add(novoLivro);
+        livros.add(inserirDadosLivro(pesquisarProximoId()));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -355,28 +356,30 @@ public class TratamentoDados {
     public static void listaTodosLivros() {
         if (livros.isEmpty()) {
             System.out.println("Não existem livros para mostrar.");
-        } else {
-            mostraTabelaLivros(livros);
+            return;
         }
+
+        mostraTabelaLivros(livros);
     }
 
     /**
      * Lista um livro pelo ISBN fornecido.
      */
     public static void listaLivroPorIsbn() {
-        String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
         if (livros.isEmpty()) {
             System.out.println("Nenhum livro registrado.");
             return;
         }
+
+        String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
+
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn)) {
-                List<Livro> livroComIsbn = new ArrayList<>();
-                livroComIsbn.add(livro);
-                mostraTabelaLivros(livroComIsbn);
+                mostraTabelaLivros(Collections.singletonList(livro));
                 return;
             }
         }
+
         System.out.println("O ISBN que inseriu não existe.");
     }
 
@@ -390,9 +393,10 @@ public class TratamentoDados {
         }
         listaTodosLivros();
         int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false);
-        for (int i = 0; i < livros.size(); i++) {
-            if (livros.get(i).getId() == idEditar) {
-                livros.set(i, inserirDadosLivro(idEditar));
+
+        for (Livro livro : livros) {
+            if (livro.getId() == idEditar) {
+                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
                 System.out.println("Livro editado com sucesso!");
                 gravarArrayLivros();
                 return;
@@ -410,6 +414,7 @@ public class TratamentoDados {
             System.out.println("Não existem livros nesta Biblioteca.");
             return;
         }
+
         listaTodosLivros();
         int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false);
         Livro livroRemover = null;
@@ -433,14 +438,12 @@ public class TratamentoDados {
      */
     public static void gravarArrayLivros() throws IOException {
         if (livros.isEmpty()) {
-            File file = new File("Biblioteca_1/Livros/livros.csv");
-            file.delete();
+            new File("Biblioteca_1/Livros/livros.csv").delete();
             System.out.println("Lista de livros vazia. Arquivo excluído.");
             return;
         }
         for (int i = 0; i < livros.size(); i++) {
-            Livro livro = livros.get(i);
-            criarFicheiroCsvLivro("Biblioteca_1/Livros/livros.csv", livro, i != 0);
+            criarFicheiroCsvLivro("Biblioteca_1/Livros/livros.csv", livros.get(i), i != 0);
         }
     }
 
@@ -450,14 +453,15 @@ public class TratamentoDados {
     public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
             fw.write(String.join(";",
-                    Integer.toString(livro.getId()),
+                    String.valueOf(livro.getId()),
                     livro.getTitulo(),
                     livro.getEditora(),
                     livro.getCategoria(),
-                    Integer.toString(livro.getAnoEdicao()),
+                    String.valueOf(livro.getAnoEdicao()),
                     livro.getIsbn(),
                     livro.getAutor(),
-                    Integer.toString(livro.getCodBiblioteca())) + "\n");
+                    String.valueOf(livro.getCodBiblioteca()),
+                    "\n"));
         }
     }
 
@@ -501,9 +505,9 @@ public class TratamentoDados {
             flag = validarTamanho(isbn, 9);
             if (!flag) {
                 System.out.println("ISBN Invalido! ( Ex: 1111-1111 )");
+                continue;
             }
-            String isbnOld = pesquisarIsbn(isbn);
-            if (isbn.equals(isbnOld)) {
+            if (isbn.equals(pesquisarIsbn(isbn))) {
                 System.out.println("ISBN já existe! Tente novamente.");
                 flag = false;
             }
@@ -563,7 +567,7 @@ public class TratamentoDados {
 
         System.out.println("Reserva criada com sucesso!");
 
-        return new Reserva(numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
+        return new Reserva(codBiblioteca, numMovimento, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }
 
     /**
@@ -571,6 +575,7 @@ public class TratamentoDados {
      * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
+        boolean exit;
         if (!clientes.isEmpty()){
             int idAuto = pesquisarIdArray(Constantes.TipoItem.RESERVA);
             reservas.add(inserirDadosReserva(idAuto));
@@ -581,12 +586,28 @@ public class TratamentoDados {
              *   Escolher livro revista ou jornal
              *   selecionar as datas
              */
-            reservasdtl.add(inserirDetalhesReserva(reserva));
-            gravarArrayReservas();
-            gravarArrayReservasDtl();
+
+            do{
+                reservasdtl.add(inserirDetalhesReserva(reserva));
+                gravarArrayReservasDtl();
+                ReservaDtl reservaDtl = reservasdtl.getLast();
+                System.out.println("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)");
+                int opcao = input.nextInt();
+                input.nextLine();
+                if (opcao == 1){
+                    exit = false;
+                }else {
+                    exit = true;
+                }
+                // Criar o historico dos movimentos
+                criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
+                reservas.add(reserva);
+            }while(!exit);
+
         }else {
             System.out.println("Não existm clientes nesta Biblioteca");
         }
+        gravarArrayReservas();
     }
 
     public static void editarReserva() throws IOException {
@@ -719,15 +740,45 @@ public class TratamentoDados {
         LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
         LocalDateTime dataRegisto = LocalDateTime.now();
 
-
         String isbn ="";
         if (!livros.isEmpty()) {
             listaTodosLivros();
-            isbn = livros.getLast().getIsbn();
+            do{
+                isbn="teste";
+            System.out.println("Escolha o(s) livro(s) que deseja adicionar a reserva: ");
+            int idLivro = input.nextInt();
+
+            /*
+                TODO:
+                    Percorre o array para encontrar o ISBN do Livro escolhido
+                    Verificar se o Livro existe
+                        Se existir verificar se está disponivel para reserva
+            */
+            for (Livro livro : livros) {
+                if (livro.getId()==idLivro){
+                    if (!reservasdtl.isEmpty()) {
+                        for (ReservaDtl reservaDtl : reservasdtl){
+                            if (reservaDtl.getIsbn().equals(livro.getIsbn())){
+                                System.out.println("Livro já se econtra reservado");
+                                isbn=null;
+                                break;
+                            }else {
+                                isbn = livro.getIsbn();
+                            }
+                        }
+                    }else {isbn = livro.getIsbn(); break;}
+                }else {
+                    System.out.println("ID não encontrado");
+                    isbn=null;
+                }
+                if (isbn==null){break;}
+            }
+            }while (isbn==null);
         }else{
             System.out.println("Não existem livros nesta Biblioteca não pode reservar");
             return null;
         }
+
 
         return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }
