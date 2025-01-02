@@ -4,13 +4,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 /**
  * Representa Classe responsavel pelo tratamento de dados
- *
  * @author ER_GRUPO_5
- * @since 2024  Criação de novos objectos das classes Criação de toda a estrutura de ficheiros Edição e Leitura de ficheiros
- */
+ * @since 2024
+ * Criação de novos objectos das classes
+ * Criação de toda a estrutura de ficheiros
+ * Edição e Leitura de ficheiros
+ * */
 public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
@@ -25,9 +26,7 @@ public class TratamentoDados {
      * Metodo para criar a estrutura de ficheiros para
      * guardar os dados permanentemente
      * Cria 7 Directorios com um ficheiro cada
-     *
-     * @throws IOException the io exception
-     */
+     * */
     public static void criarSistemaFicheiros() throws IOException {
         File[] dirs = new File[]{
                 new File("Biblioteca_1/Clientes"),
@@ -66,11 +65,7 @@ public class TratamentoDados {
     /**
      * Metodo para apresentar ao utilizador os dados
      * que deve introduzir para criar ou editar um Cliente
-     *
-     * @param id    the id
-     * @param etapa the etapa
-     * @return the cliente
-     */
+     * */
     public static Cliente inserirDadosCliente(int id, Constantes.Etapa etapa)
     {
         int nif, contacto;
@@ -111,7 +106,7 @@ public class TratamentoDados {
 
     /**
      * Metodo para criar novo Cliente
-     */
+     * */
     public static void criarCliente() {
         clientes.add(inserirDadosCliente(pesquisarIdArray(Constantes.TipoItem.CLIENTE), Constantes.Etapa.CRIAR));
     }
@@ -150,12 +145,7 @@ public class TratamentoDados {
     /**
      * Metódo para criar o ficehiro clientes.csv
      * e adicionar conteúdo ao mesmo.
-     *
-     * @param ficheiro  the ficheiro
-     * @param cliente   the cliente
-     * @param firstLine the first line
-     * @throws IOException the io exception
-     */
+     * */
     public static void criarFicheiroCsvCliente(String ficheiro, Cliente cliente, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(cliente.getId() + ";" + cliente.getNome() + ";" + cliente.getGenero() + ";" + cliente.getNif() + ";" + cliente.getContacto() + "\n");
@@ -164,7 +154,7 @@ public class TratamentoDados {
 
     /**
      * Metódo que lista todos os Clientes existentes na biblioteca
-     */
+     * */
     public static void listaTodosClientes(){
         if (clientes.isEmpty())
             System.out.println("Não existem clientes para mostrar.");
@@ -305,12 +295,10 @@ public class TratamentoDados {
     /**
      * Metodo para verificar se o NIF já se encontra
      * atribuido a algum Cliente
-     *
-     * @param nif       Recebe o valor introduzido pelo utilizador
-     * @param etapa     Recebe o enum da etapa em questão (criação ou edição de utilizador)
+     * @param nif Recebe o valor introduzido pelo utilizador
+     * @param etapa Recebe o enum da etapa em questão (criação ou edição de utilizador)
      * @param idCliente Recebe o id do cliente, para validar se ao editar está a repetir o ID dele mesmo ou a colocar um já existente mas de outro cliente
-     * @return the int
-     */
+     * */
     public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
         for (Cliente cliente : clientes) {
             if (cliente.getNif() == nif) {
@@ -334,12 +322,6 @@ public class TratamentoDados {
     * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
     * */
 
-    /**
-     * Inserir dados livro livro.
-     *
-     * @param id the id
-     * @return the livro
-     */
     public static Livro inserirDadosLivro(int id)
     {
         String isbn = "";
@@ -364,24 +346,18 @@ public class TratamentoDados {
 
     /**
      * Metodo para criar novo Livro
-     */
+     * */
     public static void criarLivro() {
         livros.add(inserirDadosLivro(pesquisarIdArray(Constantes.TipoItem.LIVRO)));
     }
 
     /**
      * Metodo para editar o Livro
-     *
-     * @param id the id
-     * @return the livro
-     */
+     * */
     public static Livro editarLivro(int id) {
         return inserirDadosLivro(id);
     }
 
-    /**
-     * Ler array livros.
-     */
     public static void lerArrayLivros(){
         if(!livros.isEmpty()){
             for (Livro livro : livros) {
@@ -397,9 +373,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Pesquisar livros pelo isbn.
-     */
     public static void pesquisarLivrosPeloIsbn(){
         int index=0;
         String isbn = "";
@@ -432,11 +405,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Apagar livro pelo isbn.
-     *
-     * @throws IOException the io exception
-     */
     public static void apagarLivroPeloIsbn() throws IOException {
         int idApagar, index=0;
         String isbn="", isbnReserva="";
@@ -477,14 +445,6 @@ public class TratamentoDados {
         gravarArraylivros();
     }
 
-    /**
-     * Criar ficheiro csvlivro.
-     *
-     * @param ficheiro  the ficheiro
-     * @param livro     the livro
-     * @param firstLine the first line
-     * @throws IOException the io exception
-     */
     public static void criarFicheiroCsvlivro(String ficheiro, Livro livro, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
@@ -499,11 +459,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Gravar arraylivros.
-     *
-     * @throws IOException the io exception
-     */
     public static void gravarArraylivros() throws IOException {
 
         if(!livros.isEmpty()){
@@ -518,11 +473,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Editar livro pelo id.
-     *
-     * @throws IOException the io exception
-     */
     public static void editarLivroPeloId() throws IOException {
         int idEditar;
         boolean idFound = false;
@@ -550,12 +500,6 @@ public class TratamentoDados {
         gravarArraylivros();
     }
 
-    /**
-     * Pesquisar isbn array livro string.
-     *
-     * @param isbn the isbn
-     * @return the string
-     */
     public static String pesquisarIsbnArrayLivro(String isbn){
         if(!livros.isEmpty()){
             for (Livro livro : livros) {
@@ -568,11 +512,6 @@ public class TratamentoDados {
         return isbn;
     }
 
-    /**
-     * Ler ficheiro csv livros.
-     *
-     * @param ficheiro the ficheiro
-     */
     public static void lerFicheiroCsvLivros(String ficheiro){
 
         BufferedReader readFile;
@@ -613,12 +552,6 @@ public class TratamentoDados {
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
      * */
 
-    /**
-     * Inserir dados reserva reserva.
-     *
-     * @param id the id
-     * @return the reserva
-     */
     public static Reserva inserirDadosReserva(int id){
         int anoEdicao = 0,numMovimento=0,codBiblioteca=1, nif=0;
         LocalDateTime dataInicio = null, dataFim = null, dataRegisto=null;
@@ -639,19 +572,11 @@ public class TratamentoDados {
 
     /**
      * Metodo para criar nova Reserva
-     */
+     * */
     public static void criarReserva() {
         reservas.add(inserirDadosReserva(pesquisarIdArray(Constantes.TipoItem.RESERVA)));
     }
 
-    /**
-     * Criar ficheiro csv reservas.
-     *
-     * @param ficheiro  the ficheiro
-     * @param reserva   the reserva
-     * @param firstLine the first line
-     * @throws IOException the io exception
-     */
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
@@ -661,11 +586,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Ler ficheiro csv reservas.
-     *
-     * @param ficheiro the ficheiro
-     */
     public static void lerFicheiroCsvReservas(String ficheiro){
 
         BufferedReader readFile;
@@ -704,11 +624,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Gravar array reservas.
-     *
-     * @throws IOException the io exception
-     */
     public static void gravarArrayReservas() throws IOException {
         if(!reservas.isEmpty()){
             for(int i = 0; i < reservas.size(); i++){
@@ -800,7 +715,6 @@ public class TratamentoDados {
      * Lê e valida um número inteiro a partir da entrada do usuário.
      *
      * @param mensagem A mensagem a ser exibida ao usuário antes de ler a entrada.
-     * @param isDate   the is date
      * @return O número inteiro digitado pelo usuário.
      */
     public static int lerInt(String mensagem, Boolean isDate)
@@ -851,20 +765,17 @@ public class TratamentoDados {
 
     /**
      * Função para validar tamanho
-     *
-     * @param valor   valor introduzido pelo utilizador
+     * @param valor valor introduzido pelo utilizador
      * @param tamanho Tamanho pre definido
-     * @return the boolean
-     */
+     * */
     public static boolean validarTamanho(String valor, int tamanho){
         return valor.length()==tamanho;
     }
 
     /**
      * Função para mostrar a lista de clientes da biblioteca
-     *
      * @param listaClientes Recebe a lista de clientes, que pode ser inteira, ou apenas uma parte dela
-     */
+     * */
     public static void mostraTabelaClientes(List<Cliente> listaClientes)
     {
         int idMaxLen = "Id".length();
