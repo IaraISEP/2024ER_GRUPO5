@@ -1,5 +1,3 @@
-import java.time.LocalDateTime;
-
 /** Representa um Jornal/Revista
  * @author ER_GRUPO_5
  * @since 2024
@@ -20,7 +18,7 @@ public class JornalRevista extends ItemBiblioteca {
      * @param codBiblioteca O código da biblioteca.
      */
     public JornalRevista(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(titulo, editora, categoria, codBiblioteca);
+        super(titulo, categoria, editora, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
     }

@@ -56,7 +56,8 @@ public class Constantes {
         JORNAL,
         REVISTA,
         EMPRESTIMO,
-        RESERVA
+        RESERVA,
+        RESERVADTL
     }
 
     public enum Etapa {
