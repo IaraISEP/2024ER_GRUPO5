@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.Scanner;
 /**
  * Representa Classe responsavel pelo tratamento de dados
@@ -344,8 +345,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        Livro novoLivro = inserirDadosLivro(pesquisarProximoId());
-        livros.add(novoLivro);
+        livros.add(inserirDadosLivro(pesquisarProximoId()));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -356,28 +356,30 @@ public class TratamentoDados {
     public static void listaTodosLivros() {
         if (livros.isEmpty()) {
             System.out.println("Não existem livros para mostrar.");
-        } else {
-            mostraTabelaLivros(livros);
+            return;
         }
+
+        mostraTabelaLivros(livros);
     }
 
     /**
      * Lista um livro pelo ISBN fornecido.
      */
     public static void listaLivroPorIsbn() {
-        String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
         if (livros.isEmpty()) {
             System.out.println("Nenhum livro registrado.");
             return;
         }
+
+        String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
+
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn)) {
-                List<Livro> livroComIsbn = new ArrayList<>();
-                livroComIsbn.add(livro);
-                mostraTabelaLivros(livroComIsbn);
+                mostraTabelaLivros(Collections.singletonList(livro));
                 return;
             }
         }
+
         System.out.println("O ISBN que inseriu não existe.");
     }
 
@@ -391,9 +393,10 @@ public class TratamentoDados {
         }
         listaTodosLivros();
         int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false);
-        for (int i = 0; i < livros.size(); i++) {
-            if (livros.get(i).getId() == idEditar) {
-                livros.set(i, inserirDadosLivro(idEditar));
+
+        for (Livro livro : livros) {
+            if (livro.getId() == idEditar) {
+                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
                 System.out.println("Livro editado com sucesso!");
                 gravarArrayLivros();
                 return;
@@ -411,6 +414,7 @@ public class TratamentoDados {
             System.out.println("Não existem livros nesta Biblioteca.");
             return;
         }
+
         listaTodosLivros();
         int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false);
         Livro livroRemover = null;
@@ -434,14 +438,12 @@ public class TratamentoDados {
      */
     public static void gravarArrayLivros() throws IOException {
         if (livros.isEmpty()) {
-            File file = new File("Biblioteca_1/Livros/livros.csv");
-            file.delete();
+            new File("Biblioteca_1/Livros/livros.csv").delete();
             System.out.println("Lista de livros vazia. Arquivo excluído.");
             return;
         }
         for (int i = 0; i < livros.size(); i++) {
-            Livro livro = livros.get(i);
-            criarFicheiroCsvLivro("Biblioteca_1/Livros/livros.csv", livro, i != 0);
+            criarFicheiroCsvLivro("Biblioteca_1/Livros/livros.csv", livros.get(i), i != 0);
         }
     }
 
@@ -451,14 +453,15 @@ public class TratamentoDados {
     public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
             fw.write(String.join(";",
-                    Integer.toString(livro.getId()),
+                    String.valueOf(livro.getId()),
                     livro.getTitulo(),
                     livro.getEditora(),
                     livro.getCategoria(),
-                    Integer.toString(livro.getAnoEdicao()),
+                    String.valueOf(livro.getAnoEdicao()),
                     livro.getIsbn(),
                     livro.getAutor(),
-                    Integer.toString(livro.getCodBiblioteca())) + "\n");
+                    String.valueOf(livro.getCodBiblioteca()),
+                    "\n"));
         }
     }
 
@@ -502,9 +505,9 @@ public class TratamentoDados {
             flag = validarTamanho(isbn, 9);
             if (!flag) {
                 System.out.println("ISBN Invalido! ( Ex: 1111-1111 )");
+                continue;
             }
-            String isbnOld = pesquisarIsbn(isbn);
-            if (isbn.equals(isbnOld)) {
+            if (isbn.equals(pesquisarIsbn(isbn))) {
                 System.out.println("ISBN já existe! Tente novamente.");
                 flag = false;
             }
