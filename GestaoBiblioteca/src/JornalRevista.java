@@ -3,7 +3,6 @@
  * @since 2024
  */
 public class JornalRevista extends ItemBiblioteca {
-    private int id;
     private String issn;
     private int dataPublicacao;
 
@@ -17,19 +16,10 @@ public class JornalRevista extends ItemBiblioteca {
      * @param dataPublicacao A data de publicação do jornal/revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public JornalRevista(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(titulo, categoria, editora, codBiblioteca);
+    public JornalRevista(int id, String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
+        super(id, titulo, categoria, editora, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
-    }
-
-    /**
-     * Obtém o ID do jornal/revista.
-     *
-     * @return O ID do jornal/revista.
-     */
-    public int getId() {
-        return id;
     }
 
     /**

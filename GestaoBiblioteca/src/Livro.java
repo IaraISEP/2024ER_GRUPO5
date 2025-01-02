@@ -3,7 +3,6 @@
  * @since 2024
  */
 public class Livro extends ItemBiblioteca {
-    private int id;
     private int anoEdicao;
     private String isbn;
     private String autor;
@@ -21,20 +20,10 @@ public class Livro extends ItemBiblioteca {
      * @param codBiblioteca O código da biblioteca.
      */
     public Livro(int id, String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor, int codBiblioteca) {
-        super(titulo, editora, categoria, codBiblioteca);
-        this.id = id;
+        super(id, titulo, editora, categoria, codBiblioteca);
         this.anoEdicao = anoEdicao;
         this.isbn = isbn;
         this.autor = autor;
-    }
-
-    /**
-     * Obtém o ID do livro.
-     *
-     * @return O ID do livro.
-     */
-    public int getId() {
-        return id;
     }
 
     /**
