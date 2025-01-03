@@ -456,7 +456,7 @@ public class TratamentoDados {
                     String.valueOf(livro.getId()),
                     livro.getTitulo(),
                     livro.getEditora(),
-                    livro.getCategoria(),
+                    String.valueOf(livro.getCategoriaInt()),
                     String.valueOf(livro.getAnoEdicao()),
                     livro.getIsbn(),
                     livro.getAutor(),
@@ -482,7 +482,7 @@ public class TratamentoDados {
                 String isbn = dados[5];
                 String autor = dados[6];
                 int codBiblioteca = Integer.parseInt(dados[7]);
-                Livro livro = new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor, codBiblioteca);
+                Livro livro = new Livro(id, codBiblioteca, titulo, editora, Constantes.CategoriaLivro.valueOf(categoria), anoEdicao, isbn, autor);
                 livros.add(livro);
             }
         } catch (IOException e) {
@@ -496,7 +496,7 @@ public class TratamentoDados {
     private static Livro inserirDadosLivro(int id) {
         String titulo = lerString("Insira o Título do livro: ");
         String editora = lerString("Insira a Editora do livro: ");
-        String categoria = lerString("Insira a Categoria do livro: ");
+        Constantes.CategoriaLivro categoria = selecionaCategoria();
         int anoEdicao = lerInt("Insira o ano de Edição do livro: ", false);
         String isbn;
         boolean flag;
@@ -514,7 +514,7 @@ public class TratamentoDados {
         }while(!flag);
         String autor = lerString("Insira o Autor do livro: ");
 
-        return new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor, 1);
+        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
     }
 
     /**
@@ -841,6 +841,7 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
+
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
         }
@@ -1062,7 +1063,7 @@ public class TratamentoDados {
             idMaxLen = Math.max(idMaxLen, String.valueOf(livro.getId()).length());
             tituloMaxLen = Math.max(tituloMaxLen, String.valueOf(livro.getTitulo()).length());
             editoraMaxLen = Math.max(editoraMaxLen, String.valueOf(livro.getEditora()).length());
-            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().length());
+            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().toString().length());
             anoEdicaoMaxLen = Math.max(anoEdicaoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
             isbnMaxLen = Math.max(isbnMaxLen, String.valueOf(livro.getIsbn()).length());
             autorMaxLen = Math.max(autorMaxLen, String.valueOf(livro.getAutor()).length());
@@ -1121,6 +1122,53 @@ public class TratamentoDados {
         }
 
         System.out.println(separador);
+    }
+
+    public static Constantes.CategoriaLivro selecionaCategoria() {
+        int categoriaMaxLen = "Categoria".length();
+
+        // percorre a lista, e retorna o tamanho máximo do código e da categoria
+        for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
+            categoriaMaxLen = Math.max(categoriaMaxLen, (categoria.getCategoriaLivro() + " - " + categoria.name().replace('_', ' ')).length());
+        }
+
+        // Esta string cria as linhas baseado no tamanho máximo da categoria
+        String formato = "| %-" + categoriaMaxLen + "s |\n";
+        // Esta string cria a linha de separação
+        String separador = "+-" + "-".repeat(categoriaMaxLen) + "-+";
+
+        // Imprime a linha de separação (+---+---+ ...)
+        System.out.println(separador);
+        // Imprime o cabeçalho da tabela
+        System.out.printf(formato, "Categoria");
+        // Imprime a linha de separação
+        System.out.println(separador);
+
+        // Imprime as categorias
+        for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
+            System.out.printf(formato, categoria.getCategoriaLivro() + " - " + categoria.name().replace('_', ' '));
+        }
+
+        System.out.println(separador);
+
+        // Valida sa a categoria inserida existe, caso contrário pede para inserir novamente
+        boolean categoriaValida = false;
+        Constantes.CategoriaLivro categoriaInserida = null;
+        while (!categoriaValida) {
+            int categoriaInt = lerInt("Insira a Categoria do livro: ", false);
+            for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
+                if (categoria.getCategoriaLivro() == categoriaInt) {
+                    categoriaInserida = categoria;
+                    categoriaValida = true;
+                    break;
+                }
+            }
+            if (!categoriaValida) {
+                System.out.println("Categoria inválida! Tente novamente.");
+            }
+        }
+
+        return categoriaInserida;
     }
 
     /*
