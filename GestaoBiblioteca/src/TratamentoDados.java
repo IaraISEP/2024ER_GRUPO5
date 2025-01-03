@@ -692,7 +692,7 @@ public class TratamentoDados {
             return;
         }
         for (int i = 0; i < revistas.size(); i++) {
-            criarFicheiroCsvJornalRevista("Biblioteca_1/Livros/livros.csv", revistas.get(i), i != 0);
+            criarFicheiroCsvJornalRevista("Biblioteca_1/Revistas/revistas.csv", revistas.get(i), i != 0);
         }
     }
 
@@ -718,48 +718,49 @@ public class TratamentoDados {
     /**
      * Edita os dados de uma REVISTA ou JORNAL existente.
      */
-    public static void editarJornalRevista(int id, Constantes.TipoItem tipoItem) throws IOException {
+    public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
         if (revistas.isEmpty()) {
             System.out.println("Não existem Revistas nesta Biblioteca.");
             return;
         }
 
-        //se receber o tipo de item jornal lista todos os jornais ou se receber revistas lista as revistas
-        if(tipoItem==Constantes.TipoItem.JORNAL)
-            System.out.println("");
-        else if(tipoItem==Constantes.TipoItem.REVISTA)
-            System.out.println("");
+        listaTodosJornalRevista(tipoItem);
+        int idEditarJornalRevista = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar: ", false, null);
 
-        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
-
-        for (Revista revista : revistas) {
-            if (revistas.get() == idEditar) {
-                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
-                System.out.println("Livro editado com sucesso!");
-                gravarArrayLivros();
-                return;
+        if (tipoItem == Constantes.TipoItem.REVISTA) {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getId() == idEditarJornalRevista) {
+                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    System.out.println("Revista editada com sucesso!");
+                    gravarArrayRevista();
+                    return;
+                }
+            }
+        }else{
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getId() == idEditarJornalRevista) {
+                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    System.out.println("Jornal editado com sucesso!");
+                    gravarArrayJornal();
+                    return;
+                }
             }
         }
-
-        System.out.println("ID do livro não encontrado.");
+        System.out.println("ID do " + tipoItem.toString().toLowerCase() + " não encontrado.");
     }
-
 
 
     /**
      * Apaga uma REVISTA e JORNAL pelo ID.
      */
-    public static void apagarLivroPeloId(int id, Constantes.TipoItem tipoItem) throws IOException {
-        if (livros.isEmpty()) {
+    /*
+    public static void apagarJornalRevista(int id, Constantes.TipoItem tipoItem) throws IOException {
+        if (revistas.isEmpty()) {
             System.out.println("Não existem livros nesta Biblioteca.");
             return;
         }
 
-        if(tipoItem==Constantes.TipoItem.JORNAL)
-            System.out.println("");
-        else if(tipoItem==Constantes.TipoItem.REVISTA)
-            System.out.println("");
-
+        listaTodosJornalRevista(tipoItem);
         int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
         Livro livroRemover = null;
         for (Livro livro : livros) {
@@ -776,7 +777,7 @@ public class TratamentoDados {
         System.out.println("Livro apagado com sucesso!");
         gravarArrayLivros();
     }
-
+*/
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
      * */

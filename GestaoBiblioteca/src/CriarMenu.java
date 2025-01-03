@@ -163,7 +163,11 @@ public class CriarMenu {
         }));
         menuJornal.adicionarOpcao(new OpcaoMenu("Listar Jornais", CriarMenu::menuListarJornais));
         menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
-            System.out.println("Editar Jornal...");
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuJornal.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
@@ -215,8 +219,12 @@ public class CriarMenu {
             keyPress();
         }));
         menuRevista.adicionarOpcao(new OpcaoMenu("Listar Revistas", CriarMenu::menuListarRevistas));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revista", () -> {
-            System.out.println("Editar Revista...");
+        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revistas", () -> {
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuRevista.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
