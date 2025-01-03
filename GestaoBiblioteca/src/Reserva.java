@@ -34,7 +34,7 @@ public class Reserva extends Movimentos {
      * @param isbn          O ISBN do livro.
      */
     public Reserva(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim,
-                   List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
+                   List<Cliente> clientes, List<Livro> livros, List<JornalRevista> jornais, List<JornalRevista> revistas,
                    LocalDateTime dataRegisto, int nif, String isbn) {
         super(codBiblioteca, numMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas);
         this.dataRegisto = dataRegisto;

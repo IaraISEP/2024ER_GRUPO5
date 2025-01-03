@@ -13,8 +13,8 @@ public class Movimentos {
     private LocalDateTime dataFim;
     private List<Cliente> clientes;
     private List<Livro> livros;
-    private List<Jornal> jornais;
-    private List<Revista> revistas;
+    private List<JornalRevista> jornais;
+    private List<JornalRevista> revistas;
 
     /**
      * Construtor para criar um movimento.
@@ -28,7 +28,7 @@ public class Movimentos {
      * @param jornais       A lista de jornais associados ao movimento.
      * @param revistas      A lista de revistas associadas ao movimento.
      */
-    public Movimentos(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
+    public Movimentos(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<JornalRevista> jornais, List<JornalRevista> revistas) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;
@@ -152,7 +152,7 @@ public class Movimentos {
      *
      * @return A lista de jornais associados ao movimento.
      */
-    public List<Jornal> getJornais() {
+    public List<JornalRevista> getJornais() {
         return jornais;
     }
 
@@ -161,7 +161,7 @@ public class Movimentos {
      *
      * @param jornais A lista de jornais associados ao movimento.
      */
-    public void setJornais(List<Jornal> jornais) {
+    public void setJornais(List<JornalRevista> jornais) {
         this.jornais = jornais;
     }
 
@@ -170,7 +170,7 @@ public class Movimentos {
      *
      * @return A lista de revistas associadas ao movimento.
      */
-    public List<Revista> getRevistas() {
+    public List<JornalRevista> getRevistas() {
         return revistas;
     }
 
@@ -179,7 +179,7 @@ public class Movimentos {
      *
      * @param revistas A lista de revistas associadas ao movimento.
      */
-    public void setRevistas(List<Revista> revistas) {
+    public void setRevistas(List<JornalRevista> revistas) {
         this.revistas = revistas;
     }
 }
