@@ -275,6 +275,10 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvClientes(String ficheiro){
         try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            if (readFile.readLine() == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
             String linha;
             String csvDivisor = ";";
             // Lê cada linha do ficheiro
@@ -470,6 +474,10 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvLivros(String ficheiro) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            if (readFile.readLine() == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
             String linha;
             String csvDivisor = ";";
             while ((linha = readFile.readLine()) != null) {
@@ -554,6 +562,10 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            if (readFile.readLine() == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
             String linha;
             String csvDivisor = ";";
             while ((linha = readFile.readLine()) != null) {
@@ -714,7 +726,6 @@ public class TratamentoDados {
         }
     }
 
-
     /**
      * Edita os dados de uma REVISTA ou JORNAL existente.
      */
@@ -752,11 +763,9 @@ public class TratamentoDados {
         System.out.println("ID do " + tipoItem.toString().toLowerCase() + " não encontrado.");
     }
 
-
     /**
      * Apaga uma REVISTA e JORNAL pelo ID.
      */
-
     public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
         if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
             System.out.println("Não existem Revistas nesta Biblioteca.");
@@ -764,8 +773,6 @@ public class TratamentoDados {
         } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
             System.out.println("Não existem Jornais nesta Biblioteca.");
         }
-
-
         listaTodosJornalRevista(tipoItem);
 
         int idApagar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " livro que deseja apagar: ", false, null);
@@ -911,6 +918,10 @@ public class TratamentoDados {
 
     public static void lerFicheiroCsvReservas(String ficheiro){
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            if (readFile.readLine() == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
             String linha;
             String csvDivisor = ";", isbn="";
             //ArrayList<String> dados= new ArrayList<String>();
@@ -1064,8 +1075,11 @@ public class TratamentoDados {
      * @param ficheiro Recebe o valor do Path do ficheiro a tratar
      * */
     public static void lerFicheiroCsvReservasDtl(String ficheiro){
-
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            if (readFile.readLine() == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
             String linha;
             String csvDivisor = ";";
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");

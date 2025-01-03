@@ -15,6 +15,8 @@ public class Main {
         TratamentoDados.criarSistemaFicheiros();
         TratamentoDados.lerFicheiroCsvClientes(Constantes.Path.CLIENTE.getValue());
         TratamentoDados.lerFicheiroCsvLivros(Constantes.Path.LIVRO.getValue());
+        TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.LIVRO.getValue(), Constantes.TipoItem.JORNAL);
+        TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.LIVRO.getValue(), Constantes.TipoItem.REVISTA);
         TratamentoDados.lerFicheiroCsvReservas(Constantes.Path.RESERVA.getValue());
         TratamentoDados.lerFicheiroCsvReservasDtl(Constantes.Path.RESERVADTL.getValue());
         CriarMenu.menuPrincipal();
