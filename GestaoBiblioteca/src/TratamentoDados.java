@@ -550,6 +550,34 @@ public class TratamentoDados {
      */
 
     /**
+     * Lê os jornais do arquivo CSV.
+     */
+    public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha;
+            String csvDivisor = ";";
+            while ((linha = readFile.readLine()) != null) {
+                String[] dados = linha.split(csvDivisor);
+                int id = Integer.parseInt(dados[0]);
+                String titulo = dados[1];
+                String editora = dados[2];
+                String issn = dados[3];
+                int anoPub = Integer.parseInt(dados[4]);
+                int codBiblioteca = Integer.parseInt(dados[5]);
+                Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
+                Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[7]);
+                JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
+                if (tipoItem == Constantes.TipoItem.JORNAL)
+                    jornais.add(jornalRevista);
+                else
+                    revistas.add(jornalRevista);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
@@ -591,6 +619,53 @@ public class TratamentoDados {
         }while(!flag);
 
         return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+    }
+
+    public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
+        if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais para mostrar.");
+            return;
+        }
+        else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+            System.out.println("Não existem revistas para mostrar.");
+            return;
+        }
+
+        if (tipoItem == Constantes.TipoItem.JORNAL)
+            mostraTabelaJornalRevista(jornais);
+        else
+            mostraTabelaJornalRevista(revistas);
+    }
+
+    /**
+     * Lista um livro pelo ISBN fornecido.
+     */
+    public static void listaJornalRevistaPorIssn(Constantes.TipoItem tipoItem) {
+        if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais para mostrar.");
+            return;
+        }
+        else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+            System.out.println("Não existem revistas para mostrar.");
+            return;
+        }
+
+        String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar: ");
+
+        if (tipoItem == Constantes.TipoItem.JORNAL) {
+            for (JornalRevista jornal : jornais) {
+                if (jornal.getIssn().equals(issn))
+                    mostraTabelaJornalRevista(Collections.singletonList(jornal));
+            }
+        } else {
+            for (JornalRevista revista : revistas) {
+                if (revista.getIssn().equals(issn)) {
+                    mostraTabelaJornalRevista(Collections.singletonList(revista));
+                    return;
+                }
+            }
+        }
+        System.out.println("O ISSN que inseriu não existe.");
     }
 
     /**
@@ -639,6 +714,90 @@ public class TratamentoDados {
         }
     }
 
+
+    /**
+     * Edita os dados de uma REVISTA ou JORNAL existente.
+     */
+    public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+            System.out.println("Não existem Revistas nesta Biblioteca.");
+            return;
+        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem Jornais nesta Biblioteca.");
+        }
+
+
+        listaTodosJornalRevista(tipoItem);
+        int idEditarJornalRevista = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar: ", false, null);
+
+        if (tipoItem == Constantes.TipoItem.REVISTA) {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getId() == idEditarJornalRevista) {
+                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    System.out.println("Revista editada com sucesso!");
+                    gravarArrayRevista();
+                    return;
+                }
+            }
+        }else{
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getId() == idEditarJornalRevista) {
+                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    System.out.println("Jornal editado com sucesso!");
+                    gravarArrayJornal();
+                    return;
+                }
+            }
+        }
+        System.out.println("ID do " + tipoItem.toString().toLowerCase() + " não encontrado.");
+    }
+
+
+    /**
+     * Apaga uma REVISTA e JORNAL pelo ID.
+     */
+
+    public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+            System.out.println("Não existem Revistas nesta Biblioteca.");
+            return;
+        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem Jornais nesta Biblioteca.");
+        }
+
+
+        listaTodosJornalRevista(tipoItem);
+
+        int idApagar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " livro que deseja apagar: ", false, null);
+        JornalRevista jornalRevistaRemover = null;
+        if (tipoItem == Constantes.TipoItem.REVISTA) {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getId() == idApagar) {
+                    jornalRevistaRemover = jornalRevista;
+                    break;
+                }
+            }
+        } else if (tipoItem == Constantes.TipoItem.JORNAL) {
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getId() == idApagar) {
+                    jornalRevistaRemover = jornalRevista;
+                    break;
+                }
+            }
+        }
+        if (jornalRevistaRemover == null) {
+            System.out.println("ID "+ tipoItem.toString().toLowerCase() +" não encontrado.");
+            return;
+        }
+        if(tipoItem == Constantes.TipoItem.REVISTA){
+            revistas.remove(jornalRevistaRemover);
+            gravarArrayRevista();
+        }else if (tipoItem == Constantes.TipoItem.JORNAL){
+            jornais.remove(jornalRevistaRemover);
+            gravarArrayJornal();
+        }
+        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+    }
 
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
@@ -1056,6 +1215,8 @@ public class TratamentoDados {
                         isInt = true;
                     else if(valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL)
                         isInt = true;
+                    else if(valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)
+                        isInt = true;
                     else
                         System.out.print("Por favor, insira um ano válido (yyyy): ");
                 } else {
@@ -1172,6 +1333,47 @@ public class TratamentoDados {
         //Imprime os dados dos livros
         for (Livro livro : listaLivros) {
             System.out.printf(formato, livro.getId(), livro.getTitulo(), livro.getEditora(), livro.getCategoria(), livro.getAnoEdicao(), livro.getIsbn(), livro.getAutor());
+        }
+
+        System.out.println(separador);
+    }
+
+    private static void mostraTabelaJornalRevista(List<JornalRevista> listaJornalRevista)
+    {
+        int idMaxLen = "Id".length();
+        int tituloMaxLen = "Titulo".length();
+        int editoraMaxLen = "Editora".length();
+        int categoriaMaxLen = "Categoria".length();
+        int anoPubMaxLen = "Ano de Publicação".length();
+        int issnMaxLen = "ISSN".length();
+
+        //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
+        for (JornalRevista jornalRevista : listaJornalRevista) {
+            idMaxLen = Math.max(idMaxLen, String.valueOf(jornalRevista.getId()).length());
+            tituloMaxLen = Math.max(tituloMaxLen, String.valueOf(jornalRevista.getTitulo()).length());
+            editoraMaxLen = Math.max(editoraMaxLen, String.valueOf(jornalRevista.getEditora()).length());
+            categoriaMaxLen = Math.max(categoriaMaxLen, jornalRevista.getCategoria().toString().length());
+            anoPubMaxLen = Math.max(anoPubMaxLen, String.valueOf(jornalRevista.getDataPublicacao()).length());
+            issnMaxLen = Math.max(issnMaxLen, String.valueOf(jornalRevista.getIssn()).length());
+        }
+
+        //Esta string cria as linhas baseado no tamanho máximo de cada coluna
+        String formato = "| %-" + idMaxLen + "s | %-" + tituloMaxLen + "s | %-" + editoraMaxLen  + "s | %-" + categoriaMaxLen  + "s | %-" + anoPubMaxLen + "s | %-" + issnMaxLen + "s |\n";
+        //Esta string cria a linha de separação
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tituloMaxLen) + "-+-" + "-".repeat(editoraMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-" + "-".repeat(anoPubMaxLen) + "-+-" + "-".repeat(issnMaxLen) + "-+";
+
+        //Imprime a linha de separação (+---+---+ ...)
+        System.out.println(separador);
+        //Imprime o cabeçalho da tabela
+        System.out.printf(formato, "Id", "Titulo", "Editora", "Categoria", "Ano de Publicação", "ISSN");
+        //Imprime a linha de separação
+        System.out.println(separador);
+
+        //int id, String titulo, String editora, String categoria, int anoEdicao, String isbn, String autor, int codBiblioteca
+
+        //Imprime os dados dos jornais/revistas
+        for (JornalRevista jornalRevista : listaJornalRevista) {
+            System.out.printf(formato, jornalRevista.getId(), jornalRevista.getTitulo(), jornalRevista.getEditora(), jornalRevista.getCategoria(), jornalRevista.getDataPublicacao(), jornalRevista.getIssn());
         }
 
         System.out.println(separador);
