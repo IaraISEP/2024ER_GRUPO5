@@ -133,18 +133,18 @@ public class CriarMenu {
      * Exibe o menu de listagem de livros.
      */
     private static void menuListarLivros() {
-        Menu menuListarClientes = new Menu("Listar Livros");
+        Menu menuListarLivros = new Menu("Listar Livros");
 
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
             TratamentoDados.listaTodosLivros();
             keyPress();
         }));
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
             TratamentoDados.listaLivroPorIsbn();
             keyPress();
         }));
 
-        menuListarClientes.exibir();
+        menuListarLivros.exibir();
     }
 
     /**
@@ -161,6 +161,7 @@ public class CriarMenu {
             }
             keyPress();
         }));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Listar Jornais", CriarMenu::menuListarJornais));
         menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
             System.out.println("Editar Jornal...");
             keyPress();
@@ -186,6 +187,24 @@ public class CriarMenu {
     }
 
     /**
+     * Exibe o menu de listagem de jornais.
+     */
+    private static void menuListarJornais() {
+        Menu menuListarJornais = new Menu("Listar Jornais");
+
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Todos jornais",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Listar jornais por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+
+        menuListarJornais.exibir();
+    }
+
+    /**
      * Exibe o menu de gestão de revistas.
      */
     private static void menuRevista() {
@@ -195,6 +214,7 @@ public class CriarMenu {
             System.out.println("Criar Revista...");
             keyPress();
         }));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Listar Revistas", CriarMenu::menuListarRevistas));
         menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revista", () -> {
             System.out.println("Editar Revista...");
             keyPress();
@@ -219,6 +239,23 @@ public class CriarMenu {
         menuRevista.exibir();
     }
 
+    /**
+     * Exibe o menu de listagem de revistas.
+     */
+    private static void menuListarRevistas() {
+        Menu menuListarRevistas = new Menu("Listar Revistas");
+
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Todos revistas",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Listar revistas por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+
+        menuListarRevistas.exibir();
+    }
 
     /**
      * Exibe o menu de gestão de reservas.
