@@ -243,6 +243,7 @@ public class CriarMenu {
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
+            //TODO : A desenvolver
             System.out.println("Reserva Concluída...");
             keyPress();
         }));
@@ -257,14 +258,17 @@ public class CriarMenu {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
 
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Criar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Criado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Editado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Concluído...");
             keyPress();
         }));

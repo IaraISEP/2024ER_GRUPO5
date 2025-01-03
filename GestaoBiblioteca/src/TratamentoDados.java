@@ -565,8 +565,6 @@ public class TratamentoDados {
                 System.out.print("Contribuinte Inválido! ex: 123456789");
         }while (!flag);
 
-        System.out.println("Reserva criada com sucesso!");
-
         return new Reserva(codBiblioteca, numMovimento, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }
 
@@ -575,6 +573,10 @@ public class TratamentoDados {
      * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
+        if(livros.isEmpty()){
+            System.out.println("Não existem livros nesta Biblioteca");
+            return;
+        }
         if (clientes.isEmpty()){
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
@@ -605,6 +607,8 @@ public class TratamentoDados {
             criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
             reservas.add(reserva);
         }while(true);
+
+        System.out.println("Reserva criada com sucesso!");
 
         gravarArrayReservas();
     }
@@ -736,11 +740,6 @@ public class TratamentoDados {
         LocalDateTime dataRegisto = LocalDateTime.now();
 
         String isbn = "";
-
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca não pode reservar");
-            return null;
-        }
 
         listaTodosLivros();
 
