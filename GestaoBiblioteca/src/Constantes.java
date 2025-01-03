@@ -1,7 +1,7 @@
 
 public class Constantes {
 
-    public enum CategoriaLivro {
+    public enum Categoria {
         ARTE(1),
         BANDA_DESENHADA(2),
         CIENCIAS(3),
@@ -12,64 +12,28 @@ public class Constantes {
         INFORMATICA(8),
         POLITICA(9),
         SAUDE(10),
-        OUTROS(11);
+        NOTICIAS(11),
+        NEGOCIOS(12),
+        DESPORTO(13),
+        CULTURA(14),
+        TECNOLOGIA(15),
+        OPINIAO(16),
+        ATUALIDADE(17),
+        ENTRETENIMENTO(18),
+        CELEBRIDADES(19),
+        MODA(20),
+        LIFESTYLE(21),
+        AUTOMOVEIS(22),
+        VIAGENS(23),
+        OUTROS(24);
+        private final int categoria;
 
-        private final int categoriaLivro;
-
-        CategoriaLivro(int categoria) {
-            this.categoriaLivro = categoria;
+        Categoria(int categoria) {
+            this.categoria = categoria;
         }
 
-        public int getCategoriaLivro() {
-            return categoriaLivro;
-        }
-    }
-
-    public enum CategoriaJornal {
-        NOTICIAS(1),
-        POLITICA(2),
-        NEGOCIOS(3),
-        DESPORTO(4),
-        CULTURA(5),
-        TECNOLOGIA(6),
-        SAUDE(7),
-        OPINIAO(8),
-        OUTROS(9);
-
-        private final int categoriaJornal;
-
-        CategoriaJornal(int categoriaJornal) {
-            this.categoriaJornal = categoriaJornal;
-        }
-
-        public int getCategoriaJornal() {
-            return categoriaJornal;
-        }
-    }
-
-    public enum CategoriaRevista {
-        ATUALIDADE(1),
-        NOTICIAS(2),
-        ENTRETENIMENTO(3),
-        CELEBRIDADES(4),
-        MODA(5),
-        LIFESTYLE(6),
-        SAUDE(7),
-        TECNOLOGIA(8),
-        AUTOMOVEIS(9),
-        DESPORTOS(10),
-        NEGOCIOS(10),
-        VIAGENS(10),
-        OUTROS(11);
-
-        private final int categoriaRevista;
-
-        CategoriaRevista(int categoriaRevista) {
-            this.categoriaRevista = categoriaRevista;
-        }
-
-        public int getCategoriaRevista() {
-            return categoriaRevista;
+        public int getCategoria() {
+            return categoria;
         }
     }
 
