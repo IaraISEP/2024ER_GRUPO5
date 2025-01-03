@@ -16,8 +16,8 @@ public class JornalRevista extends ItemBiblioteca {
      * @param dataPublicacao A data de publicação do jornal/revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public JornalRevista(int id, String titulo, String editora, String issn, int dataPublicacao, int codBiblioteca, Constantes.TipoItem tipo) {
-        super(id, titulo, editora, codBiblioteca);
+    public JornalRevista(int id, String titulo, String editora, String issn, int dataPublicacao, int codBiblioteca, Constantes.TipoItem tipo, Constantes.Categoria categoria) {
+        super(id, titulo, editora, categoria, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
         this.tipo = tipo;
