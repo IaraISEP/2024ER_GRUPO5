@@ -439,7 +439,7 @@ public class TratamentoDados {
     public static void gravarArrayLivros() throws IOException {
         if (livros.isEmpty()) {
             new File("Biblioteca_1/Livros/livros.csv").delete();
-            System.out.println("Lista de livros vazia. Arquivo excluído.");
+            System.out.println("Biblioteca não tem contem livros.");
             return;
         }
         for (int i = 0; i < livros.size(); i++) {
@@ -575,38 +575,37 @@ public class TratamentoDados {
      * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
-        boolean exit;
-        if (!clientes.isEmpty()){
-            int idAuto = pesquisarIdArray(Constantes.TipoItem.RESERVA);
-            reservas.add(inserirDadosReserva(idAuto));
-            Reserva reserva = reservas.getLast();
-            /*
-             * TODO:
-             *   Ao criar a reserva abrir a opção para editar os detalhes da reserva
-             *   Escolher livro revista ou jornal
-             *   selecionar as datas
-             */
-
-            do{
-                reservasdtl.add(inserirDetalhesReserva(reserva));
-                gravarArrayReservasDtl();
-                ReservaDtl reservaDtl = reservasdtl.getLast();
-                System.out.println("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)");
-                int opcao = input.nextInt();
-                input.nextLine();
-                if (opcao == 1){
-                    exit = false;
-                }else {
-                    exit = true;
-                }
-                // Criar o historico dos movimentos
-                criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
-                reservas.add(reserva);
-            }while(!exit);
-
-        }else {
-            System.out.println("Não existm clientes nesta Biblioteca");
+        if (clientes.isEmpty()){
+            System.out.println("Não existem clientes nesta Biblioteca");
+            return;
         }
+
+        int idAuto = pesquisarIdArray(Constantes.TipoItem.RESERVA);
+        reservas.add(inserirDadosReserva(idAuto));
+        Reserva reserva = reservas.getLast();
+
+        /*
+         * TODO:
+         *   Ao criar a reserva abrir a opção para editar os detalhes da reserva
+         *   Escolher livro revista ou jornal
+         *   selecionar as datas
+         */
+
+        do{
+            reservasdtl.add(inserirDetalhesReserva(reserva));
+            gravarArrayReservasDtl();
+            ReservaDtl reservaDtl = reservasdtl.getLast();
+            System.out.println("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)");
+            int opcao = input.nextInt();
+            input.nextLine();
+            if (opcao == 2){
+                break;
+            }
+            // Criar o historico dos movimentos
+            criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
+            reservas.add(reserva);
+        }while(true);
+
         gravarArrayReservas();
     }
 
@@ -653,14 +652,10 @@ public class TratamentoDados {
     }
 
     public static void lerFicheiroCsvReservas(String ficheiro){
-
-        BufferedReader readFile;
-        String linha;
-        String csvDivisor = ";", isbn="";
-        //ArrayList<String> dados= new ArrayList<String>();
-
-        try{
-            readFile = new BufferedReader(new FileReader(ficheiro));
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha;
+            String csvDivisor = ";", isbn="";
+            //ArrayList<String> dados= new ArrayList<String>();
             while ((linha = readFile.readLine()) != null) {
                 int codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[0]),
                     codMovimento = Integer.parseInt(linha.split(csvDivisor)[1]),
@@ -678,7 +673,6 @@ public class TratamentoDados {
                 */
 
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
-
                 reservas.add(reserva);
             }
         }
@@ -693,21 +687,22 @@ public class TratamentoDados {
     public static void listaTodasReservas() {
         if (reservas.isEmpty()) {
             System.out.println("Não existem reservas para mostrar.");
-        } else {
-            mostraTabelaReservas(reservas);
+            return;
         }
+
+        mostraTabelaReservas(reservas);
     }
 
     public static void gravarArrayReservas() throws IOException {
+        if(reservas.isEmpty()) {
+            new File("Biblioteca_1/Reservas/reservas.csv").delete();
+            System.out.println("Array vazio");
+        }
+
         if(!reservas.isEmpty()){
             for(int i = 0; i < reservas.size(); i++){
-                Reserva reserva = reservas.get(i);
-                criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reserva, i != 0);
+                criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reservas.get(i), i != 0);
             }
-        }else {
-            File file = new File("Biblioteca_1/Reservas/reservas.csv");
-            file.delete();
-            System.out.println("Array vazio");
         }
     }
 
@@ -732,21 +727,27 @@ public class TratamentoDados {
             Mas não se já estiver a ser usado noutra Reserva/emprestimo
             ou as Datas não são compativeis
         */
-        int idDetalhe = pesquisarIdArray(Constantes.TipoItem.RESERVADTL),
-            numMovimento = reserva.getNumMovimento(),
-            codBiblioteca = reserva.getCodBiblioteca(),
-            nif = reserva.getNif();
+        int idDetalhe = pesquisarIdArray(Constantes.TipoItem.RESERVADTL);
+        int numMovimento = reserva.getNumMovimento();
+        int codBiblioteca = reserva.getCodBiblioteca();
+        int nif = reserva.getNif();
         LocalDateTime dataInicio = LocalDateTime.now();
         LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
         LocalDateTime dataRegisto = LocalDateTime.now();
 
-        String isbn ="";
-        if (!livros.isEmpty()) {
-            listaTodosLivros();
-            do{
-                isbn="teste";
-            System.out.println("Escolha o(s) livro(s) que deseja adicionar a reserva: ");
+        String isbn = "";
+
+        if (livros.isEmpty()) {
+            System.out.println("Não existem livros nesta Biblioteca não pode reservar");
+            return null;
+        }
+
+        listaTodosLivros();
+
+        do {
+            System.out.println("Escolha o livro que deseja adicionar à reserva: ");
             int idLivro = input.nextInt();
+            input.nextLine(); // Clear buffer
 
             /*
                 TODO:
@@ -754,33 +755,35 @@ public class TratamentoDados {
                     Verificar se o Livro existe
                         Se existir verificar se está disponivel para reserva
             */
+
+            Livro livroEscolhido = null;
             for (Livro livro : livros) {
-                if (livro.getId()==idLivro){
-                    if (!reservasdtl.isEmpty()) {
-                        for (ReservaDtl reservaDtl : reservasdtl){
-                            if (reservaDtl.getIsbn().equals(livro.getIsbn())){
-                                System.out.println("Livro já se econtra reservado");
-                                isbn=null;
-                                break;
-                            }else {
-                                isbn = livro.getIsbn();
-                            }
-                        }
-                    }else {isbn = livro.getIsbn(); break;}
-                }else {
-                    System.out.println("ID não encontrado");
-                    isbn=null;
+                if (livro.getId() == idLivro) {
+                    livroEscolhido = livro;
+                    break;
                 }
-                if (isbn==null){break;}
             }
-            }while (isbn==null);
-        }else{
-            System.out.println("Não existem livros nesta Biblioteca não pode reservar");
-            return null;
-        }
 
+            if (livroEscolhido == null) {
+                System.out.println("ID não encontrado");
+                isbn = null;
+            } else {
+                boolean livroReservado = false;
+                for (ReservaDtl reservaDtl : reservasdtl) {
+                    if (reservaDtl.getIsbn().equals(livroEscolhido.getIsbn())) {
+                        System.out.println("Livro já se encontra reservado");
+                        livroReservado = true;
+                        isbn = null;
+                        break;
+                    }
+                }
+                if (!livroReservado) {
+                    isbn = livroEscolhido.getIsbn();
+                }
+            }
+        } while (isbn == null);
 
-        return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
+        return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
     }
 
     /**
@@ -810,31 +813,23 @@ public class TratamentoDados {
      * */
     public static void lerFicheiroCsvReservasDtl(String ficheiro){
 
-        BufferedReader readFile;
-        String linha;
-        String csvDivisor = ";";
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha;
+            String csvDivisor = ";";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-        try{
-            readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
-                int idDetalhe = Integer.parseInt(linha.split(csvDivisor)[0]),
-                        codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[1]),
-                        idReserva = Integer.parseInt(linha.split(csvDivisor)[2]);
-                String dataInicioS = (linha.split(csvDivisor)[3]),
-                              dataFimS = (linha.split(csvDivisor)[4]), // Example duration
-                              dataRegistoS = (linha.split(csvDivisor)[5]);
-                int        nif = Integer.parseInt(linha.split(csvDivisor)[6]);
-                String  isbn = (linha.split(csvDivisor)[7]);
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-                LocalDateTime dataInicio = LocalDateTime.parse(dataInicioS, formatter);
-                LocalDateTime dataFim = LocalDateTime.parse(dataFimS, formatter);
-                LocalDateTime dataRegisto = LocalDateTime.parse(dataRegistoS, formatter);
-
+                String[] dados = linha.split(csvDivisor);
+                int idDetalhe = Integer.parseInt(dados[0]);
+                int codBiblioteca = Integer.parseInt(dados[1]);
+                int idReserva = Integer.parseInt(dados[2]);
+                LocalDateTime dataInicio = LocalDateTime.parse(dados[3], formatter);
+                LocalDateTime dataFim = LocalDateTime.parse(dados[4], formatter);
+                LocalDateTime dataRegisto = LocalDateTime.parse(dados[5], formatter);
+                int nif = Integer.parseInt(dados[6]);
+                String isbn = dados[7];
 
                 ReservaDtl reservadtl = new ReservaDtl(idDetalhe, codBiblioteca, idReserva, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
-
                 reservasdtl.add(reservadtl);
             }
         }
@@ -851,15 +846,13 @@ public class TratamentoDados {
      * no Ficheiro reservasdtl.csv
      * */
     public static void gravarArrayReservasDtl() throws IOException {
-        if(!reservasdtl.isEmpty()){
-            for(int i = 0; i < reservasdtl.size(); i++){
-                ReservaDtl reservaDtl = reservasdtl.get(i);
-                criarFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv", reservaDtl, i != 0);
-            }
-        }else {
-            File file = new File("Biblioteca_1/Reservas/Details/reservadtl.csv");
-            file.delete();
+        if (reservasdtl.isEmpty()) {
+            new File("Biblioteca_1/Reservas/Details/reservadtl.csv").delete();
             System.out.println("Array vazio");
+        } else {
+            for (int i = 0; i < reservasdtl.size(); i++) {
+                criarFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv", reservasdtl.get(i), i != 0);
+            }
         }
     }
 
