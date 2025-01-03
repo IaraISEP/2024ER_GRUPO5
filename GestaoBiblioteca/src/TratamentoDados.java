@@ -20,8 +20,8 @@ public class TratamentoDados {
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
-    private static List<Jornal> jornais = new ArrayList<>();
-    private static List<Revista> revistas = new ArrayList<>();
+    private static List<JornalRevista> jornais = new ArrayList<>();
+    private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<ReservaDtl> reservasdtl = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class TratamentoDados {
         Constantes.Genero genero = null;
 
         do {
-            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false, null);
             nif = pesquisarNifArrayCliente(nif, etapa, id);
             flag = validarTamanho(String.valueOf(nif),9);
 
@@ -100,7 +100,7 @@ public class TratamentoDados {
         } while (!flag);
 
         do {
-            contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false);
+            contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
             flag=validarTamanho(String.valueOf(contacto),9);
 
             if(!flag)
@@ -134,7 +134,7 @@ public class TratamentoDados {
         listaTodosClientes();
 
         // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false, null);
 
         // Procura o cliente pelo ID e, caso encontre, edita o cliente
         for(int index = 0; index < clientes.size(); index++) {
@@ -178,7 +178,7 @@ public class TratamentoDados {
      */
     public static void listaClientePorNif(){
         // Lê o NIF do cliente a ser encontrado
-        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false);
+        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false, null);
 
         // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
@@ -215,7 +215,7 @@ public class TratamentoDados {
         listaTodosClientes();
 
         // Lê o ID do cliente a ser apagado
-        int idApagar = lerInt("Escolha o ID do cliente que deseja apagar: ", false);
+        int idApagar = lerInt("Escolha o ID do cliente que deseja apagar: ", false, null);
 
         Cliente clienteApagar = null;
 
@@ -392,7 +392,7 @@ public class TratamentoDados {
             return;
         }
         listaTodosLivros();
-        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
 
         for (Livro livro : livros) {
             if (livro.getId() == idEditar) {
@@ -416,7 +416,7 @@ public class TratamentoDados {
         }
 
         listaTodosLivros();
-        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false);
+        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
         Livro livroRemover = null;
         for (Livro livro : livros) {
             if (livro.getId() == idApagar) {
@@ -439,7 +439,7 @@ public class TratamentoDados {
     public static void gravarArrayLivros() throws IOException {
         if (livros.isEmpty()) {
             new File("Biblioteca_1/Livros/livros.csv").delete();
-            System.out.println("Biblioteca não tem contem livros.");
+            System.out.println("Lista de livros vazia. Arquivo excluído.");
             return;
         }
         for (int i = 0; i < livros.size(); i++) {
@@ -456,7 +456,7 @@ public class TratamentoDados {
                     String.valueOf(livro.getId()),
                     livro.getTitulo(),
                     livro.getEditora(),
-                    String.valueOf(livro.getCategoriaInt()),
+                    livro.getCategoria(),
                     String.valueOf(livro.getAnoEdicao()),
                     livro.getIsbn(),
                     livro.getAutor(),
@@ -482,7 +482,7 @@ public class TratamentoDados {
                 String isbn = dados[5];
                 String autor = dados[6];
                 int codBiblioteca = Integer.parseInt(dados[7]);
-                Livro livro = new Livro(id, codBiblioteca, titulo, editora, Constantes.CategoriaLivro.valueOf(categoria), anoEdicao, isbn, autor);
+                Livro livro = new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor, codBiblioteca);
                 livros.add(livro);
             }
         } catch (IOException e) {
@@ -496,8 +496,8 @@ public class TratamentoDados {
     private static Livro inserirDadosLivro(int id) {
         String titulo = lerString("Insira o Título do livro: ");
         String editora = lerString("Insira a Editora do livro: ");
-        Constantes.CategoriaLivro categoria = selecionaCategoria();
-        int anoEdicao = lerInt("Insira o ano de Edição do livro: ", false);
+        String categoria = lerString("Insira a Categoria do livro: ");
+        int anoEdicao = lerInt("Insira o ano de Edição do livro: ", true, Constantes.TipoItem.LIVRO);
         String isbn;
         boolean flag;
         do {
@@ -514,7 +514,7 @@ public class TratamentoDados {
         }while(!flag);
         String autor = lerString("Insira o Autor do livro: ");
 
-        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+        return new Livro(id, titulo, editora, categoria, anoEdicao, isbn, autor, 1);
     }
 
     /**
@@ -545,6 +545,104 @@ public class TratamentoDados {
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
      */
+    /*
+     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
+     */
+
+    /**
+     * Adiciona um novo jornal ao sistema.
+     */
+    public static void criarJornal() throws IOException {
+        jornais.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.JORNAL));
+        System.out.println("Jornal criado com sucesso!");
+        gravarArrayJornal();
+    }
+
+    /**
+     * Adiciona uma nova revista ao sistema.
+     */
+    public static void criarRevista() throws IOException {
+        revistas.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.REVISTA));
+        System.out.println("Revista criado com sucesso!");
+        gravarArrayRevista();
+    }
+
+    /**
+     * Solicita os dados do usuário para criar ou editar um jornal/revista.
+     */
+    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem) {
+        String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
+        String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
+        String categoria = lerString("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
+        int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
+        String issn;
+        boolean flag;
+        do {
+            issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+            flag = validarTamanho(issn, 9);
+            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
+                System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
+                flag = false;
+            }
+            if (issn.equals(pesquisarIssn(issn, tipoItem)) && flag) {
+                System.out.println("ISNN já existe! Tente novamente.");
+                flag = false;
+            }
+        }while(!flag);
+
+        return new JornalRevista(id, titulo, editora, categoria, issn, anoPub, 1, tipoItem);
+    }
+
+    /**
+     * Grava a lista de jornais em um arquivo CSV.
+     */
+    public static void gravarArrayJornal() throws IOException {
+        if (jornais.isEmpty()) {
+            new File("Biblioteca_1/Jornais/jornais.csv").delete();
+            System.out.println("Lista de jornais vazia. Arquivo excluído.");
+            return;
+        }
+        for (int i = 0; i < jornais.size(); i++) {
+            criarFicheiroCsvJornalRevista("Biblioteca_1/Jornais/jornais.csv", jornais.get(i), i != 0);
+        }
+    }
+
+    /**
+     * Grava a lista de revistas em um arquivo CSV.
+     */
+    public static void gravarArrayRevista() throws IOException {
+        if (revistas.isEmpty()) {
+            new File("Biblioteca_1/Revistas/revistas.csv").delete();
+            System.out.println("Lista de revistas vazia. Arquivo excluído.");
+            return;
+        }
+        for (int i = 0; i < revistas.size(); i++) {
+            criarFicheiroCsvJornalRevista("Biblioteca_1/Livros/livros.csv", revistas.get(i), i != 0);
+        }
+    }
+
+    /**
+     * Cria um arquivo CSV para armazenar os dados dos jornais/revistas.
+     */
+    public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
+        try (FileWriter fw = new FileWriter(ficheiro, append)) {
+            fw.write(String.join(";",
+                    String.valueOf(jornalRevista.getId()),
+                    jornalRevista.getTitulo(),
+                    jornalRevista.getEditora(),
+                    jornalRevista.getCategoria(),
+                    jornalRevista.getIssn(),
+                    String.valueOf(jornalRevista.getDataPublicacao()),
+                    String.valueOf(jornalRevista.getCodBiblioteca()),
+                    String.valueOf(jornalRevista.getTipo()),
+                    "\n"));
+        }
+    }
+
+
+    /*
+     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
+     * */
 
     /*
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
@@ -557,7 +655,7 @@ public class TratamentoDados {
         boolean flag;
         numMovimento = id;
         do {
-            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false, null);
             int idCliente;
             nif = pesquisarNifArrayCliente(nif, null, -1);
             flag = validarTamanho(String.valueOf(nif),9);
@@ -624,7 +722,7 @@ public class TratamentoDados {
         listaTodasReservas();
 
         // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
 
         // Procura a reserva pelo ID e, caso encontre, edita o cliente
         for(Reserva reserva : reservas) {
@@ -656,10 +754,14 @@ public class TratamentoDados {
     }
 
     public static void lerFicheiroCsvReservas(String ficheiro){
-        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            String linha;
-            String csvDivisor = ";", isbn="";
-            //ArrayList<String> dados= new ArrayList<String>();
+
+        BufferedReader readFile;
+        String linha;
+        String csvDivisor = ";", isbn="";
+        //ArrayList<String> dados= new ArrayList<String>();
+
+        try{
+            readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
                 int codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[0]),
                     codMovimento = Integer.parseInt(linha.split(csvDivisor)[1]),
@@ -677,6 +779,7 @@ public class TratamentoDados {
                 */
 
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
+
                 reservas.add(reserva);
             }
         }
@@ -691,22 +794,21 @@ public class TratamentoDados {
     public static void listaTodasReservas() {
         if (reservas.isEmpty()) {
             System.out.println("Não existem reservas para mostrar.");
-            return;
+        } else {
+            mostraTabelaReservas(reservas);
         }
-
-        mostraTabelaReservas(reservas);
     }
 
     public static void gravarArrayReservas() throws IOException {
-        if(reservas.isEmpty()) {
-            new File("Biblioteca_1/Reservas/reservas.csv").delete();
-            System.out.println("Array vazio");
-        }
-
         if(!reservas.isEmpty()){
             for(int i = 0; i < reservas.size(); i++){
-                criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reservas.get(i), i != 0);
+                Reserva reserva = reservas.get(i);
+                criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reserva, i != 0);
             }
+        }else {
+            File file = new File("Biblioteca_1/Reservas/reservas.csv");
+            file.delete();
+            System.out.println("Array vazio");
         }
     }
 
@@ -731,10 +833,10 @@ public class TratamentoDados {
             Mas não se já estiver a ser usado noutra Reserva/emprestimo
             ou as Datas não são compativeis
         */
-        int idDetalhe = pesquisarIdArray(Constantes.TipoItem.RESERVADTL);
-        int numMovimento = reserva.getNumMovimento();
-        int codBiblioteca = reserva.getCodBiblioteca();
-        int nif = reserva.getNif();
+        int idDetalhe = pesquisarIdArray(Constantes.TipoItem.RESERVADTL),
+            numMovimento = reserva.getNumMovimento(),
+            codBiblioteca = reserva.getCodBiblioteca(),
+            nif = reserva.getNif();
         LocalDateTime dataInicio = LocalDateTime.now();
         LocalDateTime dataFim = dataInicio.plusDays(7); // Example duration
         LocalDateTime dataRegisto = LocalDateTime.now();
@@ -746,7 +848,6 @@ public class TratamentoDados {
         do {
             System.out.println("Escolha o livro que deseja adicionar à reserva: ");
             int idLivro = input.nextInt();
-            input.nextLine(); // Clear buffer
 
             /*
                 TODO:
@@ -754,35 +855,33 @@ public class TratamentoDados {
                     Verificar se o Livro existe
                         Se existir verificar se está disponivel para reserva
             */
-
-            Livro livroEscolhido = null;
             for (Livro livro : livros) {
-                if (livro.getId() == idLivro) {
-                    livroEscolhido = livro;
-                    break;
+                if (livro.getId()==idLivro){
+                    if (!reservasdtl.isEmpty()) {
+                        for (ReservaDtl reservaDtl : reservasdtl){
+                            if (reservaDtl.getIsbn().equals(livro.getIsbn())){
+                                System.out.println("Livro já se econtra reservado");
+                                isbn=null;
+                                break;
+                            }else {
+                                isbn = livro.getIsbn();
+                            }
+                        }
+                    }else {isbn = livro.getIsbn(); break;}
+                }else {
+                    System.out.println("ID não encontrado");
+                    isbn=null;
                 }
+                if (isbn==null){break;}
             }
+            }while (isbn==null);
+        }else{
+            System.out.println("Não existem livros nesta Biblioteca não pode reservar");
+            return null;
+        }
 
-            if (livroEscolhido == null) {
-                System.out.println("ID não encontrado");
-                isbn = null;
-            } else {
-                boolean livroReservado = false;
-                for (ReservaDtl reservaDtl : reservasdtl) {
-                    if (reservaDtl.getIsbn().equals(livroEscolhido.getIsbn())) {
-                        System.out.println("Livro já se encontra reservado");
-                        livroReservado = true;
-                        isbn = null;
-                        break;
-                    }
-                }
-                if (!livroReservado) {
-                    isbn = livroEscolhido.getIsbn();
-                }
-            }
-        } while (isbn == null);
 
-        return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
+        return new ReservaDtl(idDetalhe, numMovimento, codBiblioteca, dataInicio, dataFim, clientes,  livros, jornais, revistas, dataRegisto, nif, isbn);
     }
 
     /**
@@ -812,30 +911,37 @@ public class TratamentoDados {
      * */
     public static void lerFicheiroCsvReservasDtl(String ficheiro){
 
-        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            String linha;
-            String csvDivisor = ";";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        BufferedReader readFile;
+        String linha;
+        String csvDivisor = ";";
 
+        try{
+            readFile = new BufferedReader(new FileReader(ficheiro));
             while ((linha = readFile.readLine()) != null) {
-                String[] dados = linha.split(csvDivisor);
-                int idDetalhe = Integer.parseInt(dados[0]);
-                int codBiblioteca = Integer.parseInt(dados[1]);
-                int idReserva = Integer.parseInt(dados[2]);
-                LocalDateTime dataInicio = LocalDateTime.parse(dados[3], formatter);
-                LocalDateTime dataFim = LocalDateTime.parse(dados[4], formatter);
-                LocalDateTime dataRegisto = LocalDateTime.parse(dados[5], formatter);
-                int nif = Integer.parseInt(dados[6]);
-                String isbn = dados[7];
+                int idDetalhe = Integer.parseInt(linha.split(csvDivisor)[0]),
+                        codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[1]),
+                        idReserva = Integer.parseInt(linha.split(csvDivisor)[2]);
+                String dataInicioS = (linha.split(csvDivisor)[3]),
+                              dataFimS = (linha.split(csvDivisor)[4]), // Example duration
+                              dataRegistoS = (linha.split(csvDivisor)[5]);
+                int        nif = Integer.parseInt(linha.split(csvDivisor)[6]);
+                String  isbn = (linha.split(csvDivisor)[7]);
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+                LocalDateTime dataInicio = LocalDateTime.parse(dataInicioS, formatter);
+                LocalDateTime dataFim = LocalDateTime.parse(dataFimS, formatter);
+                LocalDateTime dataRegisto = LocalDateTime.parse(dataRegistoS, formatter);
+
 
                 ReservaDtl reservadtl = new ReservaDtl(idDetalhe, codBiblioteca, idReserva, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
+
                 reservasdtl.add(reservadtl);
             }
         }
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-
         for (Reserva reserva : reservas) {
             System.out.println(reserva);
         }
@@ -845,13 +951,15 @@ public class TratamentoDados {
      * no Ficheiro reservasdtl.csv
      * */
     public static void gravarArrayReservasDtl() throws IOException {
-        if (reservasdtl.isEmpty()) {
-            new File("Biblioteca_1/Reservas/Details/reservadtl.csv").delete();
-            System.out.println("Array vazio");
-        } else {
-            for (int i = 0; i < reservasdtl.size(); i++) {
-                criarFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv", reservasdtl.get(i), i != 0);
+        if(!reservasdtl.isEmpty()){
+            for(int i = 0; i < reservasdtl.size(); i++){
+                ReservaDtl reservaDtl = reservasdtl.get(i);
+                criarFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv", reservaDtl, i != 0);
             }
+        }else {
+            File file = new File("Biblioteca_1/Reservas/Details/reservadtl.csv");
+            file.delete();
+            System.out.println("Array vazio");
         }
     }
 
@@ -887,15 +995,15 @@ public class TratamentoDados {
                 }
                 break;
             case JORNAL:
-                for (Jornal jornal : jornais) {
-                    if (jornal.getId() >= valor)
-                        valor = jornal.getId() + 1;
+                for (JornalRevista jornalRevista : jornais) {
+                    if (jornalRevista.getId() >= valor)
+                        valor = jornalRevista.getId() + 1;
                 }
                 break;
             case REVISTA:
-                for (Revista revista : revistas) {
-                    if (revista.getId() >= valor)
-                        valor = revista.getId() + 1;
+                for (JornalRevista jornalRevista : revistas) {
+                    if (jornalRevista.getId() >= valor)
+                        valor = jornalRevista.getId() + 1;
                 }
                 break;
             case EMPRESTIMO:
@@ -941,7 +1049,7 @@ public class TratamentoDados {
      * @param mensagem A mensagem a ser exibida ao usuário antes de ler a entrada.
      * @return O número inteiro digitado pelo usuário.
      */
-    public static int lerInt(String mensagem, Boolean isDate)
+    public static int lerInt(String mensagem, Boolean isDate, Constantes.TipoItem tipoItem)
     {
         if (isDate == null)
             isDate = false;
@@ -959,11 +1067,12 @@ public class TratamentoDados {
                     //  Primeiro livro impresso, assim como os conhecemos, em 1455 em Mainz, foi a A Bíblia de Gutenberg
                     //  Primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605 em Strasbourg.
                     //  Primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731 em Londres.
-                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear()) {
+                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO)
                         isInt = true;
-                    } else {
+                    else if(valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL)
+                        isInt = true;
+                    else
                         System.out.print("Por favor, insira um ano válido (yyyy): ");
-                    }
                 } else {
                     isInt = true;
                 }
@@ -1055,7 +1164,7 @@ public class TratamentoDados {
             idMaxLen = Math.max(idMaxLen, String.valueOf(livro.getId()).length());
             tituloMaxLen = Math.max(tituloMaxLen, String.valueOf(livro.getTitulo()).length());
             editoraMaxLen = Math.max(editoraMaxLen, String.valueOf(livro.getEditora()).length());
-            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().toString().length());
+            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().length());
             anoEdicaoMaxLen = Math.max(anoEdicaoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
             isbnMaxLen = Math.max(isbnMaxLen, String.valueOf(livro.getIsbn()).length());
             autorMaxLen = Math.max(autorMaxLen, String.valueOf(livro.getAutor()).length());
@@ -1116,53 +1225,26 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static Constantes.CategoriaLivro selecionaCategoria() {
-        int categoriaMaxLen = "Categoria".length();
-
-        // percorre a lista, e retorna o tamanho máximo do código e da categoria
-        for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
-            categoriaMaxLen = Math.max(categoriaMaxLen, (categoria.getCategoriaLivro() + " - " + categoria.name().replace('_', ' ')).length());
-        }
-
-        // Esta string cria as linhas baseado no tamanho máximo da categoria
-        String formato = "| %-" + categoriaMaxLen + "s |\n";
-        // Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(categoriaMaxLen) + "-+";
-
-        // Imprime a linha de separação (+---+---+ ...)
-        System.out.println(separador);
-        // Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Categoria");
-        // Imprime a linha de separação
-        System.out.println(separador);
-
-        // Imprime as categorias
-        for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
-            System.out.printf(formato, categoria.getCategoriaLivro() + " - " + categoria.name().replace('_', ' '));
-        }
-
-        System.out.println(separador);
-
-        // Valida sa a categoria inserida existe, caso contrário pede para inserir novamente
-        boolean categoriaValida = false;
-        Constantes.CategoriaLivro categoriaInserida = null;
-        while (!categoriaValida) {
-            int categoriaInt = lerInt("Insira a Categoria do livro: ", false);
-            for (Constantes.CategoriaLivro categoria : Constantes.CategoriaLivro.values()) {
-                if (categoria.getCategoriaLivro() == categoriaInt) {
-                    categoriaInserida = categoria;
-                    categoriaValida = true;
-                    break;
+    /**
+     * Pesquisa um ISnN na lista de jornais ou revistas.
+     */
+    private static String pesquisarIssn(String issn, Constantes.TipoItem tipoItem) {
+        if(tipoItem==Constantes.TipoItem.JORNAL) {
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getIssn().equals(issn)) {
+                    return issn;
                 }
             }
-            if (!categoriaValida) {
-                System.out.println("Categoria inválida! Tente novamente.");
+        }
+        else {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getIssn().equals(issn)) {
+                    return issn;
+                }
             }
         }
-
-        return categoriaInserida;
+        return null;
     }
-
     /*
      * ########################################## HELPERS - FIM ########################################################
      * */

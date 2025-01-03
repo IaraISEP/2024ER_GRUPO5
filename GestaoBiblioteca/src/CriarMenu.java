@@ -154,7 +154,11 @@ public class CriarMenu {
         Menu menuJornal = new Menu("Gestão de Jornais");
 
         menuJornal.adicionarOpcao(new OpcaoMenu("Criar Jornal", () -> {
-            System.out.println("Criar Jornal...");
+            try {
+                TratamentoDados.criarJornal();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
