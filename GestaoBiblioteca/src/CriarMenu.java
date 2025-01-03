@@ -219,7 +219,11 @@ public class CriarMenu {
         Menu menuRevista = new Menu("Gestão de Revistas");
 
         menuRevista.adicionarOpcao(new OpcaoMenu("Criar Revista", () -> {
-            System.out.println("Criar Revista...");
+            try {
+                TratamentoDados.criarRevista();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuRevista.adicionarOpcao(new OpcaoMenu("Listar Revistas", CriarMenu::menuListarRevistas));
@@ -261,7 +265,7 @@ public class CriarMenu {
     private static void menuListarRevistas() {
         Menu menuListarRevistas = new Menu("Listar Revistas");
 
-        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Todos revistas",  () -> {
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Todas revistas",  () -> {
             TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
             keyPress();
         }));

@@ -603,7 +603,7 @@ public class TratamentoDados {
      */
     public static void criarRevista() throws IOException {
         revistas.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.REVISTA));
-        System.out.println("Revista criado com sucesso!");
+        System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
 
