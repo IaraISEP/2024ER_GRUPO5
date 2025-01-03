@@ -1,4 +1,4 @@
-/** Representa um Jornal/Revista
+/** Representa um Jornal/Revista na biblioteca.
  * @author ER_GRUPO_5
  * @since 2024
  */
@@ -9,15 +9,15 @@ public class JornalRevista extends ItemBiblioteca {
     /**
      * Construtor para criar um Jornal/Revista.
      *
+     * @param id O ID do jornal/revista.
      * @param titulo O título do jornal/revista.
      * @param editora A editora do jornal/revista.
-     * @param categoria A categoria do jornal/revista.
      * @param issn O ISSN do jornal/revista.
      * @param dataPublicacao A data de publicação do jornal/revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public JornalRevista(int id, String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(id, titulo, categoria, editora, codBiblioteca);
+    public JornalRevista(int id, String titulo, String editora, String issn, int dataPublicacao, int codBiblioteca) {
+        super(id, titulo, editora, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
     }
