@@ -13,10 +13,10 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         TratamentoDados.criarSistemaFicheiros();
-        TratamentoDados.lerFicheiroCsvClientes("Biblioteca_1/Clientes/clientes.csv");
-        TratamentoDados.lerFicheiroCsvLivros("Biblioteca_1/Livros/livros.csv");
-        TratamentoDados.lerFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv");
-        TratamentoDados.lerFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv");
+        TratamentoDados.lerFicheiroCsvClientes(Constantes.Path.CLIENTE.getValue());
+        TratamentoDados.lerFicheiroCsvLivros(Constantes.Path.LIVRO.getValue());
+        TratamentoDados.lerFicheiroCsvReservas(Constantes.Path.RESERVA.getValue());
+        TratamentoDados.lerFicheiroCsvReservasDtl(Constantes.Path.RESERVADTL.getValue());
         CriarMenu.menuPrincipal();
     }
 }

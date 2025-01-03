@@ -47,13 +47,13 @@ public class TratamentoDados {
             }
         }
         File[] files = new File[]{
-                new File("Biblioteca_1/Clientes/clientes.csv"),
-                new File("Biblioteca_1/Livros/livros.csv"),
-                new File("Biblioteca_1/Jornais/jornais.csv"),
-                new File("Biblioteca_1/Revistas/revistas.csv"),
-                new File("Biblioteca_1/Emprestimos/emprestimos.csv"),
-                new File("Biblioteca_1/Reservas/reservas.csv"),
-                new File("Biblioteca_1/Reservas/Details/reservadtl.csv"),
+                new File(Constantes.Path.CLIENTE.getValue()),
+                new File(Constantes.Path.LIVRO.getValue()),
+                new File(Constantes.Path.JORNAL.getValue()),
+                new File(Constantes.Path.REVISTA.getValue()),
+                new File(Constantes.Path.EMPRESTIMO.getValue()),
+                new File(Constantes.Path.RESERVA.getValue()),
+                new File(Constantes.Path.RESERVADTL.getValue()),
                 new File("Biblioteca_1/Historico/reservas_h.csv"),
                 new File("Biblioteca_1/Historico/emprestimos_h.csv")
         };
@@ -264,7 +264,7 @@ public class TratamentoDados {
         // Itera pela lista de clientes e grava cada um no ficheiro
         for(int i = 0; i < clientes.size(); i++) {
             Cliente cliente = clientes.get(i);
-            criarFicheiroCsvCliente("Biblioteca_1/Clientes/clientes.csv", cliente, i != 0);
+            criarFicheiroCsvCliente(Constantes.Path.CLIENTE.getValue(), cliente, i != 0);
         }
     }
 
@@ -438,12 +438,12 @@ public class TratamentoDados {
      */
     public static void gravarArrayLivros() throws IOException {
         if (livros.isEmpty()) {
-            new File("Biblioteca_1/Livros/livros.csv").delete();
+            new File(Constantes.Path.LIVRO.getValue()).delete();
             System.out.println("Biblioteca não tem contem livros.");
             return;
         }
         for (int i = 0; i < livros.size(); i++) {
-            criarFicheiroCsvLivro("Biblioteca_1/Livros/livros.csv", livros.get(i), i != 0);
+            criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
         }
     }
 
@@ -598,12 +598,12 @@ public class TratamentoDados {
      */
     public static void gravarArrayJornal() throws IOException {
         if (jornais.isEmpty()) {
-            new File("Biblioteca_1/Jornais/jornais.csv").delete();
+            new File(Constantes.Path.JORNAL.getValue()).delete();
             System.out.println("Lista de jornais vazia. Arquivo excluído.");
             return;
         }
         for (int i = 0; i < jornais.size(); i++) {
-            criarFicheiroCsvJornalRevista("Biblioteca_1/Jornais/jornais.csv", jornais.get(i), i != 0);
+            criarFicheiroCsvJornalRevista(Constantes.Path.JORNAL.getValue(), jornais.get(i), i != 0);
         }
     }
 
@@ -612,12 +612,12 @@ public class TratamentoDados {
      */
     public static void gravarArrayRevista() throws IOException {
         if (revistas.isEmpty()) {
-            new File("Biblioteca_1/Revistas/revistas.csv").delete();
+            new File(Constantes.Path.REVISTA.getValue()).delete();
             System.out.println("Lista de revistas vazia. Arquivo excluído.");
             return;
         }
         for (int i = 0; i < revistas.size(); i++) {
-            criarFicheiroCsvJornalRevista("Biblioteca_1/Livros/livros.csv", revistas.get(i), i != 0);
+            criarFicheiroCsvJornalRevista(Constantes.Path.REVISTA.getValue(), revistas.get(i), i != 0);
         }
     }
 
@@ -796,12 +796,12 @@ public class TratamentoDados {
 
     public static void gravarArrayReservas() throws IOException {
         if(reservas.isEmpty()) {
-            new File("Biblioteca_1/Reservas/reservas.csv").delete();
+            new File(Constantes.Path.RESERVA.getValue()).delete();
             System.out.println("Array vazio");
         }
 
         for(int i = 0; i < reservas.size(); i++){
-            criarFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv", reservas.get(i), i != 0);
+            criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
         }
     }
 
@@ -939,12 +939,12 @@ public class TratamentoDados {
      * */
     public static void gravarArrayReservasDtl() throws IOException {
         if (reservasdtl.isEmpty()) {
-            new File("Biblioteca_1/Reservas/Details/reservadtl.csv").delete();
+            new File(Constantes.Path.RESERVADTL.getValue()).delete();
             System.out.println("Array vazio");
         }
 
         for (int i = 0; i < reservasdtl.size(); i++) {
-            criarFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv", reservasdtl.get(i), i != 0);
+            criarFicheiroCsvReservasDtl(Constantes.Path.RESERVADTL.getValue(), reservasdtl.get(i), i != 0);
         }
     }
 
