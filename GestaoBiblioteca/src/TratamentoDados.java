@@ -719,10 +719,13 @@ public class TratamentoDados {
      * Edita os dados de uma REVISTA ou JORNAL existente.
      */
     public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
-        if (revistas.isEmpty()) {
+        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
             System.out.println("Não existem Revistas nesta Biblioteca.");
             return;
+        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem Jornais nesta Biblioteca.");
         }
+
 
         listaTodosJornalRevista(tipoItem);
         int idEditarJornalRevista = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar: ", false, null);
@@ -753,31 +756,49 @@ public class TratamentoDados {
     /**
      * Apaga uma REVISTA e JORNAL pelo ID.
      */
-    /*
-    public static void apagarJornalRevista(int id, Constantes.TipoItem tipoItem) throws IOException {
-        if (revistas.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca.");
+
+    public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+            System.out.println("Não existem Revistas nesta Biblioteca.");
             return;
+        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem Jornais nesta Biblioteca.");
         }
 
+
         listaTodosJornalRevista(tipoItem);
+
         int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
-        Livro livroRemover = null;
-        for (Livro livro : livros) {
-            if (livro.getId() == idApagar) {
-                livroRemover = livro;
-                break;
+        JornalRevista jornalRevistaRemover = null;
+        if (tipoItem == Constantes.TipoItem.REVISTA) {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getId() == idApagar) {
+                    jornalRevistaRemover = jornalRevista;
+                    break;
+                }
+            }
+        } else if (tipoItem == Constantes.TipoItem.JORNAL) {
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getId() == idApagar) {
+                    jornalRevistaRemover = jornalRevista;
+                    break;
+                }
             }
         }
-        if (livroRemover == null) {
-            System.out.println("ID do livro não encontrado.");
+        if (jornalRevistaRemover == null) {
+            System.out.println("ID "+ tipoItem.toString().toLowerCase() +" não encontrado.");
             return;
         }
-        livros.remove(livroRemover);
-        System.out.println("Livro apagado com sucesso!");
-        gravarArrayLivros();
+        if(tipoItem == Constantes.TipoItem.REVISTA){
+            revistas.remove(jornalRevistaRemover);
+            gravarArrayRevista();
+        }else if (tipoItem == Constantes.TipoItem.JORNAL){
+            jornais.add(jornalRevistaRemover);
+            gravarArrayJornal();
+        }
+        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
     }
-*/
+
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
      * */

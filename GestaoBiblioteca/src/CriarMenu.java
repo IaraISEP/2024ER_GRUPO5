@@ -171,7 +171,11 @@ public class CriarMenu {
             keyPress();
         }));
         menuJornal.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
-            System.out.println("Apagar Jornal...");
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         /*
@@ -228,7 +232,11 @@ public class CriarMenu {
             keyPress();
         }));
         menuRevista.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
-            System.out.println("Apagar Revista...");
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         /*
