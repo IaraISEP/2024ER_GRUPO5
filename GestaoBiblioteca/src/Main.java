@@ -15,6 +15,8 @@ public class Main {
         TratamentoDados.criarSistemaFicheiros();
         TratamentoDados.lerFicheiroCsvClientes("Biblioteca_1/Clientes/clientes.csv");
         TratamentoDados.lerFicheiroCsvLivros("Biblioteca_1/Livros/livros.csv");
+        TratamentoDados.lerFicheiroCsvJornaisRevistas("Biblioteca_1/Jornais/jornais.csv", Constantes.TipoItem.JORNAL);
+        TratamentoDados.lerFicheiroCsvJornaisRevistas("Biblioteca_1/Revistas/revistas.csv", Constantes.TipoItem.REVISTA);
         TratamentoDados.lerFicheiroCsvReservas("Biblioteca_1/Reservas/reservas.csv");
         TratamentoDados.lerFicheiroCsvReservasDtl("Biblioteca_1/Reservas/Details/reservadtl.csv");
         CriarMenu.menuPrincipal();
