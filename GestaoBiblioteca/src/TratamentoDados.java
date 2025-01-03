@@ -640,6 +640,68 @@ public class TratamentoDados {
     }
 
 
+    /**
+     * Edita os dados de uma REVISTA ou JORNAL existente.
+     */
+    public static void editarJornalRevista(int id, Constantes.TipoItem tipoItem) throws IOException {
+        if (revistas.isEmpty()) {
+            System.out.println("Não existem Revistas nesta Biblioteca.");
+            return;
+        }
+
+        //se receber o tipo de item jornal lista todos os jornais ou se receber revistas lista as revistas
+        if(tipoItem==Constantes.TipoItem.JORNAL)
+            System.out.println("");
+        else if(tipoItem==Constantes.TipoItem.REVISTA)
+            System.out.println("");
+
+        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
+
+        for (Revista revista : revistas) {
+            if (revistas.get() == idEditar) {
+                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
+                System.out.println("Livro editado com sucesso!");
+                gravarArrayLivros();
+                return;
+            }
+        }
+
+        System.out.println("ID do livro não encontrado.");
+    }
+
+
+
+    /**
+     * Apaga uma REVISTA e JORNAL pelo ID.
+     */
+    public static void apagarLivroPeloId(int id, Constantes.TipoItem tipoItem) throws IOException {
+        if (livros.isEmpty()) {
+            System.out.println("Não existem livros nesta Biblioteca.");
+            return;
+        }
+
+        if(tipoItem==Constantes.TipoItem.JORNAL)
+            System.out.println("");
+        else if(tipoItem==Constantes.TipoItem.REVISTA)
+            System.out.println("");
+
+        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
+        Livro livroRemover = null;
+        for (Livro livro : livros) {
+            if (livro.getId() == idApagar) {
+                livroRemover = livro;
+                break;
+            }
+        }
+        if (livroRemover == null) {
+            System.out.println("ID do livro não encontrado.");
+            return;
+        }
+        livros.remove(livroRemover);
+        System.out.println("Livro apagado com sucesso!");
+        gravarArrayLivros();
+    }
+
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
      * */
@@ -1055,6 +1117,8 @@ public class TratamentoDados {
                     if (valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO)
                         isInt = true;
                     else if(valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL)
+                        isInt = true;
+                    else if(valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)
                         isInt = true;
                     else
                         System.out.print("Por favor, insira um ano válido (yyyy): ");
