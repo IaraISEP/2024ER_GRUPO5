@@ -650,7 +650,7 @@ public class TratamentoDados {
             return;
         }
 
-        String issn = lerString("Digite o ISSN do livro que deseja encontrar: ");
+        String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar: ");
 
         if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
@@ -768,7 +768,7 @@ public class TratamentoDados {
 
         listaTodosJornalRevista(tipoItem);
 
-        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
+        int idApagar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " livro que deseja apagar: ", false, null);
         JornalRevista jornalRevistaRemover = null;
         if (tipoItem == Constantes.TipoItem.REVISTA) {
             for (JornalRevista jornalRevista : revistas) {
@@ -793,7 +793,7 @@ public class TratamentoDados {
             revistas.remove(jornalRevistaRemover);
             gravarArrayRevista();
         }else if (tipoItem == Constantes.TipoItem.JORNAL){
-            jornais.add(jornalRevistaRemover);
+            jornais.remove(jornalRevistaRemover);
             gravarArrayJornal();
         }
         System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
