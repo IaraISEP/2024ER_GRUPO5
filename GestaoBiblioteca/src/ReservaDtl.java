@@ -18,7 +18,7 @@ public class ReservaDtl extends Reserva {
      * @param nif           O NIF do cliente.
      * @param isbn          O ISBN do livro.
      */
-    public ReservaDtl(int idDetalhe, int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas, LocalDateTime dataRegisto, int nif, String isbn) {
+    public ReservaDtl(int idDetalhe, int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<JornalRevista> jornais, List<JornalRevista> revistas, LocalDateTime dataRegisto, int nif, String isbn) {
         super(codBiblioteca, numMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
 
         this.idDetalhe = idDetalhe;

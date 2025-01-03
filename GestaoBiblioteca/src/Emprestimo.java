@@ -22,7 +22,7 @@ public class Emprestimo extends Movimentos{
      * @param dataFim A data de devolução do item bibliotecário.
      */
     public Emprestimo(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,
-                      List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
+                      List<Cliente> clientes, List<Livro> livros, List<JornalRevista> jornais, List<JornalRevista> revistas,
                       LocalDateTime dataPrevFim) {
         super(codBiblioteca, numMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas);
         this.dataPrevFim = dataPrevFim;

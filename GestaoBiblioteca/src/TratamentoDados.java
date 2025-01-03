@@ -20,8 +20,8 @@ public class TratamentoDados {
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
-    private static List<Jornal> jornais = new ArrayList<>();
-    private static List<Revista> revistas = new ArrayList<>();
+    private static List<JornalRevista> jornais = new ArrayList<>();
+    private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<ReservaDtl> reservasdtl = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class TratamentoDados {
         Constantes.Genero genero = null;
 
         do {
-            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false, null);
             nif = pesquisarNifArrayCliente(nif, etapa, id);
             flag = validarTamanho(String.valueOf(nif),9);
 
@@ -100,7 +100,7 @@ public class TratamentoDados {
         } while (!flag);
 
         do {
-            contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false);
+            contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
             flag=validarTamanho(String.valueOf(contacto),9);
 
             if(!flag)
@@ -134,7 +134,7 @@ public class TratamentoDados {
         listaTodosClientes();
 
         // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false, null);
 
         // Procura o cliente pelo ID e, caso encontre, edita o cliente
         for(int index = 0; index < clientes.size(); index++) {
@@ -178,7 +178,7 @@ public class TratamentoDados {
      */
     public static void listaClientePorNif(){
         // Lê o NIF do cliente a ser encontrado
-        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false);
+        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false, null);
 
         // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
@@ -215,7 +215,7 @@ public class TratamentoDados {
         listaTodosClientes();
 
         // Lê o ID do cliente a ser apagado
-        int idApagar = lerInt("Escolha o ID do cliente que deseja apagar: ", false);
+        int idApagar = lerInt("Escolha o ID do cliente que deseja apagar: ", false, null);
 
         Cliente clienteApagar = null;
 
@@ -392,7 +392,7 @@ public class TratamentoDados {
             return;
         }
         listaTodosLivros();
-        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
 
         for (Livro livro : livros) {
             if (livro.getId() == idEditar) {
@@ -416,7 +416,7 @@ public class TratamentoDados {
         }
 
         listaTodosLivros();
-        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false);
+        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
         Livro livroRemover = null;
         for (Livro livro : livros) {
             if (livro.getId() == idApagar) {
@@ -497,7 +497,7 @@ public class TratamentoDados {
         String titulo = lerString("Insira o Título do livro: ");
         String editora = lerString("Insira a Editora do livro: ");
         String categoria = lerString("Insira a Categoria do livro: ");
-        int anoEdicao = lerInt("Insira o ano de Edição do livro: ", false);
+        int anoEdicao = lerInt("Insira o ano de Edição do livro: ", true, Constantes.TipoItem.LIVRO);
         String isbn;
         boolean flag;
         do {
@@ -545,6 +545,104 @@ public class TratamentoDados {
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
      */
+    /*
+     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
+     */
+
+    /**
+     * Adiciona um novo jornal ao sistema.
+     */
+    public static void criarJornal() throws IOException {
+        jornais.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.JORNAL));
+        System.out.println("Jornal criado com sucesso!");
+        gravarArrayJornal();
+    }
+
+    /**
+     * Adiciona uma nova revista ao sistema.
+     */
+    public static void criarRevista() throws IOException {
+        revistas.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.REVISTA));
+        System.out.println("Revista criado com sucesso!");
+        gravarArrayRevista();
+    }
+
+    /**
+     * Solicita os dados do usuário para criar ou editar um jornal/revista.
+     */
+    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem) {
+        String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
+        String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
+        String categoria = lerString("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
+        int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
+        String issn;
+        boolean flag;
+        do {
+            issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+            flag = validarTamanho(issn, 9);
+            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
+                System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
+                flag = false;
+            }
+            if (issn.equals(pesquisarIssn(issn, tipoItem)) && flag) {
+                System.out.println("ISNN já existe! Tente novamente.");
+                flag = false;
+            }
+        }while(!flag);
+
+        return new JornalRevista(id, titulo, editora, categoria, issn, anoPub, 1, tipoItem);
+    }
+
+    /**
+     * Grava a lista de jornais em um arquivo CSV.
+     */
+    public static void gravarArrayJornal() throws IOException {
+        if (jornais.isEmpty()) {
+            new File("Biblioteca_1/Jornais/jornais.csv").delete();
+            System.out.println("Lista de jornais vazia. Arquivo excluído.");
+            return;
+        }
+        for (int i = 0; i < jornais.size(); i++) {
+            criarFicheiroCsvJornalRevista("Biblioteca_1/Jornais/jornais.csv", jornais.get(i), i != 0);
+        }
+    }
+
+    /**
+     * Grava a lista de revistas em um arquivo CSV.
+     */
+    public static void gravarArrayRevista() throws IOException {
+        if (revistas.isEmpty()) {
+            new File("Biblioteca_1/Revistas/revistas.csv").delete();
+            System.out.println("Lista de revistas vazia. Arquivo excluído.");
+            return;
+        }
+        for (int i = 0; i < revistas.size(); i++) {
+            criarFicheiroCsvJornalRevista("Biblioteca_1/Livros/livros.csv", revistas.get(i), i != 0);
+        }
+    }
+
+    /**
+     * Cria um arquivo CSV para armazenar os dados dos jornais/revistas.
+     */
+    public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
+        try (FileWriter fw = new FileWriter(ficheiro, append)) {
+            fw.write(String.join(";",
+                    String.valueOf(jornalRevista.getId()),
+                    jornalRevista.getTitulo(),
+                    jornalRevista.getEditora(),
+                    jornalRevista.getCategoria(),
+                    jornalRevista.getIssn(),
+                    String.valueOf(jornalRevista.getDataPublicacao()),
+                    String.valueOf(jornalRevista.getCodBiblioteca()),
+                    String.valueOf(jornalRevista.getTipo()),
+                    "\n"));
+        }
+    }
+
+
+    /*
+     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
+     * */
 
     /*
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
@@ -557,7 +655,7 @@ public class TratamentoDados {
         boolean flag;
         numMovimento = id;
         do {
-            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false);
+            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false, null);
             int idCliente;
             nif = pesquisarNifArrayCliente(nif, null, -1);
             flag = validarTamanho(String.valueOf(nif),9);
@@ -621,7 +719,7 @@ public class TratamentoDados {
         listaTodasReservas();
 
         // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false);
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
 
         // Procura a reserva pelo ID e, caso encontre, edita o cliente
         for(Reserva reserva : reservas) {
@@ -894,15 +992,15 @@ public class TratamentoDados {
                 }
                 break;
             case JORNAL:
-                for (Jornal jornal : jornais) {
-                    if (jornal.getId() >= valor)
-                        valor = jornal.getId() + 1;
+                for (JornalRevista jornalRevista : jornais) {
+                    if (jornalRevista.getId() >= valor)
+                        valor = jornalRevista.getId() + 1;
                 }
                 break;
             case REVISTA:
-                for (Revista revista : revistas) {
-                    if (revista.getId() >= valor)
-                        valor = revista.getId() + 1;
+                for (JornalRevista jornalRevista : revistas) {
+                    if (jornalRevista.getId() >= valor)
+                        valor = jornalRevista.getId() + 1;
                 }
                 break;
             case EMPRESTIMO:
@@ -948,7 +1046,7 @@ public class TratamentoDados {
      * @param mensagem A mensagem a ser exibida ao usuário antes de ler a entrada.
      * @return O número inteiro digitado pelo usuário.
      */
-    public static int lerInt(String mensagem, Boolean isDate)
+    public static int lerInt(String mensagem, Boolean isDate, Constantes.TipoItem tipoItem)
     {
         if (isDate == null)
             isDate = false;
@@ -966,11 +1064,12 @@ public class TratamentoDados {
                     //  Primeiro livro impresso, assim como os conhecemos, em 1455 em Mainz, foi a A Bíblia de Gutenberg
                     //  Primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605 em Strasbourg.
                     //  Primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731 em Londres.
-                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear()) {
+                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO)
                         isInt = true;
-                    } else {
+                    else if(valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL)
+                        isInt = true;
+                    else
                         System.out.print("Por favor, insira um ano válido (yyyy): ");
-                    }
                 } else {
                     isInt = true;
                 }
@@ -1123,6 +1222,26 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
+    /**
+     * Pesquisa um ISnN na lista de jornais ou revistas.
+     */
+    private static String pesquisarIssn(String issn, Constantes.TipoItem tipoItem) {
+        if(tipoItem==Constantes.TipoItem.JORNAL) {
+            for (JornalRevista jornalRevista : jornais) {
+                if (jornalRevista.getIssn().equals(issn)) {
+                    return issn;
+                }
+            }
+        }
+        else {
+            for (JornalRevista jornalRevista : revistas) {
+                if (jornalRevista.getIssn().equals(issn)) {
+                    return issn;
+                }
+            }
+        }
+        return null;
+    }
     /*
      * ########################################## HELPERS - FIM ########################################################
      * */
