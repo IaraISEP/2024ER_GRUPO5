@@ -7,6 +7,7 @@ public class ItemBiblioteca {
     private String titulo;
     private String editora;
     private int codBiblioteca;
+    private Constantes.Categoria categoria;
 
     /**
      * Construtor para criar um item da biblioteca.
@@ -16,11 +17,20 @@ public class ItemBiblioteca {
      * @param editora       A editora do item.
      * @param codBiblioteca O código da biblioteca.
      */
-    public ItemBiblioteca(int id, String titulo, String editora, int codBiblioteca) {
+    public ItemBiblioteca(int id, String titulo, String editora, Constantes.Categoria categoria, int codBiblioteca) {
         this.id = id;
         this.titulo = titulo;
         this.editora = editora;
         this.codBiblioteca = codBiblioteca;
+        this.categoria = categoria;
+    }
+
+    public Constantes.Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Constantes.Categoria categoria) {
+        this.categoria = categoria;
     }
 
     /**

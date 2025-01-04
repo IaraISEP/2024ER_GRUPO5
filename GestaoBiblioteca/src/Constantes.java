@@ -87,6 +87,28 @@ public class Constantes {
         RESERVA,
         RESERVADTL
     }
+    public enum Path {
+        CLIENTE("Biblioteca_1/Clientes/clientes.csv"),
+        LIVRO("Biblioteca_1/Livros/livros.csv"),
+        JORNAL("Biblioteca_1/Jornais/jornais.csv"),
+        REVISTA("Biblioteca_1/Revistas/revistas.csv"),
+        EMPRESTIMO("Biblioteca_1/Emprestimos/emprestimos.csv"),
+        RESERVA("Biblioteca_1/Reservas/reservas.csv"),
+        RESERVADTL("Biblioteca_1/Reservas/Details/reservadtl.csv");
+
+
+        private final String value;
+
+        Path(String value) {
+            this.value = value;
+        }
+
+        // Getter for the string value
+        public String getValue() {
+            return value;
+        }
+
+    }
 
     public enum Etapa {
         CRIAR,

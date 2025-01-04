@@ -13,7 +13,7 @@ public class Revista extends JornalRevista{
      * @param dataPublicacao A data de publicação da revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public Revista(int id, String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(id, titulo, editora, categoria, issn, dataPublicacao, codBiblioteca, Constantes.TipoItem.REVISTA);
+    public Revista(int id, String titulo, String editora, Constantes.Categoria categoria, String issn, int dataPublicacao, int codBiblioteca) {
+        super(id, titulo, editora, issn, dataPublicacao, codBiblioteca, Constantes.TipoItem.REVISTA, categoria);
     }
 }
