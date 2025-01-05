@@ -18,7 +18,7 @@ public class Main {
         TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.JORNAL.getValue(), Constantes.TipoItem.JORNAL);
         TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.REVISTA.getValue(), Constantes.TipoItem.REVISTA);
         TratamentoDados.lerFicheiroCsvReservas(Constantes.Path.RESERVA.getValue());
-        TratamentoDados.lerFicheiroCsvReservasDtl(Constantes.Path.RESERVADTL.getValue());
+        TratamentoDados.lerFicheiroCsvReservasDtl(Constantes.Path.RESERVALINHA.getValue());
         CriarMenu.menuPrincipal();
     }
 }

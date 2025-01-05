@@ -1,5 +1,6 @@
 
 public class Constantes {
+    public static String splitChar = ";";
 
     public enum Categoria {
         ARTE(1),
@@ -84,18 +85,20 @@ public class Constantes {
         JORNAL,
         REVISTA,
         EMPRESTIMO,
+        EMPRESTIMOLINHA,
         RESERVA,
-        RESERVADTL
+        RESERVALINHA
     }
+
     public enum Path {
         CLIENTE("Biblioteca_1/Clientes/clientes.csv"),
         LIVRO("Biblioteca_1/Livros/livros.csv"),
         JORNAL("Biblioteca_1/Jornais/jornais.csv"),
         REVISTA("Biblioteca_1/Revistas/revistas.csv"),
         EMPRESTIMO("Biblioteca_1/Emprestimos/emprestimos.csv"),
+        EMPRESTIMOLINHA("Biblioteca_1/Emprestimos/emprestimolinha.csv"),
         RESERVA("Biblioteca_1/Reservas/reservas.csv"),
-        RESERVADTL("Biblioteca_1/Reservas/Details/reservadtl.csv");
-
+        RESERVALINHA("Biblioteca_1/Reservas/Details/reservalinha.csv");
 
         private final String value;
 
@@ -107,11 +110,16 @@ public class Constantes {
         public String getValue() {
             return value;
         }
-
     }
 
     public enum Etapa {
         CRIAR,
         EDITAR;
+    }
+
+    public enum ValidacaoCliente {
+        ID,
+        NIF,
+        CONTACTO;
     }
 }
