@@ -114,7 +114,7 @@ public class TratamentoDados {
      * Metodo para criar novo Cliente
      * */
     public static void criarCliente() throws IOException {
-        clientes.add(inserirDadosCliente(pesquisarIdArray(Constantes.TipoItem.CLIENTE), Constantes.Etapa.CRIAR));
+        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE), Constantes.Etapa.CRIAR));
         gravarArrayClientes();
     }
 
@@ -344,7 +344,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(pesquisarIdArray(Constantes.TipoItem.LIVRO)));
+        livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO)));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -576,7 +576,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(pesquisarIdArray(Constantes.TipoItem.JORNAL), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL), Constantes.TipoItem.JORNAL));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -585,7 +585,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(pesquisarIdArray(Constantes.TipoItem.REVISTA), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA), Constantes.TipoItem.REVISTA));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -831,6 +831,7 @@ public class TratamentoDados {
 
         int idAuto = pesquisarIdArray(Constantes.TipoItem.RESERVA);
         reservas.add(inserirDadosReserva(idAuto));
+        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA);
         Reserva reserva = reservas.getLast();
 
         /*
@@ -1119,7 +1120,7 @@ public class TratamentoDados {
      * @param tipoItem O tipo de item para o qual o ID está sendo pesquisado.
      * @return O próximo ID disponível para o tipo de item especificado.
      */
-    public static int pesquisarIdArray(Constantes.TipoItem tipoItem)
+    public static int getIdAutomatico(Constantes.TipoItem tipoItem)
     {
         int valor = 1;
 
