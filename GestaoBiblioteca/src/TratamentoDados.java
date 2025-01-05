@@ -849,10 +849,13 @@ public class TratamentoDados {
 
         do {
             dataFim = lerData("Insira a data de fim da reserva (dd/MM/yyyy): ");
-            if (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
+            if (dataFim.isBefore(dataInicio)) {
                 System.out.println("A data de fim não pode ser anterior à data de início.");
             }
-        } while (dataFim.isBefore(dataInicio));
+            else if(dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
+                System.out.println("A reserva não pode ser superior a " + Constantes.TempoMaxReservaDias + " dias.");
+            }
+        } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
 
         return new Reserva(1, id, dataInicio, dataFim, cliente,null);
     }
