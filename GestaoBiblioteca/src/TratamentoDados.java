@@ -903,6 +903,7 @@ public class TratamentoDados {
                     continue;
             }
             reservasLinha.add(inserirDetalhesReserva(reserva.getNumMovimento(), tipoItem));
+            gravarArrayReservaLinha();
 
             System.out.println("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)");
 
@@ -916,9 +917,7 @@ public class TratamentoDados {
 
         System.out.println("Reserva criada com sucesso!");
 
-        //TODO : Rever estes métodos
         gravarArrayReservas();
-        gravarArrayReservaLinha();
 
         // Criar o historico dos movimentos
         //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
@@ -964,7 +963,7 @@ public class TratamentoDados {
                     Integer.toString(reserva.getNumMovimento()),
                     reserva.getDataInicio().toString(),
                     reserva.getDataFim().toString(),
-                    reserva.getCliente() + "\n"));
+                    reserva.getClienteId() + "\n"));
         }
     }
 
@@ -1006,6 +1005,7 @@ public class TratamentoDados {
         if(reservas.isEmpty()) {
             new File(Constantes.Path.RESERVA.getValue()).delete();
             System.out.println("Array vazio");
+            return;
         }
 
         for(int i = 0; i < reservas.size(); i++){
@@ -1069,14 +1069,15 @@ public class TratamentoDados {
      * @param reservaLinha Recebe o valor de uma ReservaLinha do Array
      * @param firstLine reescrever o ficheiro só e só se for a primeira linha a ser inserida
      * */
-    public static void criarFicheiroCsvReservasDtl(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException {
+    public static void criarFicheiroCsvReservasLinha(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
                     Integer.toString(reservaLinha.getIdReserva()),
                     reservaLinha.getTipoItem().toString(),
-                    Integer.toString(reservaLinha.getIdItem()) + "\n"));
+                    Integer.toString(reservaLinha.getIdItem())) + "\n");
         }
     }
+
     /**
      * Metodo para ler o Ficheiro de Detalhes de Reserva e carregar a
      * informação no Array ReservasDtl
@@ -1106,6 +1107,7 @@ public class TratamentoDados {
             System.out.println(reserva);
         }
     }
+
     /**
      * Metodo para gravar as alterações efetuadas no Array ReservasDtl
      * no Ficheiro reservasdtl.csv
@@ -1117,7 +1119,7 @@ public class TratamentoDados {
         }
 
         for (int i = 0; i < reservasLinha.size(); i++) {
-            criarFicheiroCsvReservasDtl(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
+            criarFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
         }
     }
 
@@ -1429,7 +1431,7 @@ public class TratamentoDados {
             bibliotecaMaxLen = Math.max(bibliotecaMaxLen, String.valueOf(reservas.getCodBiblioteca()).length());
             dataInicioLen = Math.max(dataInicioLen, String.valueOf(reservas.getDataInicio()).length());
             dataFimLen = Math.max(dataFimLen, String.valueOf(reservas.getDataFim()).length());
-            clienteMaxLen = Math.max(clienteMaxLen, String.valueOf(reservas.getCliente()).length());
+            clienteMaxLen = Math.max(clienteMaxLen, String.valueOf(reservas.getClienteNome()).length());
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
@@ -1446,7 +1448,7 @@ public class TratamentoDados {
 
         //Imprime os dados dos clientes
         for (Reserva reserva : listaReservas) {
-            System.out.printf(formato, reserva.getNumMovimento(), reserva.getCodBiblioteca(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getCliente());
+            System.out.printf(formato, reserva.getNumMovimento(), reserva.getCodBiblioteca(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome());
         }
 
         System.out.println(separador);

@@ -111,6 +111,13 @@ public class Movimentos {
         return cliente;
     }
 
+    public int getClienteId() {
+        return cliente.getId();
+    }
+
+    public String getClienteNome() {
+        return cliente.getNome();
+    }
     /**
      * Define o cliente associado à reserva.
      *
