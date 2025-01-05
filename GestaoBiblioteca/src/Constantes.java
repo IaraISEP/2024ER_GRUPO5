@@ -1,6 +1,7 @@
 
 public class Constantes {
-    public static String splitChar = ";";
+    public static String SplitChar = ";";
+    public static int TempoMaxReservaDias = 7;
 
     public enum Categoria {
         ARTE(1),
