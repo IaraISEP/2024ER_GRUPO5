@@ -275,14 +275,13 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvClientes(String ficheiro){
         try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            if (readFile.readLine() == null) {
+            String linha = readFile.readLine();
+            if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String linha;
             String csvDivisor = ";";
-            // Lê cada linha do ficheiro
-            while ((linha = readFile.readLine()) != null) {
+            do {
                 // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
                 String[] dados = linha.split(csvDivisor);
                 int id = Integer.parseInt(dados[0]);
@@ -294,7 +293,7 @@ public class TratamentoDados {
                 // Cria um novo objeto Cliente e adiciona à lista
                 Cliente cliente = new Cliente(id, nome, genero, nif, contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
                 clientes.add(cliente);
-            }
+            }while ((linha = readFile.readLine()) != null);
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
@@ -313,7 +312,6 @@ public class TratamentoDados {
      * @param idCliente Recebe o id do cliente, para validar se ao editar está a repetir o ID dele mesmo ou a colocar um já existente mas de outro cliente
      * */
     public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
-        boolean clienteExiste = false;
         if (!clientes.isEmpty()) {
             for (Cliente cliente : clientes) {
 
@@ -322,15 +320,12 @@ public class TratamentoDados {
                     //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
                     if (etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
                         System.out.println("Nif existente!");
-                        clienteExiste = true;
                         return 0;
                     } else if (cliente.getNif() == nif) {
                         return nif;
                     }
                 }
             }
-            System.out.println("Cliente nao existe nesta Biblioteca!");
-            //return -1;
         }else{
             System.out.println("Não existem Clientes nesta Biblioteca.");
         }
@@ -349,7 +344,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(pesquisarProximoIdLivro()));
+        livros.add(inserirDadosLivro(pesquisarIdArray(Constantes.TipoItem.LIVRO)));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -474,13 +469,13 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvLivros(String ficheiro) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            if (readFile.readLine() == null) {
+            String linha = readFile.readLine();
+            if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String linha;
             String csvDivisor = ";";
-            while ((linha = readFile.readLine()) != null) {
+            do {
                 String[] dados = linha.split(csvDivisor);
                 int id = Integer.parseInt(dados[0]);
                 String titulo = dados[1];
@@ -492,7 +487,7 @@ public class TratamentoDados {
                 int codBiblioteca = Integer.parseInt(dados[7]);
                 Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
                 livros.add(livro);
-            }
+            }while ((linha = readFile.readLine()) != null);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -550,13 +545,13 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            if (readFile.readLine() == null) {
+            String linha = readFile.readLine();
+            if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String linha;
             String csvDivisor = ";";
-            while ((linha = readFile.readLine()) != null) {
+            do {
                 String[] dados = linha.split(csvDivisor);
                 int id = Integer.parseInt(dados[0]);
                 String titulo = dados[1];
@@ -571,7 +566,7 @@ public class TratamentoDados {
                     jornais.add(jornalRevista);
                 else
                     revistas.add(jornalRevista);
-            }
+            } while ((linha = readFile.readLine()) != null);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -581,7 +576,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(pesquisarProximoIdJornais(), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(pesquisarIdArray(Constantes.TipoItem.JORNAL), Constantes.TipoItem.JORNAL));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -590,7 +585,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(pesquisarProximoIdRevistas(), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(pesquisarIdArray(Constantes.TipoItem.REVISTA), Constantes.TipoItem.REVISTA));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -705,11 +700,11 @@ public class TratamentoDados {
                     String.valueOf(jornalRevista.getId()),
                     jornalRevista.getTitulo(),
                     jornalRevista.getEditora(),
-                    String.valueOf(jornalRevista.getCategoria()),
                     jornalRevista.getIssn(),
                     String.valueOf(jornalRevista.getDataPublicacao()),
                     String.valueOf(jornalRevista.getCodBiblioteca()),
                     String.valueOf(jornalRevista.getTipo()),
+                    String.valueOf(jornalRevista.getCategoria()),
                     "\n"));
         }
     }
@@ -906,15 +901,13 @@ public class TratamentoDados {
 
     public static void lerFicheiroCsvReservas(String ficheiro){
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            if (readFile.readLine() == null) {
+            String linha = readFile.readLine();
+            if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String linha;
-            String csvDivisor = ";", isbn="";
-            //ArrayList<String> dados= new ArrayList<String>();
-
-            while ((linha = readFile.readLine()) != null) {
+            String csvDivisor = ";", isbn="";;
+            do {
                 int codBiblioteca = Integer.parseInt(linha.split(csvDivisor)[0]),
                     codMovimento = Integer.parseInt(linha.split(csvDivisor)[1]),
                     nif = Integer.parseInt(linha.split(csvDivisor)[2]);
@@ -933,7 +926,7 @@ public class TratamentoDados {
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
 
                 reservas.add(reserva);
-            }
+            }while ((linha = readFile.readLine()) != null);
         }
         catch (IOException e){
             System.out.println(e.getMessage());
@@ -1064,14 +1057,14 @@ public class TratamentoDados {
      * */
     public static void lerFicheiroCsvReservasDtl(String ficheiro){
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            if (readFile.readLine() == null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            String linha = readFile.readLine();
+            if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String linha;
             String csvDivisor = ";";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-            while ((linha = readFile.readLine()) != null) {
+            do {
                 String[] dados = linha.split(csvDivisor);
                 int idDetalhe = Integer.parseInt(dados[0]);
                 int codBiblioteca = Integer.parseInt(dados[1]);
@@ -1085,7 +1078,7 @@ public class TratamentoDados {
                 ReservaDtl reservadtl = new ReservaDtl(idDetalhe, codBiblioteca, idReserva, dataInicio, dataFim, clientes, livros, jornais, revistas, dataRegisto, nif, isbn);
 
                 reservasdtl.add(reservadtl);
-            }
+            }while ((linha = readFile.readLine()) != null);
         }
         catch (IOException e){
             System.out.println(e.getMessage());
@@ -1116,46 +1109,6 @@ public class TratamentoDados {
     /*
      * ######################################## HELPERS - INICIO #######################################################
      * */
-
-    /**
-     * Pesquisa o próximo ID disponível dos LIVROS.
-     */
-    private static int pesquisarProximoIdLivro() {
-        int maiorId = 0;
-        for (Livro livro : livros) {
-            if (livro.getId() > maiorId) {
-                maiorId = livro.getId();
-            }
-        }
-        return maiorId + 1;
-    }
-
-    /**
-     * Pesquisa o próximo ID disponível Dos Jornais.
-     */
-    private static int pesquisarProximoIdJornais() {
-        int maiorId = 0;
-        for (JornalRevista jornalRevista : jornais) {
-            if (jornalRevista.getId() > maiorId) {
-                maiorId = jornalRevista.getId();
-            }
-        }
-        return maiorId + 1;
-    }
-
-    /**
-     * Pesquisa o próximo ID disponível das Revistas.
-     */
-    private static int pesquisarProximoIdRevistas() {
-        int maiorId = 0;
-        for (JornalRevista jornalRevista : revistas) {
-            if (jornalRevista.getId() > maiorId) {
-                maiorId = jornalRevista.getId();
-            }
-        }
-        return maiorId + 1;
-    }
-
 
     /**
      * Metodo para atribuir automaticamente um ID com base no tipo de função.
