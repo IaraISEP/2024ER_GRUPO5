@@ -133,18 +133,18 @@ public class CriarMenu {
      * Exibe o menu de listagem de livros.
      */
     private static void menuListarLivros() {
-        Menu menuListarClientes = new Menu("Listar Livros");
+        Menu menuListarLivros = new Menu("Listar Livros");
 
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
             TratamentoDados.listaTodosLivros();
             keyPress();
         }));
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
             TratamentoDados.listaLivroPorIsbn();
             keyPress();
         }));
 
-        menuListarClientes.exibir();
+        menuListarLivros.exibir();
     }
 
     /**
@@ -154,15 +154,28 @@ public class CriarMenu {
         Menu menuJornal = new Menu("Gestão de Jornais");
 
         menuJornal.adicionarOpcao(new OpcaoMenu("Criar Jornal", () -> {
-            System.out.println("Criar Jornal...");
+            try {
+                TratamentoDados.criarJornal();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Listar Jornais", CriarMenu::menuListarJornais));
         menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
-            System.out.println("Editar Jornal...");
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuJornal.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
-            System.out.println("Apagar Jornal...");
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         /*
@@ -182,21 +195,52 @@ public class CriarMenu {
     }
 
     /**
+     * Exibe o menu de listagem de jornais.
+     */
+    private static void menuListarJornais() {
+        Menu menuListarJornais = new Menu("Listar Jornais");
+
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Todos jornais",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Listar jornais por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+
+        menuListarJornais.exibir();
+    }
+
+    /**
      * Exibe o menu de gestão de revistas.
      */
     private static void menuRevista() {
         Menu menuRevista = new Menu("Gestão de Revistas");
 
         menuRevista.adicionarOpcao(new OpcaoMenu("Criar Revista", () -> {
-            System.out.println("Criar Revista...");
+            try {
+                TratamentoDados.criarRevista();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revista", () -> {
-            System.out.println("Editar Revista...");
+        menuRevista.adicionarOpcao(new OpcaoMenu("Listar Revistas", CriarMenu::menuListarRevistas));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revistas", () -> {
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuRevista.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
-            System.out.println("Apagar Revista...");
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         /*
@@ -215,6 +259,23 @@ public class CriarMenu {
         menuRevista.exibir();
     }
 
+    /**
+     * Exibe o menu de listagem de revistas.
+     */
+    private static void menuListarRevistas() {
+        Menu menuListarRevistas = new Menu("Listar Revistas");
+
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Todas revistas",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Listar revistas por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+
+        menuListarRevistas.exibir();
+    }
 
     /**
      * Exibe o menu de gestão de reservas.
@@ -243,6 +304,7 @@ public class CriarMenu {
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
+            //TODO : A desenvolver
             System.out.println("Reserva Concluída...");
             keyPress();
         }));
@@ -257,14 +319,17 @@ public class CriarMenu {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
 
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Criar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Criado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Editado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Concluído...");
             keyPress();
         }));

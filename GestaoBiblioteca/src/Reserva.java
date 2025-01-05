@@ -1,84 +1,45 @@
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
-/** Representa as Reservas
+/**
+ * Representa as Reservas
+ *
  * @author ER_GRUPO_5
  * @since 2024
  */
 public class Reserva extends Movimentos {
-    private LocalDateTime dataRegisto;
-    private int nif;
-    private String isbn;
-
-    /*
-     * TODO:
-     *   Alterar o construtor e passar os parametros para a
-     *   nova classe ReservasDtl onde vai ficar guradado todos os
-     *   livros, revistas, jornais e datas
-     *   de cada reserva.
-     */
+    private List<ReservaLinha> reservaLinha;
 
     /**
-     * Construtor para criar uma reserva.
+     * Construtor para criar uma Reserva.
      *
-     * @param codBiblioteca O código da biblioteca.
-     * @param numMovimento  O número do movimento.
-     * @param dataInicio    A data de início do movimento.
-     * @param dataFim       A data limite da reserva.
-     * @param clientes      O cliente associado ao movimento.
-     * @param livros        A lista de livros associados ao movimento.
-     * @param jornais       A lista de jornais associados ao movimento.
-     * @param revistas      A lista de revistas associadas ao movimento.
-     * @param dataRegisto   A data de registo da reserva.
-     * @param nif           O NIF do cliente.
-     * @param isbn          O ISBN do livro.
+     * @param codBiblioteca o código da biblioteca
+     * @param numMovimento  o número do movimento
+     * @param dataInicio    a data de inicio da reserva
+     * @param dataFim       a data de fim da reserva
+     * @param cliente       o cliente associado à reserva
+     * @param reservaLinha  a lista que contém todos os items associados à reserva
      */
-    public Reserva(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim,
-                   List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
-                   LocalDateTime dataRegisto, int nif, String isbn) {
-        super(codBiblioteca, numMovimento, dataInicio, dataFim, clientes, livros, jornais, revistas);
-        this.dataRegisto = dataRegisto;
-        this.nif = nif;
-        this.isbn = isbn;
+    public Reserva(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, List<ReservaLinha> reservaLinha) {
+        super(codBiblioteca, numMovimento, dataInicio, dataFim, cliente);
+        this.reservaLinha = reservaLinha;
     }
 
     /**
-     * Obtém o NIF do cliente.
+     * Obtém a lista dos items da reserva
      *
-     * @return O NIF do cliente.
+     * @return A lista dos items da reserva
      */
-    public int getNif() {
-        return nif;
-    }
-
-    public LocalDateTime getDataRegisto() {
-        return dataRegisto;
+    public List<ReservaLinha> getReservaLinha() {
+        return reservaLinha;
     }
 
     /**
-     * Define o NIF do cliente.
+     * Define a lista com os items da reserva
      *
-     * @param nif O NIF do cliente.
+     * @param reservaLinha A lista com os items da reserva
      */
-    public void setNif(int nif) {
-        this.nif = nif;
-    }
-
-    /**
-     * Obtém o ISBN do livro.
-     *
-     * @return O ISBN do livro.
-     */
-    public String getIsbn() {
-        return isbn;
-    }
-
-    /**
-     * Define o ISBN do livro.
-     *
-     * @param isbn O ISBN do livro.
-     */
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
+    public void setReservaLinha(List<ReservaLinha> reservaLinha) {
+        this.reservaLinha = reservaLinha;
     }
 }

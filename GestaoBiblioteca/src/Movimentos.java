@@ -1,42 +1,33 @@
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
-/** Classe base que representa um movimento na biblioteca (empréstimo ou reserva).
+/**
+ * Classe base que representa um movimento na biblioteca (empréstimo ou reserva).
  * Fornece propriedades e métodos comuns para as classes derivadas.
+ *
  * @author ER_GRUPO_5
  * @since 2024
  */
 public class Movimentos {
     private int numMovimento;
     private int codBiblioteca;
-    private LocalDateTime dataInicio;
-    private LocalDateTime dataFim;
-    private List<Cliente> clientes;
-    private List<Livro> livros;
-    private List<Jornal> jornais;
-    private List<Revista> revistas;
-
+    private LocalDate dataInicio;
+    private LocalDate dataFim;
+    private Cliente cliente;
     /**
-     * Construtor para criar um movimento.
+     * Instancia um novo Movimentos.
      *
-     * @param codBiblioteca O código da biblioteca.
-     * @param numMovimento  O número do movimento.
-     * @param dataInicio    A data de início do movimento.
-     * @param dataFim       A data de fim do movimento.
-     * @param clientes      O cliente associado ao movimento.
-     * @param livros        A lista de livros associados ao movimento.
-     * @param jornais       A lista de jornais associados ao movimento.
-     * @param revistas      A lista de revistas associadas ao movimento.
+     * @param numMovimento  o número do movimento
+     * @param codBiblioteca o código da biblioteca
+     * @param dataInicio    a data de início
+     * @param dataFim       a data de fim
+     * @param cliente       o cliente afeto ao movimento
      */
-    public Movimentos(int codBiblioteca, int numMovimento, LocalDateTime dataInicio, LocalDateTime dataFim, List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas) {
+    public Movimentos(int numMovimento, int codBiblioteca, LocalDate dataInicio, LocalDate dataFim, Cliente cliente) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
-        this.clientes = clientes;
-        this.livros = livros;
-        this.jornais = jornais;
-        this.revistas = revistas;
+        this.cliente = cliente;
     }
 
     /**
@@ -80,7 +71,7 @@ public class Movimentos {
      *
      * @return A data de início do movimento.
      */
-    public LocalDateTime getDataInicio() {
+    public LocalDate getDataInicio() {
         return dataInicio;
     }
 
@@ -89,7 +80,7 @@ public class Movimentos {
      *
      * @param dataInicio A data de início do movimento.
      */
-    public void setDataInicio(LocalDateTime dataInicio) {
+    public void setDataInicio(LocalDate dataInicio) {
         this.dataInicio = dataInicio;
     }
 
@@ -98,7 +89,7 @@ public class Movimentos {
      *
      * @return A data de início do movimento.
      */
-    public LocalDateTime getDataFim() {
+    public LocalDate getDataFim() {
         return dataFim;
     }
 
@@ -107,79 +98,32 @@ public class Movimentos {
      *
      * @param dataFim A data de início do movimento.
      */
-    public void setDataFim(LocalDateTime dataFim) {
+    public void setDataFim(LocalDate dataFim) {
         this.dataFim = dataFim;
     }
 
     /**
-     * Obtém o cliente associado ao movimento.
+     * Obtém o cliente associado à reserva.
      *
-     * @return O cliente associado ao movimento.
+     * @return O cliente associado à reserva.
      */
-    public List<Cliente> getCliente() {
-        return clientes;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    /**
-     * Define o cliente associado ao movimento.
-     *
-     * @param clientes O cliente associado ao movimento.
-     */
-    public void setCliente(List<Cliente> clientes) {
-        this.clientes = clientes;
+    public int getClienteId() {
+        return cliente.getId();
     }
 
-    /**
-     * Obtém a lista de livros associados ao movimento.
-     *
-     * @return A lista de livros associados ao movimento.
-     */
-    public List<Livro> getLivros() {
-        return livros;
+    public String getClienteNome() {
+        return cliente.getNome();
     }
-
     /**
-     * Define a lista de livros associados ao movimento.
+     * Define o cliente associado à reserva.
      *
-     * @param livros A lista de livros associados ao movimento.
+     * @param cliente O cliente associado à reserva.
      */
-    public void setLivros(List<Livro> livros) {
-        this.livros = livros;
-    }
-
-    /**
-     * Obtém a lista de jornais associados ao movimento.
-     *
-     * @return A lista de jornais associados ao movimento.
-     */
-    public List<Jornal> getJornais() {
-        return jornais;
-    }
-
-    /**
-     * Define a lista de jornais associados ao movimento.
-     *
-     * @param jornais A lista de jornais associados ao movimento.
-     */
-    public void setJornais(List<Jornal> jornais) {
-        this.jornais = jornais;
-    }
-
-    /**
-     * Obtém a lista de revistas associadas ao movimento.
-     *
-     * @return A lista de revistas associadas ao movimento.
-     */
-    public List<Revista> getRevistas() {
-        return revistas;
-    }
-
-    /**
-     * Define a lista de revistas associadas ao movimento.
-     *
-     * @param revistas A lista de revistas associadas ao movimento.
-     */
-    public void setRevistas(List<Revista> revistas) {
-        this.revistas = revistas;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }

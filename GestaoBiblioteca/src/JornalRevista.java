@@ -3,33 +3,24 @@
  * @since 2024
  */
 public class JornalRevista extends ItemBiblioteca {
-    private int id;
     private String issn;
     private int dataPublicacao;
+    private Constantes.TipoItem tipo;
 
     /**
      * Construtor para criar um Jornal/Revista.
      *
      * @param titulo O título do jornal/revista.
      * @param editora A editora do jornal/revista.
-     * @param categoria A categoria do jornal/revista.
      * @param issn O ISSN do jornal/revista.
      * @param dataPublicacao A data de publicação do jornal/revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public JornalRevista(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(titulo, categoria, editora, codBiblioteca);
+    public JornalRevista(int id, String titulo, String editora, String issn, int dataPublicacao, int codBiblioteca, Constantes.TipoItem tipo, Constantes.Categoria categoria) {
+        super(id, titulo, editora, categoria, codBiblioteca);
         this.issn = issn;
         this.dataPublicacao = dataPublicacao;
-    }
-
-    /**
-     * Obtém o ID do jornal/revista.
-     *
-     * @return O ID do jornal/revista.
-     */
-    public int getId() {
-        return id;
+        this.tipo = tipo;
     }
 
     /**
@@ -37,9 +28,14 @@ public class JornalRevista extends ItemBiblioteca {
      *
      * @return O ISSN do jornal/revista.
      */
-    public String getIssn() {
-        return issn;
-    }
+    public String getIssn() { return issn; }
+
+    /**
+     * Obtém um tipo jornal ou revista.
+     *
+     * @return O tipo do jornal/revista.
+     */
+    public Constantes.TipoItem getTipo() { return tipo; }
 
     /**
      * Obtém a data de publicação do jornal/revista.
