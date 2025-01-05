@@ -349,7 +349,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(pesquisarProximoId()));
+        livros.add(inserirDadosLivro(pesquisarProximoIdLivro()));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -537,18 +537,6 @@ public class TratamentoDados {
         return null;
     }
 
-    /**
-     * Pesquisa o próximo ID disponível.
-     */
-    private static int pesquisarProximoId() {
-        int maiorId = 0;
-        for (Livro livro : livros) {
-            if (livro.getId() > maiorId) {
-                maiorId = livro.getId();
-            }
-        }
-        return maiorId + 1;
-    }
 
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
@@ -593,7 +581,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(pesquisarProximoIdJornais(), Constantes.TipoItem.JORNAL));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -602,7 +590,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(pesquisarProximoId(), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(pesquisarProximoIdRevistas(), Constantes.TipoItem.REVISTA));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -1128,6 +1116,46 @@ public class TratamentoDados {
     /*
      * ######################################## HELPERS - INICIO #######################################################
      * */
+
+    /**
+     * Pesquisa o próximo ID disponível dos LIVROS.
+     */
+    private static int pesquisarProximoIdLivro() {
+        int maiorId = 0;
+        for (Livro livro : livros) {
+            if (livro.getId() > maiorId) {
+                maiorId = livro.getId();
+            }
+        }
+        return maiorId + 1;
+    }
+
+    /**
+     * Pesquisa o próximo ID disponível Dos Jornais.
+     */
+    private static int pesquisarProximoIdJornais() {
+        int maiorId = 0;
+        for (JornalRevista jornalRevista : jornais) {
+            if (jornalRevista.getId() > maiorId) {
+                maiorId = jornalRevista.getId();
+            }
+        }
+        return maiorId + 1;
+    }
+
+    /**
+     * Pesquisa o próximo ID disponível das Revistas.
+     */
+    private static int pesquisarProximoIdRevistas() {
+        int maiorId = 0;
+        for (JornalRevista jornalRevista : revistas) {
+            if (jornalRevista.getId() > maiorId) {
+                maiorId = jornalRevista.getId();
+            }
+        }
+        return maiorId + 1;
+    }
+
 
     /**
      * Metodo para atribuir automaticamente um ID com base no tipo de função.
