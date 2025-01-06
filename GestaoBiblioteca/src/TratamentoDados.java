@@ -883,13 +883,12 @@ public class TratamentoDados {
         reservas.add(inserirDadosReserva(idReserva));
         Reserva reserva = reservas.getLast();
 
-
-        // TODO: Chamar metodo de criar detalhes da reserva
-        criarDetalheReserva(reserva.getNumMovimento());
+        criarReservaLinha(reserva.getNumMovimento());
 
         System.out.println("Reserva criada com sucesso!");
 
         gravarArrayReservas();
+        gravarArrayReservaLinha();
 
         // Criar o historico dos movimentos
         //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
@@ -907,7 +906,7 @@ public class TratamentoDados {
 
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        Constantes.TipoItem tipoItem = criarDetalheReserva(idEditar);
+        Constantes.TipoItem tipoItem = criarReservaLinha(idEditar);
         reservasLinha.add(inserirDetalhesReserva(idEditar, tipoItem));
         gravarArrayReservaLinha();
         System.out.println("ID não encontrado!");
@@ -1008,7 +1007,7 @@ public class TratamentoDados {
      * Metodo para inserir os detalhes de uma reserva atribuido a algum Cliente
      * @param idReserva Recebe o Id da Reserva
      * */
-    public static Constantes.TipoItem criarDetalheReserva(int idReserva) throws IOException {
+    public static Constantes.TipoItem criarReservaLinha(int idReserva) throws IOException {
         Constantes.TipoItem tipoItem;
         do {
             int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
@@ -1027,7 +1026,7 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
                     continue;
             }
-            inserirDetalhesReserva(idReserva,tipoItem);
+            reservasLinha.add(inserirDetalhesReserva(idReserva, tipoItem));
             int opcao = lerInt("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)", false, null);
             if (opcao == 2){
                 break;
