@@ -21,7 +21,7 @@ public class Reserva extends Movimentos {
      * @param reservaLinha  a lista que contém todos os items associados à reserva
      */
     public Reserva(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, List<ReservaLinha> reservaLinha) {
-        super(codBiblioteca, numMovimento, dataInicio, dataFim, cliente);
+        super( codBiblioteca, numMovimento, dataInicio, dataFim, cliente);
         this.reservaLinha = reservaLinha;
     }
 

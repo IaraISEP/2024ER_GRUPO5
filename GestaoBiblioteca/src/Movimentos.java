@@ -16,13 +16,13 @@ public class Movimentos {
     /**
      * Instancia um novo Movimentos.
      *
-     * @param numMovimento  o número do movimento
      * @param codBiblioteca o código da biblioteca
+     * @param numMovimento  o número do movimento
      * @param dataInicio    a data de início
      * @param dataFim       a data de fim
      * @param cliente       o cliente afeto ao movimento
      */
-    public Movimentos(int numMovimento, int codBiblioteca, LocalDate dataInicio, LocalDate dataFim, Cliente cliente) {
+    public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;

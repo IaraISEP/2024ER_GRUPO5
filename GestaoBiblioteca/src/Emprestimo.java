@@ -18,7 +18,7 @@ public class Emprestimo extends Movimentos{
      * @param cliente o cliente associado ao empréstimo.
      */
     public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, LocalDate dataPrevFim, Cliente cliente) {
-        super(codBiblioteca, numMovimento, dataInicio, dataFim, cliente);
+        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente);
         this.dataPrevFim = dataPrevFim;
     }
 

@@ -295,6 +295,15 @@ public class CriarMenu {
             TratamentoDados.listaTodasReservas();
             keyPress();
         }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Detalhes Reserva", () -> {
+            try {
+                TratamentoDados.listaTodasReservas();
+                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             try {
                 TratamentoDados.editarReserva();
