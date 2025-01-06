@@ -21,6 +21,7 @@ public class TratamentoDados {
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
+    private static List<EmprestimoLinha> emprestimolinha = new ArrayList<>();
     private static List<JornalRevista> jornais = new ArrayList<>();
     private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
@@ -1194,7 +1195,78 @@ public class TratamentoDados {
 
         // Criar o historico dos movimentos
         //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
+
     }
+
+    /**
+     * Edita um Emprestimo pelo ID.
+     */
+
+    public static void editarEmprestimo() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(emprestimos.isEmpty()) {
+            System.out.println("Não há emprestimos nesta biblioteca.");
+            return;
+        }
+
+        // Lista todos os clientes
+        listaTodasEmprestimos();
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        Constantes.TipoItem tipoItem = criarDetalheReserva(idEditar);
+        emprestimolinha.add(inserirDetalhesReserva(idEditar, tipoItem));
+        gravarArrayReservaLinha();
+        System.out.println("ID não encontrado!");
+    }
+
+    /**
+     * Apaga um Emprestimo pelo ID.
+     */
+    public static void listaTodosEmprestimos() {
+        if (emprestimos.isEmpty()) {
+            System.out.println("Não existem emprestimos para mostrar.");
+            return;
+        }
+        mostraTabelaReservas(emprestimos);
+    }
+
+    /**
+     * Apaga um Emprestimo pelo ID.
+     */
+
+    public static void apagarEmprestimos(Constantes.TipoItem tipoItem) throws IOException {
+        if (tipoItem == Constantes.TipoItem.EMPRESTIMO && emprestimos.isEmpty()) {
+            System.out.println("Não existem Emprestimos nesta Biblioteca.");
+            return;
+        }
+
+        //listaTodosJornalRevista(tipoItem);
+
+        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
+        Emprestimo emprestimoRemover = null;
+        if (tipoItem == Constantes.TipoItem.EMPRESTIMO) {
+            for (Emprestimo emprestimo : emprestimos) {
+                if (emprestimo.getNumMovimento() == idApagar) {
+                    emprestimoRemover = emprestimo;
+                    break;
+                }
+            }
+        }
+
+        if (emprestimoRemover == null) {
+            System.out.println("ID "+ tipoItem.toString().toLowerCase() +" não encontrado.");
+            return;
+        }
+        if(tipoItem == Constantes.TipoItem.EMPRESTIMO){
+            emprestimos.remove(emprestimoRemover);
+            gravarArrayRevista();
+        }
+        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+    }
+
+
+
 
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
