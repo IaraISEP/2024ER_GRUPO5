@@ -39,21 +39,14 @@ public class Constantes {
         }
     }
 
-    public enum EstadoEmprestimo {
-        DISPONIVEL(1),
-        EMPRESTADO(2),
-        ATRASADO(3),
-        RESERVADO(4);
 
-        private final int estadoEmprestimo;
-
-        EstadoEmprestimo(int estadoEmprestimo) {
-            this.estadoEmprestimo = estadoEmprestimo;
-        }
-
-        public int getEstadoEmprestimo() {
-            return estadoEmprestimo;
-        }
+    public enum Estado {
+        DISPONIVEL,
+        EMPRESTADO,
+        ATRASADO,
+        RESERVADO,
+        CONCLUIDO,
+        CANCELADO
     }
 
     public enum Genero {

@@ -315,7 +315,6 @@ public class TratamentoDados {
     public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
         if (!clientes.isEmpty()) {
             for (Cliente cliente : clientes) {
-
                 if (cliente.getNif() == nif) {
                     //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
                     //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
@@ -327,8 +326,6 @@ public class TratamentoDados {
                     }
                 }
             }
-        }else{
-            System.out.println("Não existem Clientes nesta Biblioteca.");
         }
 
         return nif;
