@@ -1161,6 +1161,46 @@ public class TratamentoDados {
      * */
 
     /*
+     * ############################### TRATAMENTO DE DADOS EMPRESTIMO - INICIO ##############################################
+     * */
+
+    public static void criarEmprestimo() throws IOException {
+        //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
+        if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
+            System.out.println("Não existem Items nesta Biblioteca");
+            return;
+        }
+        //Mostra mensagem a informar que não tem cliente.
+        //TODO : Ao invés de não deixar prosseguir, pode perguntar se deseja criar um novo cliente e prosseguir para a sua criação.
+        if (clientes.isEmpty()){
+            System.out.println("Não existem clientes nesta Biblioteca");
+            return;
+        }
+
+        //Atribui automaticamente o Id com base no último Id existente.
+        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA);
+
+        //Cria a reserva
+        reservas.add(inserirDadosReserva(idReserva));
+        Reserva reserva = reservas.getLast();
+
+
+        // TODO: Chamar metodo de criar detalhes da reserva
+        criarDetalheReserva(reserva.getNumMovimento());
+
+        System.out.println("Reserva criada com sucesso!");
+
+        gravarArrayReservas();
+
+        // Criar o historico dos movimentos
+        //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
+    }
+
+    /*
+     * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
+     * */
+
+    /*
      * ######################################## HELPERS - INICIO #######################################################
      * */
 
