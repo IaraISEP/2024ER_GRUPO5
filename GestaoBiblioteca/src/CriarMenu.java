@@ -37,13 +37,12 @@ public class CriarMenu {
         Menu menuCliente = new Menu("Gestão Clientes");
 
         menuCliente.adicionarOpcao(new OpcaoMenu("Criar Clientes", () -> {
-            TratamentoDados.criarCliente();
-            keyPress();
             try {
-                TratamentoDados.gravarArrayClientes();
+                TratamentoDados.criarCliente();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            keyPress();
         }));
         menuCliente.adicionarOpcao(new OpcaoMenu("Listar Clientes", CriarMenu::menuListarClientes));
         menuCliente.adicionarOpcao(new OpcaoMenu("Editar Cliente", () -> {
@@ -84,25 +83,237 @@ public class CriarMenu {
     }
 
     /**
+     * Exibe o menu de gestão de livros.
+     */
+    private static void menuLivro() {
+        Menu menuLivro = new Menu("Gestão de Livros");
+
+        menuLivro.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
+            try {
+                TratamentoDados.criarLivro();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", CriarMenu::menuListarLivros));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
+            try {
+                TratamentoDados.editarLivro();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
+            try {
+                TratamentoDados.apagarLivroPeloId();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        /*
+        TODO:
+            Penso que seja possivel retirar estes menus daqui
+            e apenas usar o menu principal das Reservas / Emprestimos
+        menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
+            System.out.println("Reservar Livro...");
+            keyPress();
+        }));
+        menuLivro.adicionarOpcao(new OpcaoMenu("Empréstimo Livro", () -> {
+            System.out.println("Empréstimo Livro...");
+            keyPress();
+        }));*/
+
+        menuLivro.exibir();
+    }
+
+    /**
+     * Exibe o menu de listagem de livros.
+     */
+    private static void menuListarLivros() {
+        Menu menuListarLivros = new Menu("Listar Livros");
+
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
+            TratamentoDados.listaTodosLivros();
+            keyPress();
+        }));
+        menuListarLivros.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
+            TratamentoDados.listaLivroPorIsbn();
+            keyPress();
+        }));
+
+        menuListarLivros.exibir();
+    }
+
+    /**
+     * Exibe o menu de gestão de jornais.
+     */
+    private static void menuJornal() {
+        Menu menuJornal = new Menu("Gestão de Jornais");
+
+        menuJornal.adicionarOpcao(new OpcaoMenu("Criar Jornal", () -> {
+            try {
+                TratamentoDados.criarJornal();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Listar Jornais", CriarMenu::menuListarJornais));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.JORNAL);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        /*
+        TODO:
+            Penso que seja possivel retirar estes menus daqui
+            e apenas usar o menu principal das Reservas / Emprestimos
+        menuJornal.adicionarOpcao(new OpcaoMenu("Reservar Jornal", () -> {
+            System.out.println("Reservar Jornal...");
+            keyPress();
+        }));
+        menuJornal.adicionarOpcao(new OpcaoMenu("Empréstimo Jornal", () -> {
+            System.out.println("Empréstimo Jornal...");
+            keyPress();
+        }));*/
+
+        menuJornal.exibir();
+    }
+
+    /**
+     * Exibe o menu de listagem de jornais.
+     */
+    private static void menuListarJornais() {
+        Menu menuListarJornais = new Menu("Listar Jornais");
+
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Todos jornais",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+        menuListarJornais.adicionarOpcao(new OpcaoMenu("Listar jornais por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.JORNAL);
+            keyPress();
+        }));
+
+        menuListarJornais.exibir();
+    }
+
+    /**
+     * Exibe o menu de gestão de revistas.
+     */
+    private static void menuRevista() {
+        Menu menuRevista = new Menu("Gestão de Revistas");
+
+        menuRevista.adicionarOpcao(new OpcaoMenu("Criar Revista", () -> {
+            try {
+                TratamentoDados.criarRevista();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Listar Revistas", CriarMenu::menuListarRevistas));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revistas", () -> {
+            try {
+                TratamentoDados.editarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
+            try {
+                TratamentoDados.apagarJornalRevista(Constantes.TipoItem.REVISTA);
+            }catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        /*
+        TODO:
+            Penso que seja possivel retirar estes menus daqui
+            e apenas usar o menu principal das Reservas / Emprestimos
+        menuRevista.adicionarOpcao(new OpcaoMenu("Reservar Revista", () -> {
+            System.out.println("Reservar Revista...");
+            keyPress();
+        }));
+        menuRevista.adicionarOpcao(new OpcaoMenu("Empréstimo Revista", () -> {
+            System.out.println("Empréstimo Revista...");
+            keyPress();
+        }));
+        */
+        menuRevista.exibir();
+    }
+
+    /**
+     * Exibe o menu de listagem de revistas.
+     */
+    private static void menuListarRevistas() {
+        Menu menuListarRevistas = new Menu("Listar Revistas");
+
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Todas revistas",  () -> {
+            TratamentoDados.listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+        menuListarRevistas.adicionarOpcao(new OpcaoMenu("Listar revistas por ISSN", () -> {
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.REVISTA);
+            keyPress();
+        }));
+
+        menuListarRevistas.exibir();
+    }
+
+    /**
      * Exibe o menu de gestão de reservas.
      */
     private static void menuReservas() {
         Menu menuReservas = new Menu("Gestão de Reservas");
 
         menuReservas.adicionarOpcao(new OpcaoMenu("Criar Reserva", () -> {
-            TratamentoDados.criarReserva();
-            keyPress();
             try {
-                TratamentoDados.gravarArrayReservas();
+                TratamentoDados.criarReserva();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            keyPress();
+        }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", () -> {
+            TratamentoDados.listaTodasReservas();
+            keyPress();
+        }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Detalhes Reserva", () -> {
+            try {
+                TratamentoDados.listaTodasReservas();
+                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
-            System.out.println("Reserva Editada...");
+            try {
+                TratamentoDados.editarReserva();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
+            //TODO : A desenvolver
             System.out.println("Reserva Concluída...");
             keyPress();
         }));
@@ -117,140 +328,21 @@ public class CriarMenu {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
 
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Criar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Criado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Editado...");
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
+            //TODO : A desenvolver
             System.out.println("Empréstimo Concluído...");
             keyPress();
         }));
 
         menuEmprestimos.exibir();
-    }
-
-    /**
-     * Exibe o menu de gestão de livros.
-     */
-    private static void menuLivro() {
-        Menu menuLivro = new Menu("Gestão de Livros");
-
-        menuLivro.adicionarOpcao(new OpcaoMenu("Criar Livro", () -> {
-            TratamentoDados.criarLivro();
-            keyPress();
-            try {
-                TratamentoDados.gravarArraylivros();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Listar Livro", CriarMenu::menuListarLivros));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Editar Livro", () -> {
-            try {
-                TratamentoDados.editarLivroPeloId();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            keyPress();
-        }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Apagar Livro", () -> {
-            try {
-                TratamentoDados.apagarLivroPeloIsbn();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            keyPress();
-        }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
-            System.out.println("Reservar Livro...");
-            keyPress();
-        }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Empréstimo Livro", () -> {
-            System.out.println("Empréstimo Livro...");
-            keyPress();
-        }));
-
-        menuLivro.exibir();
-    }
-
-    /**
-     * Exibe o menu de listagem de livros.
-     */
-    private static void menuListarLivros() {
-        Menu menuListarClientes = new Menu("Listar Livros");
-
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Todos Livros",  () -> {
-            TratamentoDados.lerArrayLivros();
-            keyPress();
-        }));
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Livros por ISBN", () -> {
-            TratamentoDados.pesquisarLivrosPeloIsbn();
-            keyPress();
-        }));
-
-        menuListarClientes.exibir();
-    }
-
-    /**
-     * Exibe o menu de gestão de jornais.
-     */
-    private static void menuJornal() {
-        Menu menuJornal = new Menu("Gestão de Jornais");
-
-        menuJornal.adicionarOpcao(new OpcaoMenu("Criar Jornal", () -> {
-            System.out.println("Criar Jornal...");
-            keyPress();
-        }));
-        menuJornal.adicionarOpcao(new OpcaoMenu("Editar Jornal", () -> {
-            System.out.println("Editar Jornal...");
-            keyPress();
-        }));
-        menuJornal.adicionarOpcao(new OpcaoMenu("Apagar Jornal", () -> {
-            System.out.println("Apagar Jornal...");
-            keyPress();
-        }));
-        menuJornal.adicionarOpcao(new OpcaoMenu("Reservar Jornal", () -> {
-            System.out.println("Reservar Jornal...");
-            keyPress();
-        }));
-        menuJornal.adicionarOpcao(new OpcaoMenu("Empréstimo Jornal", () -> {
-            System.out.println("Empréstimo Jornal...");
-            keyPress();
-        }));
-
-        menuJornal.exibir();
-    }
-
-    /**
-     * Exibe o menu de gestão de revistas.
-     */
-    private static void menuRevista() {
-        Menu menuRevista = new Menu("Gestão de Revistas");
-
-        menuRevista.adicionarOpcao(new OpcaoMenu("Criar Revista", () -> {
-            System.out.println("Criar Revista...");
-            keyPress();
-        }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Editar Revista", () -> {
-            System.out.println("Editar Revista...");
-            keyPress();
-        }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Apagar Revista", () -> {
-            System.out.println("Apagar Revista...");
-            keyPress();
-        }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Reservar Revista", () -> {
-            System.out.println("Reservar Revista...");
-            keyPress();
-        }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Empréstimo Revista", () -> {
-            System.out.println("Empréstimo Revista...");
-            keyPress();
-        }));
-
-        menuRevista.exibir();
     }
 }

@@ -2,7 +2,8 @@
 .idea/
 *.iml
 out/
-
+GestaoBiblioteca/*.csv
+GestaoBiblioteca/Biblioteca_1
 # Logs
 *.log
 

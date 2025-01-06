@@ -1,0 +1,76 @@
+/** Representa o detalhe da Reserva
+ * @author ER_GRUPO_5
+ * @since 2024
+ */
+public class ReservaLinha {
+    private int idReserva;
+    private Constantes.TipoItem tipoItem;
+    private int idItem;
+
+    /**
+     * Construtor para criar a linha da reserva.
+     *
+     * @param idReserva O Id da Reserva
+     * @param tipoItem  O Tipo de item associado à reserva
+     * @param idItem    O Id do item associado à reserva
+     */
+    public ReservaLinha(int idReserva, Constantes.TipoItem tipoItem, int idItem) {
+        this.idReserva = idReserva;
+        this.tipoItem = tipoItem;
+        this.idItem = idItem;
+    }
+
+    /**
+     * Obtém o Id da reserva.
+     *
+     * @return O Id da reserva.
+     */
+    public int getIdReserva() {
+        return idReserva;
+    }
+
+    /**
+     * Define o Id da reserva.
+     *
+     * @param idReserva O Id da reserva.
+     */
+    public void setIdReserva(int idReserva) {
+        this.idReserva = idReserva;
+    }
+
+    /**
+     * Obtém o Tipo de Item.
+     *
+     * @return O Tipo de Item.
+     */
+    public Constantes.TipoItem getTipoItem() {
+        return tipoItem;
+    }
+
+    /**
+     * Define o Tipo de Item.
+     *
+     * @param tipoItem O Tipo de Item.
+     */
+    public void setTipoItem(Constantes.TipoItem tipoItem) {
+        this.tipoItem = tipoItem;
+    }
+
+    /**
+     * Obtém o Id do Item.
+     *
+     * @return O Id do item.
+     */
+    public int getIdItem() {
+        return idItem;
+    }
+
+    /**
+     * Define o Id do Item.
+     *
+     * @param idItem O Id do Item.
+     */
+    public void setIdItem(int idItem) {
+        this.idItem = idItem;
+    }
+}

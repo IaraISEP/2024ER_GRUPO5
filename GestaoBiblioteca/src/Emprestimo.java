@@ -1,12 +1,11 @@
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
-/** Representa um Emprestimo
+/** Representa um Empréstimo
  * @author ER_GRUPO_5
  * @since 2024
  */
 public class Emprestimo extends Movimentos{
-    private LocalDateTime dataPrevFim;
+    private LocalDate dataPrevFim;
 
     /**
      * Construtor para criar um empréstimo.
@@ -14,17 +13,12 @@ public class Emprestimo extends Movimentos{
      * @param numMovimento O número do movimento.
      * @param codBiblioteca O código da biblioteca.
      * @param dataInicio A data de início do empréstimo.
-     * @param clientes O cliente associado ao empréstimo.
-     * @param livros A lista de livros associados ao empréstimo (pode ser null).
-     * @param jornais A lista de jornais associados ao empréstimo (pode ser null).
-     * @param revistas A lista de revistas associadas ao empréstimo (pode ser null).
      * @param dataPrevFim A data prevista da devolução do item bibliotecário.
      * @param dataFim A data de devolução do item bibliotecário.
+     * @param cliente o cliente associado ao empréstimo.
      */
-    public Emprestimo(int numMovimento, int codBiblioteca, LocalDateTime dataInicio, LocalDateTime dataFim,
-                      List<Cliente> clientes, List<Livro> livros, List<Jornal> jornais, List<Revista> revistas,
-                      LocalDateTime dataPrevFim) {
-        super(numMovimento, codBiblioteca, dataInicio, dataFim, clientes, livros, jornais, revistas);
+    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, LocalDate dataPrevFim, Cliente cliente) {
+        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente);
         this.dataPrevFim = dataPrevFim;
     }
 
@@ -33,16 +27,16 @@ public class Emprestimo extends Movimentos{
      *
      * @return A data prevista da devolução.
      */
-    public LocalDateTime getDataPrevFim() {
+    public LocalDate getDataPrevFim() {
         return dataPrevFim;
     }
 
     /**
-     * Define a data de devolução do empréstimo.
+     * Define a data prevista de devolução do empréstimo.
      *
      * @param dataPrevFim A data de devolução.
      */
-    public void setDataPrevFim(LocalDateTime dataPrevFim) {
+    public void setDataPrevFim(LocalDate dataPrevFim) {
         this.dataPrevFim = dataPrevFim;
     }
 }

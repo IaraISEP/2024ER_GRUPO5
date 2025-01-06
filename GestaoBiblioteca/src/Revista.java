@@ -1,5 +1,3 @@
-import java.time.LocalDateTime;
-
 /** Representa uma Revista
  * @author ER_GRUPO_5
  * @since 2024
@@ -15,7 +13,7 @@ public class Revista extends JornalRevista{
      * @param dataPublicacao A data de publicação da revista.
      * @param codBiblioteca O código da biblioteca.
      */
-    public Revista(String titulo, String editora, String categoria, String issn, int dataPublicacao, int codBiblioteca) {
-        super(titulo, editora, categoria, issn, dataPublicacao, codBiblioteca);
+    public Revista(int id, String titulo, String editora, Constantes.Categoria categoria, String issn, int dataPublicacao, int codBiblioteca) {
+        super(id, titulo, editora, issn, dataPublicacao, codBiblioteca, Constantes.TipoItem.REVISTA, categoria);
     }
 }
