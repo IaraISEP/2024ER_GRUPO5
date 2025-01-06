@@ -15,9 +15,9 @@ public class Biblioteca {
     /** Representa a lista de Livros da respetiva biblioteca */
     private List<Livro> livro;
     /** Representa a lista de jornais da respetiva biblioteca */
-    private List<Jornal> jornal;
+    private List<JornalRevista> jornal;
     /** Representa a lista de revistas da respetiva biblioteca */
-    private List<Revista> revista;
+    private List<JornalRevista> revista;
     /** Representa a lista de clientes da respetiva biblioteca */
     private List<Cliente> cliente;
     /** Representa a lista de emprestimos da da biblioteca */
@@ -134,7 +134,7 @@ public class Biblioteca {
      *
      * @return A lista de jornais.
      */
-    public List<Jornal> getJornais() {
+    public List<JornalRevista> getJornais() {
         return jornal;
     }
 
@@ -143,7 +143,7 @@ public class Biblioteca {
      *
      * @param jornal A lista de jornais.
      */
-    public void setJornais(List<Jornal> jornal) {
+    public void setJornais(List<JornalRevista> jornal) {
         this.jornal = jornal;
     }
 
@@ -152,7 +152,7 @@ public class Biblioteca {
      *
      * @return A lista de revistas.
      */
-    public List<Revista> getRevistas() {
+    public List<JornalRevista> getRevistas() {
         return revista;
     }
 
@@ -161,7 +161,7 @@ public class Biblioteca {
      *
      * @param revista A lista de revistas.
      */
-    public void setRevistas(List<Revista> revista) {
+    public void setRevistas(List<JornalRevista> revista) {
         this.revista = revista;
     }
 
