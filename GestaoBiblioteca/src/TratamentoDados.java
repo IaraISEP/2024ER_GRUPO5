@@ -634,7 +634,7 @@ public class TratamentoDados {
     }
 
     /**
-     * Lista um livro pelo ISBN fornecido.
+     * Lista um Jornal/Revista pelo ISSN fornecido.
      */
     public static void listaJornalRevistaPorIssn(Constantes.TipoItem tipoItem) {
         if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
@@ -650,8 +650,10 @@ public class TratamentoDados {
 
         if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
-                if (jornal.getIssn().equals(issn))
+                if (jornal.getIssn().equals(issn)) {
                     mostraTabelaJornalRevista(Collections.singletonList(jornal));
+                    return;
+                }
             }
         } else {
             for (JornalRevista revista : revistas) {
@@ -759,7 +761,7 @@ public class TratamentoDados {
         }
         listaTodosJornalRevista(tipoItem);
 
-        int idApagar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " livro que deseja apagar: ", false, null);
+        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
         JornalRevista jornalRevistaRemover = null;
         if (tipoItem == Constantes.TipoItem.REVISTA) {
             for (JornalRevista jornalRevista : revistas) {
