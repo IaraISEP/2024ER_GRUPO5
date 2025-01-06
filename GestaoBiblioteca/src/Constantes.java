@@ -45,7 +45,8 @@ public class Constantes {
         EMPRESTADO,
         ATRASADO,
         RESERVADO,
-        CONCLUIDO
+        CONCLUIDO,
+        CANCELADO
     }
 
     public enum Genero {
