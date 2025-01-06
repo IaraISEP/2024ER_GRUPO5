@@ -14,11 +14,10 @@ import java.time.LocalDate;
      * @param codBiblioteca O código da biblioteca.
      * @param dataInicio A data de início do empréstimo.
      * @param dataPrevFim A data prevista da devolução do item bibliotecário.
-     * @param dataFim A data de devolução do item bibliotecário.
      * @param cliente o cliente associado ao empréstimo.
      */
-    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, LocalDate dataPrevFim, Cliente cliente) {
-        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente);
+    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataPrevFim, Cliente cliente) {
+        super(numMovimento, codBiblioteca, dataInicio, dataPrevFim, cliente);
         this.dataPrevFim = dataPrevFim;
     }
 

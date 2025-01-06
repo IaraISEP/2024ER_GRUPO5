@@ -1,4 +1,4 @@
-/** Representa o detalhe da Reserva
+/** Representa o detalhe da Emprestimo
  * @author ER_GRUPO_5
  * @since 2024
  */
@@ -11,11 +11,10 @@ public class EmprestimoLinha {
     /**
      * Construtor para criar a linha da reserva.
      *
-     * @param idEmprestimo O Id da Reserva
+     * @param idEmprestimo O Id da Emprestimo
      * @param tipoItem  O Tipo de item associado à reserva
      * @param idItem    O Id do item associado à reserva
      */
-
     public EmprestimoLinha(int idEmprestimo, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
         this.idEmprestimo = idEmprestimo;
         this.tipoItem = tipoItem;
@@ -24,18 +23,18 @@ public class EmprestimoLinha {
     }
 
     /**
-     * Obtém o Id da reserva.
+     * Obtém o Id da emprestimo.
      *
-     * @return O Id da reserva.
+     * @return O Id da emprestimo.
      */
     public int getIdEmprestimo() {
-        return getIdEmprestimo();
+        return idEmprestimo;
     }
 
     /**
-     * Define o Id da reserva.
+     * Define o Id da emprestimo.
      *
-     * @param idEmprestimo O Id da reserva.
+     * @param idEmprestimo O Id da emprestimo.
      */
     public void setIdEmprestimo(int idEmprestimo) {
         this.idEmprestimo = idEmprestimo;

@@ -13,7 +13,7 @@ public class Movimentos {
     private LocalDate dataInicio;
     private LocalDate dataFim;
     private Cliente cliente;
-    private Constantes.Estado estado;
+
     /**
      * Instancia um novo Movimentos.
      *

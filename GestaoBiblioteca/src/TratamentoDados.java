@@ -21,7 +21,7 @@ public class TratamentoDados {
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
-    private static List<EmprestimoLinha> emprestimolinha = new ArrayList<>();
+    private static List<EmprestimoLinha> emprestimoLinha = new ArrayList<>();
     private static List<JornalRevista> jornais = new ArrayList<>();
     private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
@@ -1165,6 +1165,9 @@ public class TratamentoDados {
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - INICIO ##############################################
      * */
 
+    /**
+     * Metodo para criar o Emprestimo
+     * */
     public static void criarEmprestimo() throws IOException {
         //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
@@ -1179,95 +1182,168 @@ public class TratamentoDados {
         }
 
         //Atribui automaticamente o Id com base no último Id existente.
-        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA);
+        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO);
 
         //Cria a reserva
-        reservas.add(inserirDadosReserva(idReserva));
-        Reserva reserva = reservas.getLast();
+        emprestimos.add(inserirDadosEmprestimo(idEmprestimo));
+        Emprestimo emprestimo = emprestimos.getLast();
 
 
         // TODO: Chamar metodo de criar detalhes da reserva
-        criarDetalheReserva(reserva.getNumMovimento());
+        criarDetalheEmprestimo(emprestimo.getNumMovimento());
 
-        System.out.println("Reserva criada com sucesso!");
+        System.out.println("Emprestimo criada com sucesso!");
 
-        gravarArrayReservas();
+        gravarArrayEmprestimo();
 
         // Criar o historico dos movimentos
         //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
-
     }
 
-    /**
-     * Edita um Emprestimo pelo ID.
-     */
+    public static Emprestimo inserirDadosEmprestimo(int idEmprestimo){
+        Cliente cliente = null;
+        LocalDate dataInicio;
+        LocalDate dataPrevFim;
 
-    public static void editarEmprestimo() throws IOException {
-        // Verifica se a lista de clientes está vazia
-        if(emprestimos.isEmpty()) {
-            System.out.println("Não há emprestimos nesta biblioteca.");
-            return;
-        }
-
-        // Lista todos os clientes
-        listaTodasEmprestimos();
-
-        // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        Constantes.TipoItem tipoItem = criarDetalheReserva(idEditar);
-        emprestimolinha.add(inserirDetalhesReserva(idEditar, tipoItem));
-        gravarArrayReservaLinha();
-        System.out.println("ID não encontrado!");
-    }
-
-    /**
-     * Apaga um Emprestimo pelo ID.
-     */
-    public static void listaTodosEmprestimos() {
-        if (emprestimos.isEmpty()) {
-            System.out.println("Não existem emprestimos para mostrar.");
-            return;
-        }
-        mostraTabelaReservas(emprestimos);
-    }
-
-    /**
-     * Apaga um Emprestimo pelo ID.
-     */
-
-    public static void apagarEmprestimos(Constantes.TipoItem tipoItem) throws IOException {
-        if (tipoItem == Constantes.TipoItem.EMPRESTIMO && emprestimos.isEmpty()) {
-            System.out.println("Não existem Emprestimos nesta Biblioteca.");
-            return;
-        }
-
-        //listaTodosJornalRevista(tipoItem);
-
-        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
-        Emprestimo emprestimoRemover = null;
-        if (tipoItem == Constantes.TipoItem.EMPRESTIMO) {
-            for (Emprestimo emprestimo : emprestimos) {
-                if (emprestimo.getNumMovimento() == idApagar) {
-                    emprestimoRemover = emprestimo;
+        // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
+        do {
+            int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - NIF, 3 - Contacto): ", false, null);
+            Constantes.ValidacaoCliente validacaoCliente;
+            switch (opcao) {
+                case 1:
+                    validacaoCliente = Constantes.ValidacaoCliente.ID;
                     break;
-                }
+                case 2:
+                    validacaoCliente = Constantes.ValidacaoCliente.NIF;
+                    break;
+                case 3:
+                    validacaoCliente = Constantes.ValidacaoCliente.CONTACTO;
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    continue;
             }
-        }
+            int valor = lerInt("Insira o " + validacaoCliente.toString().toLowerCase() + " : ", false, null);
+            cliente = validarCliente(validacaoCliente, valor);
+            if (cliente == null) {
+                System.out.println("Cliente não encontrado. Tente novamente.");
+            }
+        } while (cliente == null);
 
-        if (emprestimoRemover == null) {
-            System.out.println("ID "+ tipoItem.toString().toLowerCase() +" não encontrado.");
-            return;
-        }
-        if(tipoItem == Constantes.TipoItem.EMPRESTIMO){
-            emprestimos.remove(emprestimoRemover);
-            gravarArrayRevista();
-        }
-        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+        // Introdução das datas.
+        // É validado se a data início introduzida é inferior a hoje.
+        // É validado se a data final prevista introduzida é inferior à início e superior ao limite estipulado.
+        do {
+            dataInicio = lerData("Insira a data de início da empréstimo (dd/MM/yyyy): ");
+            if (dataInicio.isBefore(Constantes.datahoje)) {
+                System.out.println("A data de início não pode ser anterior ao dia de hoje.");
+            }
+        } while (dataInicio.isBefore(Constantes.datahoje));
+
+        do {
+            dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
+            if (dataPrevFim.isBefore(dataInicio)) {
+                System.out.println("A data final prevista não pode ser anterior à data de início.");
+            }
+            else if(dataPrevFim.isAfter(dataInicio.plusDays(30))) {
+                System.out.println("A empréstimo não pode ser superior a 30 dias.");
+            }
+        } while (dataPrevFim.isBefore(dataInicio) || dataPrevFim.isAfter(dataInicio.plusDays(30)));
+
+        return new Emprestimo(1, idEmprestimo, dataInicio, dataPrevFim, cliente);
     }
 
+    public static Constantes.TipoItem criarDetalheEmprestimo(int idEmprestimo) throws IOException {
+        Constantes.TipoItem tipoItem;
+        do {
+            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
 
+            switch (tipoItemOpcao) {
+                case 1:
+                    tipoItem = Constantes.TipoItem.LIVRO;
+                    break;
+                case 2:
+                    tipoItem = Constantes.TipoItem.REVISTA;
+                    break;
+                case 3:
+                    tipoItem = Constantes.TipoItem.JORNAL;
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    continue;
+            }
+            inserirDetalhesEmprestimo(idEmprestimo,tipoItem);
+            int opcao = lerInt("Deseja acrescentar mais Items ao empréstimo? (1 - Sim, 2 - Não)", false, null);
+            if (opcao == 2){
+                break;
+            }
+        } while(true);
+        return tipoItem;
+    }
 
+    public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem)
+    {
+        //TODO: Validar se os items inseridos não estão noutro empréstimo
+        //Talvez se possa criar um boolean nos itens a true/false, para ser mais fácil a validação,
+        //ao invés de se ter que percorrer listas.
+        int idItem=0;
+        boolean idValido=false;
 
+        do {
+            switch (tipoItem) {
+                case LIVRO:
+                    if (!livros.isEmpty()) {
+                        listaTodosLivros();
+                        idItem = lerInt("Insira o ID do Livro: ", false, null);
+                        idValido = validarIdLivro(idItem);
+                        break;
+                    }else {
+                        System.out.println("Não existem Livros para mostrar.");
+                        break;
+                    }
+                case REVISTA:
+                    if (!revistas.isEmpty()) {
+                        listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                        idItem = lerInt("Insira o ID da Revista: ", false, null);
+                        idValido = validarIdRevista(idItem);
+                        break;
+                    }else {
+                        System.out.println("Não existem Revistas para mostrar.");
+                        break;
+                    }
+                case JORNAL:
+                    if (!jornais.isEmpty()) {
+                        listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                        idItem = lerInt("Insira o ID do Jornal: ", false, null);
+                        idValido = validarIdJornal(idItem);
+                        break;
+                    }else {
+                        System.out.println("Não existem Jornais para mostrar.");
+                        break;
+                    }
+                default:
+                    throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
+            }
+
+            if (!idValido) {
+                System.out.println("ID inválido. Tente novamente.");
+            }
+        } while (!idValido);
+
+        return new EmprestimoLinha(emprestimoId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+    }
+
+    public static void gravarArrayEmprestimo() throws IOException {
+        if(emprestimos.isEmpty()) {
+            new File(Constantes.Path.EMPRESTIMO.getValue()).delete();
+            System.out.println("Array vazio");
+            return;
+        }
+
+        for(int i = 0; i < emprestimos.size(); i++){
+            criarFicheiroCsvReservas(Constantes.Path.EMPRESTIMO.getValue(), emprestimos.get(i), i != 0);
+        }
+    }
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
      * */
