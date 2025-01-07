@@ -521,6 +521,7 @@ public class TratamentoDados {
     /**
      * Pesquisa um ISBN na lista de livros.
      */
+
     private static String pesquisarIsbn(String isbn) {
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn)) {
@@ -600,8 +601,10 @@ public class TratamentoDados {
         boolean flag;
         do {
             issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
-            flag = validarTamanho(issn, 9);
-            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
+
+            if (issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
+                flag = true;
+            }else {
                 System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
                 flag = false;
             }
