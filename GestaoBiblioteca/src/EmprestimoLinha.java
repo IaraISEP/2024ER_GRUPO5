@@ -22,6 +22,14 @@ public class EmprestimoLinha {
         this.estado = estado;
     }
 
+    public Constantes.Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Constantes.Estado estado) {
+        this.estado = estado;
+    }
+
     /**
      * Obtém o Id da emprestimo.
      *

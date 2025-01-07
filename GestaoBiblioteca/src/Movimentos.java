@@ -13,6 +13,7 @@ public class Movimentos {
     private LocalDate dataInicio;
     private LocalDate dataFim;
     private Cliente cliente;
+    private Constantes.Etapa etapa;
 
     /**
      * Instancia um novo Movimentos.
@@ -23,12 +24,20 @@ public class Movimentos {
      * @param dataFim       a data de fim
      * @param cliente       o cliente afeto ao movimento
      */
-    public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente) {
+    public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, Constantes.Etapa etapa) {
         this.numMovimento = numMovimento;
         this.codBiblioteca = codBiblioteca;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.cliente = cliente;
+    }
+
+    public void setEtapa(Constantes.Etapa etapa) {
+        this.etapa = etapa;
+    }
+
+    public Constantes.Etapa getEtapa() {
+        return etapa;
     }
 
     /**

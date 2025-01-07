@@ -1341,7 +1341,28 @@ public class TratamentoDados {
         }
 
         for(int i = 0; i < emprestimos.size(); i++){
-            criarFicheiroCsvReservas(Constantes.Path.EMPRESTIMO.getValue(), emprestimos.get(i), i != 0);
+            criarFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue(), emprestimos.get(i), i != 0);
+        }
+    }
+
+    public static void criarFicheiroCsvEmprestimoLinha(String ficheiro, EmprestimoLinha emprestimoLinha, Boolean firstLine) throws IOException {
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(String.join(";",
+                    Integer.toString(emprestimoLinha.getIdEmprestimo()),
+                    emprestimoLinha.getTipoItem().toString(),
+                    Integer.toString(emprestimoLinha.getIdItem()),
+                    emprestimoLinha.getEstado().toString()+ "\n"));
+        }
+    }
+
+    public static void criarFicheiroCsvEmprestimos(String ficheiro, Emprestimo emprestimo, Boolean firstLine) throws IOException {
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(String.join(";",
+                    Integer.toString(emprestimo.getCodBiblioteca()),
+                    Integer.toString(emprestimo.getNumMovimento()),
+                    emprestimo.getDataInicio().toString(),
+                    emprestimo.getDataFim().toString(),
+                    emprestimo.getClienteId() + "\n"));
         }
     }
     /*
