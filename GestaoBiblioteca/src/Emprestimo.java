@@ -16,8 +16,8 @@ import java.time.LocalDate;
      * @param dataPrevFim A data prevista da devolução do item bibliotecário.
      * @param cliente o cliente associado ao empréstimo.
      */
-    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataPrevFim, Cliente cliente) {
-        super(numMovimento, codBiblioteca, dataInicio, dataPrevFim, cliente);
+    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataPrevFim, Cliente cliente, Constantes.Estado estado) {
+        super(numMovimento, codBiblioteca, dataInicio, dataPrevFim, cliente, estado);
         this.dataPrevFim = dataPrevFim;
     }
 
