@@ -1250,7 +1250,7 @@ public class TratamentoDados {
             }
         } while (dataPrevFim.isBefore(dataInicio) || dataPrevFim.isAfter(dataInicio.plusDays(30)));
 
-        return new Emprestimo(1, idEmprestimo, dataInicio, dataPrevFim, cliente);
+        return new Emprestimo(1, idEmprestimo, dataInicio, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);
     }
 
     public static Constantes.TipoItem criarDetalheEmprestimo(int idEmprestimo) throws IOException {
@@ -1367,6 +1367,84 @@ public class TratamentoDados {
                     emprestimo.getEstado().toString() + "\n"));
         }
     }
+
+    /**
+     * Apaga um Emprestimo pelo ID.
+     */
+    public static void apagarEmprestimo() throws IOException {
+        if (emprestimos.isEmpty()) {
+            System.out.println("Não existem Emprestimos nesta Biblioteca.");
+            return;
+        }
+
+        //listaTodosJornalRevista(tipoItem);
+
+        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
+        Emprestimo emprestimoRemover = null;
+        for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getNumMovimento() == idApagar) {
+                emprestimoRemover = emprestimo;
+                break;
+            }
+        }
+        if (emprestimoRemover == null) {
+            System.out.println("ID do empréstimo não encontrado.");
+            return;
+        }
+
+        System.out.println("Quer apagar todos os itens?");
+        int escolha = lerInt("Escolha 1- Sim \n 2-Não", false, null);
+        if (escolha == 1){
+            emprestimos.remove(emprestimoRemover);
+            gravarArrayEmprestimo();
+        }else{
+            //listaEmprestimoLinha(idEmprestimo)
+            escolha = lerInt("Escolha o tipo de item: \n 1- Livro \n 2- Jornal \n 3- Revista", false, null);
+            switch (escolha){
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+                    
+                    break;
+            }
+        }
+
+
+
+
+
+
+
+        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+    }
+
+    /**
+     * Editar Emprestimo
+     */
+    public static void editarEmprestimo() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(emprestimos.isEmpty()) {
+            System.out.println("Não há emprestimos nesta biblioteca.");
+            return;
+        }
+
+        // Lista todos os clientes
+        //listaTodasReservas();
+
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        Constantes.TipoItem tipoItem = criarDetalheReserva(idEditar);
+        emprestimoLinha.add(inserirDetalhesEmprestimo(idEditar, tipoItem));
+        gravarArrayEmprestimo();
+        System.out.println("ID não encontrado!");
+    }
+
+
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
      * */
