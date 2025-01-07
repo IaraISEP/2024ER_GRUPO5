@@ -1235,10 +1235,10 @@ public class TratamentoDados {
         // É validado se a data final prevista introduzida é inferior à início e superior ao limite estipulado.
         do {
             dataInicio = lerData("Insira a data de início da empréstimo (dd/MM/yyyy): ");
-            if (dataInicio.isBefore(Constantes.datahoje)) {
+            if (dataInicio.isBefore(Constantes.getDatahoje())) {
                 System.out.println("A data de início não pode ser anterior ao dia de hoje.");
             }
-        } while (dataInicio.isBefore(Constantes.datahoje));
+        } while (dataInicio.isBefore(Constantes.getDatahoje()));
 
         do {
             dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
@@ -1361,8 +1361,10 @@ public class TratamentoDados {
                     Integer.toString(emprestimo.getCodBiblioteca()),
                     Integer.toString(emprestimo.getNumMovimento()),
                     emprestimo.getDataInicio().toString(),
+                    emprestimo.getDataPrevFim().toString(),
                     emprestimo.getDataFim().toString(),
-                    emprestimo.getClienteId() + "\n"));
+                    emprestimo.getClienteId(),
+                    emprestimo.getEstado().toString() + "\n"));
         }
     }
     /*
