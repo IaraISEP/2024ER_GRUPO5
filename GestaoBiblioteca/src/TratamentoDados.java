@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.Scanner;
+import java.util.*;
+
+
 /**
  * Representa Classe responsavel pelo tratamento de dados
  * @author ER_GRUPO_5
@@ -334,6 +337,7 @@ public class TratamentoDados {
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - FIM #################################################
      * */
+
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
      */
@@ -342,7 +346,8 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO)));
+        Livro novoLivro = inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO));
+        livros.add(novoLivro);
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -355,8 +360,9 @@ public class TratamentoDados {
             System.out.println("Não existem livros para mostrar.");
             return;
         }
-
-        mostraTabelaLivros(livros);
+        livros.stream()
+                .sorted(Comparator.comparing(Livro::getTitulo))
+                .forEach(System.out::println);
     }
 
     /**
@@ -370,62 +376,43 @@ public class TratamentoDados {
 
         String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
 
-        for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn)) {
-                mostraTabelaLivros(Collections.singletonList(livro));
-                return;
-            }
-        }
-
-        System.out.println("O ISBN que inseriu não existe.");
+        livros.stream().filter(l -> l.getIsbn().equals(isbn)).findFirst()
+                .ifPresentOrElse(
+                        livro -> System.out.println(livro),
+                        () -> System.out.println("O ISBN que inseriu não existe.")
+                );
     }
 
     /**
      * Edita os dados de um livro existente.
      */
     public static void editarLivro() throws IOException {
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca.");
-            return;
-        }
         listaTodosLivros();
         int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
 
-        for (Livro livro : livros) {
-            if (livro.getId() == idEditar) {
-                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
-                System.out.println("Livro editado com sucesso!");
-                gravarArrayLivros();
-                return;
-            }
-        }
-
-        System.out.println("ID do livro não encontrado.");
+        livros.stream().filter(l -> l.getId() == idEditar).findFirst().ifPresentOrElse(
+                livro -> {
+                    try {
+                        int index = livros.indexOf(livro);
+                        livros.set(index, inserirDadosLivro(idEditar));
+                        System.out.println("Livro editado com sucesso!");
+                        gravarArrayLivros();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                },
+                () -> System.out.println("ID do livro não encontrado.")
+        );
     }
 
     /**
      * Apaga um livro pelo ID.
      */
     public static void apagarLivroPeloId() throws IOException {
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca.");
-            return;
-        }
-
         listaTodosLivros();
         int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
-        Livro livroRemover = null;
-        for (Livro livro : livros) {
-            if (livro.getId() == idApagar) {
-                livroRemover = livro;
-                break;
-            }
-        }
-        if (livroRemover == null) {
-            System.out.println("ID do livro não encontrado.");
-            return;
-        }
-        livros.remove(livroRemover);
+
+        livros.removeIf(livro -> livro.getId() == idApagar);
         System.out.println("Livro apagado com sucesso!");
         gravarArrayLivros();
     }
@@ -434,13 +421,10 @@ public class TratamentoDados {
      * Grava a lista de livros em um arquivo CSV.
      */
     public static void gravarArrayLivros() throws IOException {
-        if (livros.isEmpty()) {
-            new File(Constantes.Path.LIVRO.getValue()).delete();
-            System.out.println("Biblioteca não tem contem livros.");
-            return;
-        }
-        for (int i = 0; i < livros.size(); i++) {
-            criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
+        try (FileWriter fw = new FileWriter(Constantes.Path.LIVRO.getValue())) {
+            for (Livro livro : livros) {
+                criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livro, true);
+            }
         }
     }
 
@@ -467,14 +451,7 @@ public class TratamentoDados {
      */
     public static void lerFicheiroCsvLivros(String ficheiro) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            String linha = readFile.readLine();
-            if (linha == null) {
-                System.out.println("O arquivo está vazio.");
-                return;
-            }
-            String csvDivisor = ";";
-            do {
-                String[] dados = linha.split(csvDivisor);
+            readFile.lines().map(linha -> linha.split(";")).forEach(dados -> {
                 int id = Integer.parseInt(dados[0]);
                 String titulo = dados[1];
                 String editora = dados[2];
@@ -483,9 +460,9 @@ public class TratamentoDados {
                 String isbn = dados[5];
                 String autor = dados[6];
                 int codBiblioteca = Integer.parseInt(dados[7]);
-                Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
-                livros.add(livro);
-            }while ((linha = readFile.readLine()) != null);
+
+                livros.add(new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor));
+            });
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -499,41 +476,17 @@ public class TratamentoDados {
         String editora = lerString("Insira a Editora do livro: ");
         Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do livro: ");
         int anoEdicao = lerInt("Insira o ano de Edição do livro: ", true, Constantes.TipoItem.LIVRO);
-        String isbn;
-        boolean flag;
-        do {
-            isbn = lerString("Insira o ISBN do livro: ");
-            flag = validarTamanho(isbn, 9);
-            if (!flag) {
-                System.out.println("ISBN Invalido! ( Ex: 1111-1111 )");
-                continue;
-            }
-            if (isbn.equals(pesquisarIsbn(isbn))) {
-                System.out.println("ISBN já existe! Tente novamente.");
-                flag = false;
-            }
-        }while(!flag);
+        String isbn = lerString("Insira o ISBN do livro: ");
         String autor = lerString("Insira o Autor do livro: ");
+        int codBiblioteca = lerInt("Insira o Código da Biblioteca: ", true, null);
 
-        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+        return new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
     }
-
-    /**
-     * Pesquisa um ISBN na lista de livros.
-     */
-    private static String pesquisarIsbn(String isbn) {
-        for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn)) {
-                return isbn;
-            }
-        }
-        return null;
-    }
-
 
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
      */
+
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
      */
