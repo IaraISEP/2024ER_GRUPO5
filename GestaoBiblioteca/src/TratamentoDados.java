@@ -1103,38 +1103,23 @@ public class TratamentoDados {
         do {
             switch (tipoItem) {
                 case LIVRO:
-                    if (!livros.isEmpty()) {
-                        listaTodosLivros();
-                        idItem = lerInt("Insira o ID do Livro: ", false, null);
-                        idValido = validarIdLivro(idItem);
-                        estado = Constantes.Estado.RESERVADO;
-                        break;
-                    }else {
-                        System.out.println("Não existem Livros para mostrar.");
-                        return null;
-                    }
+                    listaTodosLivros();
+                    idItem = lerInt("Insira o ID do Livro: ", false, null);
+                    idValido = validarIdLivro(idItem);
+                    estado = Constantes.Estado.RESERVADO;
+                    break;
                 case REVISTA:
-                    if (!revistas.isEmpty()) {
-                        listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
-                        idItem = lerInt("Insira o ID da Revista: ", false, null);
-                        idValido = validarIdRevista(idItem);
-                        estado = Constantes.Estado.RESERVADO;
-                        break;
-                    }else {
-                        System.out.println("Não existem Revistas para mostrar.");
-                        return null;
-                    }
+                    listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                    idItem = lerInt("Insira o ID da Revista: ", false, null);
+                    idValido = validarIdRevista(idItem);
+                    estado = Constantes.Estado.RESERVADO;
+                    break;
                 case JORNAL:
-                    if (!jornais.isEmpty()) {
-                        listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
-                        idItem = lerInt("Insira o ID do Jornal: ", false, null);
-                        idValido = validarIdJornal(idItem);
-                        estado = Constantes.Estado.RESERVADO;
-                        break;
-                    }else {
-                        System.out.println("Não existem Jornais para mostrar.");
-                        return null;
-                    }
+                    listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                    idItem = lerInt("Insira o ID do Jornal: ", false, null);
+                    idValido = validarIdJornal(idItem);
+                    estado = Constantes.Estado.RESERVADO;
+                    break;
                 default:
                     throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
             }
@@ -1394,31 +1379,19 @@ public class TratamentoDados {
         do {
             switch (tipoItem) {
                 case LIVRO:
-                    if (!livros.isEmpty()) {
-                        listaTodosLivros();
-                        idItem = lerInt("Insira o ID do Livro: ", false, null);
-                        idValido = validarIdLivro(idItem);
-                    }else {
-                        System.out.println("Não existem Livros para mostrar.");
-                    }
+                    listaTodosLivros();
+                    idItem = lerInt("Insira o ID do Livro: ", false, null);
+                    idValido = validarIdLivro(idItem);
                     break;
                 case REVISTA:
-                    if (!revistas.isEmpty()) {
                         listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
                         idItem = lerInt("Insira o ID da Revista: ", false, null);
                         idValido = validarIdRevista(idItem);
-                    }else {
-                        System.out.println("Não existem Revistas para mostrar.");
-                    }
                     break;
                 case JORNAL:
-                    if (!jornais.isEmpty()) {
                         listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
                         idItem = lerInt("Insira o ID do Jornal: ", false, null);
                         idValido = validarIdJornal(idItem);
-                    }else {
-                        System.out.println("Não existem Jornais para mostrar.");
-                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
@@ -1608,24 +1581,49 @@ public class TratamentoDados {
 
     public static Constantes.TipoItem criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException {
         Constantes.TipoItem tipoItem = null;
-        boolean flag=false;
+        boolean flag=false, itemExists = true;
         do {
-            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            do {
+                int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
 
-            switch (tipoItemOpcao) {
-                case 1:
-                    tipoItem = Constantes.TipoItem.LIVRO;
+                switch (tipoItemOpcao) {
+                    case 1:
+                        if (livros.isEmpty()) {
+                            System.out.println("Não existem Livros para mostrar.");
+                            itemExists = false;
+                        }
+                        else {
+                            tipoItem = Constantes.TipoItem.LIVRO;
+                            itemExists = true;
+                        }
+                        break;
+                    case 2:
+                        if (revistas.isEmpty()) {
+                            System.out.println("Não existem Revistas para mostrar.");
+                            itemExists = false;
+                        }
+                        else {
+                            tipoItem = Constantes.TipoItem.REVISTA;
+                            itemExists = true;
+                        }
                     break;
-                case 2:
-                    tipoItem = Constantes.TipoItem.REVISTA;
-                    break;
-                case 3:
-                    tipoItem = Constantes.TipoItem.JORNAL;
-                    break;
-                default:
-                    System.out.println("Opção inválida! Tente novamente.");
-                    continue;
-            }
+                    case 3:
+                        if (jornais.isEmpty()) {
+                            System.out.println("Não existem Jornais para mostrar.");
+                            itemExists = false;
+                        }
+                        else {
+                            tipoItem = Constantes.TipoItem.JORNAL;
+                            itemExists = true;
+                        }           
+                        break;
+                    default:
+                        System.out.println("Opção inválida! Tente novamente.");
+                        itemExists = false;
+                        break;
+                }
+            } while (!itemExists);
+            
             if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO)
                 try
                 {
