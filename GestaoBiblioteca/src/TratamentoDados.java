@@ -982,11 +982,10 @@ public class TratamentoDados {
      *
      * */
     public static void cancelarReserva(int idCancelar, Constantes.Estado estado, Constantes.Etapa etapa) throws IOException {
-        // Verifica se a lista de clientes está vazia
-        if(reservas.isEmpty()) {
-            System.out.println("Não há reservas nesta biblioteca.");
-            return;
-        }
+        
+        boolean hasReservas = hasReservas();        
+        if(!hasReservas) return;
+        
         // Lista todos os clientes
         listaTodasReservas(etapa);
 
@@ -1482,6 +1481,9 @@ public class TratamentoDados {
      * */
 
     public static void concluirReserva() throws IOException {
+
+        boolean hasReservas = hasReservas();
+        if(!hasReservas) return;
 
         // ******** MOSTRAR TODAS AS RESERVAS E ESCOLHER 1 *******
         mostraTabelaReservas(reservas, Constantes.Etapa.CONCLUIR);
@@ -2356,6 +2358,30 @@ public class TratamentoDados {
             }
         }
         return false;
+    }
+    
+    private static boolean hasReservas() {
+        if(reservas.isEmpty())
+        {
+            System.out.println("Não existem reservas para mostrar.");
+            return false;
+        }
+
+        boolean hasReserva  = false;
+
+        for(Reserva reserva : reservas){
+            if(reserva.getEstado() == Constantes.Estado.RESERVADO){
+                hasReserva = true;
+                break;
+            }
+        }
+
+        if(!hasReserva){
+            System.out.println("Não existem reservas para mostrar.");
+            return false;
+        }
+        
+        return true;
     }
 
     /*
