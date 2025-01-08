@@ -116,7 +116,7 @@ public class TratamentoDados {
      * Metodo para criar novo Cliente
      * */
     public static void criarCliente() throws IOException {
-        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE), Constantes.Etapa.CRIAR));
+        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1), Constantes.Etapa.CRIAR));
         gravarArrayClientes();
     }
 
@@ -343,7 +343,7 @@ public class TratamentoDados {
      * Adiciona um novo livro ao sistema.
      */
     public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO)));
+        livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO, -1)));
         System.out.println("Livro criado com sucesso!");
         gravarArrayLivros();
     }
@@ -575,7 +575,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -584,7 +584,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -879,7 +879,7 @@ public class TratamentoDados {
         }
 
         //Atribui automaticamente o Id com base no último Id existente.
-        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA);
+        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA, -1);
 
         //Cria a reserva
         reservas.add(inserirDadosReserva(idReserva));
@@ -891,9 +891,6 @@ public class TratamentoDados {
 
         gravarArrayReservas();
         gravarArrayReservaLinha();
-
-        // Criar o historico dos movimentos
-        //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
     }
 
     public static void editarReserva() throws IOException {
@@ -1105,7 +1102,7 @@ public class TratamentoDados {
         int idItem=0;
         boolean idValido=false;
         Constantes.Estado estado = null;
-        int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA);
+        int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
         
         do {
             switch (tipoItem) {
@@ -1149,6 +1146,7 @@ public class TratamentoDados {
     public static void criarFicheiroCsvReservasLinha(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
+                    Integer.toString(reservaLinha.getIdReservaLinha()),
                     Integer.toString(reservaLinha.getIdReserva()),
                     reservaLinha.getTipoItem().toString(),
                     Integer.toString(reservaLinha.getIdItem()),
@@ -1303,23 +1301,18 @@ public class TratamentoDados {
         }
         mostraTabelaClientes(clientes);
         //Atribui automaticamente o Id com base no último Id existente.
-        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO);
+        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO, -1);
 
         //Cria a emprestimo
         emprestimos.add(inserirDadosEmprestimo(idEmprestimo, null));
         Emprestimo emprestimo = emprestimos.getLast();
 
-
-        // TODO: Chamar metodo de criar detalhes do emprestimo
         criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO);
 
         System.out.println("Emprestimo criada com sucesso!");
 
         gravarArrayEmprestimo();
         gravarArrayEmprestimoLinha();
-
-        // Criar o historico dos movimentos
-        //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
     }
 
     public static Emprestimo inserirDadosEmprestimo(int idEmprestimo, Reserva reserva){
@@ -1383,7 +1376,7 @@ public class TratamentoDados {
         //Talvez se possa criar um boolean nos itens a true/false, para ser mais fácil a validação,
         //ao invés de se ter que percorrer listas.
         int idItem=0;
-        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA);
+        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
         boolean idValido=false;
         
         do {
@@ -1446,6 +1439,7 @@ public class TratamentoDados {
     public static void criarFicheiroCsvEmprestimosLinha(String ficheiro, EmprestimoLinha emprestimoLinha, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
+                    Integer.toString(emprestimoLinha.getIdEmprestimoLinha()),
                     Integer.toString(emprestimoLinha.getIdEmprestimo()),
                     emprestimoLinha.getTipoItem().toString(),
                     Integer.toString(emprestimoLinha.getIdItem()),
@@ -1494,7 +1488,7 @@ public class TratamentoDados {
         int idReserva = lerInt("Escolha o id da reserva: ", false, null);
 
         //Atribui automaticamente o Id com base no último Id existente.
-        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO);
+        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO, -1);
 
         // Faz a procura da reserva pelo id e retorna se encontrar
         for (Reserva reserva : reservas) {
@@ -1504,7 +1498,7 @@ public class TratamentoDados {
                     if (reservalinha.getIdReserva() == idReserva) {
                         int idItem = reservalinha.getIdItem();
                         Constantes.TipoItem tipoItem = reservalinha.getTipoItem();
-                        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA);
+                        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, idEmprestimo);
                         EmprestimoLinha emprestimoLinha = new EmprestimoLinha(emprestimoLinhaId, idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
                         emprestimosLinha.add(emprestimoLinha);
 
@@ -1594,7 +1588,7 @@ public class TratamentoDados {
      * @param tipoItem O tipo de item para o qual o ID está sendo pesquisado.
      * @return O próximo ID disponível para o tipo de item especificado.
      */
-    public static int getIdAutomatico(Constantes.TipoItem tipoItem)
+    public static int getIdAutomatico(Constantes.TipoItem tipoItem, int reservaEmprestimoId)
     {
         int valor = 1;
 
@@ -1637,13 +1631,13 @@ public class TratamentoDados {
                 break;
             case RESERVALINHA:
                 for (ReservaLinha reservaLinha : reservasLinha) {
-                    if (reservaLinha.getIdReservaLinha() >= valor)
+                    if (reservaLinha.getIdReservaLinha() >= valor && reservaLinha.getIdReserva() == reservaEmprestimoId)
                         valor = reservaLinha.getIdReservaLinha() + 1;
                 }
                 break;
             case EMPRESTIMOLINHA:
                 for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                    if (emprestimoLinha.getIdEmprestimoLinha() >= valor)
+                    if (emprestimoLinha.getIdEmprestimoLinha() >= valor && emprestimoLinha.getIdEmprestimo() == reservaEmprestimoId)
                         valor = emprestimoLinha.getIdEmprestimoLinha() + 1;
                 }
                 break;
