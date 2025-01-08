@@ -364,8 +364,10 @@ public class CriarMenu {
         }));
         menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Detalhada", () -> {
             try {
-                TratamentoDados.listaTodasReservas();
-                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
+                boolean flag = TratamentoDados.listaTodasReservas();
+                if (flag) {
+                    TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
