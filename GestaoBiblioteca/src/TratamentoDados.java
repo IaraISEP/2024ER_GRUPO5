@@ -18,6 +18,7 @@ import java.util.Scanner;
 public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
+    private static List<Biblioteca> bibliotecas = new ArrayList<>();
     private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
@@ -34,14 +35,15 @@ public class TratamentoDados {
      * */
     public static void criarSistemaFicheiros() throws IOException {
         File[] dirs = new File[]{
-                new File("Biblioteca_1/Clientes"),
-                new File("Biblioteca_1/Livros"),
-                new File("Biblioteca_1/Jornais"),
-                new File("Biblioteca_1/Revistas"),
-                new File("Biblioteca_1/Emprestimos"),
-                new File("Biblioteca_1/Reservas"),
-                new File("Biblioteca_1/Reservas/Details"),
-                new File("Biblioteca_1/Historico"),
+                new File("Dados/Bibliotecas"),
+                new File("Dados/Clientes"),
+                new File("Dados/Livros"),
+                new File("Dados/Jornais"),
+                new File("Dados/Revistas"),
+                new File("Dados/Emprestimos"),
+                new File("Dados/Reservas"),
+                new File("Dados/Reservas/Details"),
+                new File("Dados/Historico"),
         };
         for (File dir : dirs) {
             if (!dir.exists()) {
@@ -49,15 +51,14 @@ public class TratamentoDados {
             }
         }
         File[] files = new File[]{
+                new File(Constantes.Path.BIBLIOTECA.getValue()),
                 new File(Constantes.Path.CLIENTE.getValue()),
                 new File(Constantes.Path.LIVRO.getValue()),
                 new File(Constantes.Path.JORNAL.getValue()),
                 new File(Constantes.Path.REVISTA.getValue()),
                 new File(Constantes.Path.EMPRESTIMO.getValue()),
                 new File(Constantes.Path.RESERVA.getValue()),
-                new File(Constantes.Path.RESERVALINHA.getValue()),
-                new File("Biblioteca_1/Historico/reservas_h.csv"),
-                new File("Biblioteca_1/Historico/emprestimos_h.csv")
+                new File(Constantes.Path.RESERVALINHA.getValue())
         };
         for (File file : files) {
             if (!file.exists()) {
@@ -65,6 +66,97 @@ public class TratamentoDados {
             }
         }
     }
+
+    /*
+     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
+     * */
+
+    public static Biblioteca inserirDadosBiblioteca() throws IOException {
+        String nome="", morada = "";
+        int idBiblioteca = 0;
+
+        System.out.println("Insira o nome da Biblioteca; ");
+        nome = input.nextLine();
+        System.out.println("Insira amorada da Biblioteca; ");
+        morada = input.nextLine();
+        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA,-1);
+
+        return new Biblioteca(nome, morada, idBiblioteca);
+    }
+
+    public static void criarBiblioteca() throws IOException {
+        bibliotecas.add(inserirDadosBiblioteca());
+        gravarArrayBibliotecas();
+    }
+
+    /**
+     * Metódo para criar o ficehiro bibliotecas.csv
+     * e adicionar conteúdo ao mesmo.
+     * */
+    public static void criarFicheiroCsvBiblioteca(String ficheiro, Biblioteca biblioteca, Boolean firstLine) throws IOException {
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(biblioteca.getNome() + ";" + biblioteca.getMorada() + ";" + biblioteca.getCodBiblioteca() + "\n");
+        }
+    }
+
+    public static void lerFicheiroCsvBiblioteca(String ficheiro){
+        try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha = readFile.readLine();
+            if (linha == null) {
+                System.out.println("O arquivo está vazio.");
+                return;
+            }
+            String csvDivisor = ";";
+            do {
+                // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
+                String[] dados = linha.split(csvDivisor);
+                String nome = dados[0];
+                String morada = dados[0];
+                int id = Integer.parseInt(dados[2]);
+
+                // Cria um novo objeto Cliente e adiciona à lista
+                Biblioteca biblioteca = new Biblioteca(nome, morada, id);
+                bibliotecas.add(biblioteca);
+            }while ((linha = readFile.readLine()) != null);
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+
+        // Imprime todos os clientes
+        for (Biblioteca biblioteca : bibliotecas) {
+            System.out.println(biblioteca);
+        }
+    }
+
+    /**
+     * Metódo que lista todos os Clientes existentes na biblioteca
+     * */
+    public static void listaTodasBibliotecas(){
+        if (bibliotecas.isEmpty())
+            System.out.println("Não existem Bibliotecas para mostrar.");
+        else
+            System.out.println(bibliotecas);
+            //mostraTabelaBibliotecas(bibliotecas);
+    }
+
+    public static void gravarArrayBibliotecas() throws IOException {
+        // Verifica se a lista de clientes está vazia
+        if(bibliotecas.isEmpty()){
+/*            File file = new File("Biblioteca_1/Clientes/clientes.csv");
+            file.delete();*/
+            System.out.println("Array vazio");
+        }
+
+        // Itera pela lista de clientes e grava cada um no ficheiro
+        for(int i = 0; i < bibliotecas.size(); i++) {
+            Biblioteca biblioteca = bibliotecas.get(i);
+            criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), biblioteca, i != 0);
+        }
+    }
+
+    /*
+     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
+     * */
 
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
@@ -293,7 +385,7 @@ public class TratamentoDados {
                 int contacto = Integer.parseInt(dados[4]);
 
                 // Cria um novo objeto Cliente e adiciona à lista
-                Cliente cliente = new Cliente(id, nome, genero, nif, contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
+                Cliente cliente = new Cliente(id, nome, genero, nif, contacto, 1); //TODO : codBiblioteca a ser desenvolvido posteriormente
                 clientes.add(cliente);
             }while ((linha = readFile.readLine()) != null);
         } catch (IOException e){
@@ -1109,6 +1201,15 @@ public class TratamentoDados {
                     listaTodosLivros();
                     idItem = lerInt("Insira o ID do Livro: ", false, null);
                     idValido = validarIdLivro(idItem);
+/*                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdItem() == idItem ) {
+                            if (reservaLinha.getEstado() != Constantes.Estado.RESERVADO){
+                                estado = Constantes.Estado.RESERVADO;
+                            }else{
+                                System.out.println("Já se encontra numa Reserva!");
+                            }
+                        }
+                    }*/
                     estado = Constantes.Estado.RESERVADO;
                     break;
                 case REVISTA:
@@ -1595,6 +1696,12 @@ public class TratamentoDados {
         int valor = 1;
 
         switch (tipoItem) {
+            case BIBLIOTECA:
+                for (Biblioteca biblioteca : bibliotecas) {
+                    if (biblioteca.getCodBiblioteca() >= valor)
+                        valor = biblioteca.getCodBiblioteca() + 1;
+                }
+                break;
             case CLIENTE:
                 for (Cliente cliente : clientes) {
                     if (cliente.getId() >= valor)

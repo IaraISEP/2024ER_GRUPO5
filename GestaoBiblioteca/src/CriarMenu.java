@@ -13,6 +13,7 @@ public class CriarMenu {
      */
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Bilioteca", CriarMenu::menuBiblioteca));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", CriarMenu::menuCliente));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", CriarMenu::menuLivro));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Jornal", CriarMenu::menuJornal));
@@ -28,6 +29,35 @@ public class CriarMenu {
     private static void keyPress() {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
+    }
+
+    /**
+     * Exibe o menu de gestão de Bibliotecas.
+     */
+    private static void menuBiblioteca(){
+        Menu menuBiblioteca = new Menu("Gestão Bibliotecas");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Criar Bibliotecas", () -> {
+            try {
+                TratamentoDados.criarBiblioteca();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Listar Bibliotecas", () -> {
+            TratamentoDados.listaTodasBibliotecas();
+            keyPress();
+        }));
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Editar Bibliotecas", () -> {
+            System.out.println("Editar Biblioteca");
+            keyPress();
+        }));
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Apagar Bibliotecas", () -> {
+            System.out.println("Apagar Biblioteca");
+            keyPress();
+        }));
+        menuBiblioteca.exibir();
     }
 
     /**

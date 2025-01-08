@@ -79,6 +79,7 @@ public class Constantes {
     }
 
     public enum TipoItem {
+        BIBLIOTECA,
         CLIENTE,
         LIVRO,
         JORNAL,
@@ -90,14 +91,15 @@ public class Constantes {
     }
 
     public enum Path {
-        CLIENTE("Biblioteca_1/Clientes/clientes.csv"),
-        LIVRO("Biblioteca_1/Livros/livros.csv"),
-        JORNAL("Biblioteca_1/Jornais/jornais.csv"),
-        REVISTA("Biblioteca_1/Revistas/revistas.csv"),
-        EMPRESTIMO("Biblioteca_1/Emprestimos/emprestimos.csv"),
-        EMPRESTIMOLINHA("Biblioteca_1/Emprestimos/emprestimolinha.csv"),
-        RESERVA("Biblioteca_1/Reservas/reservas.csv"),
-        RESERVALINHA("Biblioteca_1/Reservas/Details/reservalinha.csv");
+        BIBLIOTECA("Dados/Bibliotecas/bibliotecas.csv"),
+        CLIENTE("Dados/Clientes/clientes.csv"),
+        LIVRO("Dados/Livros/livros.csv"),
+        JORNAL("Dados/Jornais/jornais.csv"),
+        REVISTA("Dados/Revistas/revistas.csv"),
+        EMPRESTIMO("Dados/Emprestimos/emprestimos.csv"),
+        EMPRESTIMOLINHA("Dados/Emprestimos/emprestimolinha.csv"),
+        RESERVA("Dados/Reservas/reservas.csv"),
+        RESERVALINHA("Dados/Reservas/Details/reservalinha.csv");
 
         private final String value;
 
