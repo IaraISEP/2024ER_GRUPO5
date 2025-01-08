@@ -53,7 +53,7 @@ public class ReservaLinha {
     /**
      * Define o Id da reserva linha.
      *
-     * @param idReserva O Id da reserva linha.
+     * @param idReservaLinha O Id da reserva linha.
      */
     public void setIdReservaLinha(int idReservaLinha) {
         this.idReservaLinha = idReservaLinha;

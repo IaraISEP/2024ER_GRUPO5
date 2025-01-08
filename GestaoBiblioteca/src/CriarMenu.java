@@ -304,7 +304,7 @@ public class CriarMenu {
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
             try {
-                TratamentoDados.ConcluirReserva();
+                TratamentoDados.concluirReserva();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -313,7 +313,7 @@ public class CriarMenu {
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
             try {
-                TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null), Constantes.Estado.CANCELADO);
+                TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null), Constantes.Estado.CANCELADO, Constantes.Etapa.CANCELAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -359,12 +359,12 @@ public class CriarMenu {
         Menu menuListarReservas = new Menu("Listar Reservas");
 
         menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Simplificada",  () -> {
-            TratamentoDados.listaTodasReservas();
+            TratamentoDados.listaTodasReservas(null);
             keyPress();
         }));
         menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Detalhada", () -> {
             try {
-                boolean flag = TratamentoDados.listaTodasReservas();
+                boolean flag = TratamentoDados.listaTodasReservas(null);
                 if (flag) {
                     TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
                 }

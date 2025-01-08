@@ -901,7 +901,7 @@ public class TratamentoDados {
         }
 
         // Lista todos os clientes
-        listaTodasReservas();
+        listaTodasReservas(Constantes.Etapa.EDITAR);
 
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
@@ -981,17 +981,16 @@ public class TratamentoDados {
      * dos itens que lhe pertence
      *
      * */
-    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException {
+    public static void cancelarReserva(int idCancelar, Constantes.Estado estado, Constantes.Etapa etapa) throws IOException {
         // Verifica se a lista de clientes está vazia
         if(reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
             return;
         }
         // Lista todos os clientes
-        listaTodasReservas();
+        listaTodasReservas(etapa);
 
         //int idCancelar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-
         for (Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idCancelar) {
                 reserva.setEstado(estado);
@@ -1002,6 +1001,7 @@ public class TratamentoDados {
                 }
             }
         }
+        
         gravarArrayReservas();
         gravarArrayReservaLinha();
     }
@@ -1059,13 +1059,13 @@ public class TratamentoDados {
         }
     }
 
-    public static boolean listaTodasReservas() {
+    public static boolean listaTodasReservas(Constantes.Etapa etapa) {
         if (reservas.isEmpty()) {
             System.out.println("Não existem reservas para mostrar.");
             return false;
         }
 
-        mostraTabelaReservas(reservas);
+        mostraTabelaReservas(reservas, etapa);
         return true;
     }
 
@@ -1481,10 +1481,10 @@ public class TratamentoDados {
      * ######################################## HELPERS - INICIO #######################################################
      * */
 
-    public static void ConcluirReserva() throws IOException {
+    public static void concluirReserva() throws IOException {
 
         // ******** MOSTRAR TODAS AS RESERVAS E ESCOLHER 1 *******
-        mostraTabelaReservas(reservas);
+        mostraTabelaReservas(reservas, Constantes.Etapa.CONCLUIR);
         int idReserva = lerInt("Escolha o id da reserva: ", false, null);
 
         //Atribui automaticamente o Id com base no último Id existente.
@@ -1502,7 +1502,7 @@ public class TratamentoDados {
                         EmprestimoLinha emprestimoLinha = new EmprestimoLinha(emprestimoLinhaId, idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
                         emprestimosLinha.add(emprestimoLinha);
 
-                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO);
+                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO, Constantes.Etapa.CONCLUIR);
                     }
                 }
             }
@@ -1873,7 +1873,7 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static void mostraTabelaReservas(List<Reserva> listaReservas)
+    public static void mostraTabelaReservas(List<Reserva> listaReservas, Constantes.Etapa etapa)
     {
         //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id".length();
@@ -1907,7 +1907,8 @@ public class TratamentoDados {
 
         //Imprime os dados dos clientes
         for (Reserva reserva : listaReservas) {
-            System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
+            if ((etapa != Constantes.Etapa.CONCLUIR && etapa != Constantes.Etapa.CANCELAR) || ((etapa == Constantes.Etapa.CONCLUIR || etapa == Constantes.Etapa.CANCELAR) && reserva.getEstado() == Constantes.Estado.RESERVADO)) 
+                System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
         }
 
         System.out.println(separador);
