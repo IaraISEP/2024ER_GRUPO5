@@ -1495,24 +1495,22 @@ public class TratamentoDados {
                 emprestimoLinhaDetails.add(emprestimoLinha);
             }
         }
-        mostraDetalhesEmprestimos(emprestimoLinhaDetails);
+        mostraDetalhesEmprestimos(emprestimoLinhaDetails, 0);
     }
 
     /**
      * Apaga um Emprestimo pelo ID.
      */
-    /*public static void apagarEmprestimo() throws IOException {
+    public static void apagarEmprestimo() throws IOException {
         if (emprestimos.isEmpty()) {
             System.out.println("Não existem Emprestimos nesta Biblioteca.");
             return;
         }
-
-        //listaTodosJornalRevista(tipoItem);
-
-        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
+        listaTodosEmprestimos();
+        int idEmprestimo = lerInt("Escolha o ID do emprestimo que deseja apagar: ", false, null);
         Emprestimo emprestimoRemover = null;
         for (Emprestimo emprestimo : emprestimos) {
-            if (emprestimo.getNumMovimento() == idApagar) {
+            if (emprestimo.getNumMovimento() == idEmprestimo) {
                 emprestimoRemover = emprestimo;
                 break;
             }
@@ -1526,24 +1524,33 @@ public class TratamentoDados {
         int escolha = lerInt("Escolha 1- Sim \n 2-Não", false, null);
         if (escolha == 1){
             emprestimos.remove(emprestimoRemover);
-            gravarArrayEmprestimo();
-        }else{
-            //listaEmprestimoLinha(idEmprestimo)
-            escolha = lerInt("Escolha o tipo de item: \n 1- Livro \n 2- Jornal \n 3- Revista", false, null);
-            switch (escolha){
-                case 1:
-
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
+            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
+                    emprestimos.remove(emprestimoLinha);
+                }
             }
+            gravarArrayEmprestimo();
+            gravarArrayEmprestimoLinha();
+        }else{
+            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
+                    mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo);
+                }
+            }
+            do {
+                escolha = lerInt("Escolha\n 1- Livro \n 2-Revista \n 3-Jornal", false, null);
+                switch (escolha){
+                    case 1:
+                        break;
+                }
+
+
+            }while (escolha >= 4 || escolha <= 0 );
+            
+
         }
-        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
-    }*/
+        System.out.println("Emprestimo apagado(a) com sucesso!");
+    }
 
     /**
      * Editar Emprestimo
@@ -2130,7 +2137,7 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos)
+    public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo)
     {
         //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id Reserva".length();
@@ -2252,7 +2259,10 @@ public class TratamentoDados {
                     }
                     break;
             }
-            System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
+            if(idEmprestimo==0)
+                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
+            else if (emprestimoLinha.getIdEmprestimo()==idEmprestimo)
+                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
 
         }
 

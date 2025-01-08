@@ -343,9 +343,13 @@ public class CriarMenu {
             System.out.println("Empréstimo Editado...");
             keyPress();
         }));
-        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
+        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Apagar Empréstimo", () -> {
             //TODO : A desenvolver
-            System.out.println("Empréstimo Concluído...");
+            try {
+                TratamentoDados.apagarEmprestimo();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
 
