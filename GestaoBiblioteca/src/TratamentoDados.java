@@ -550,17 +550,16 @@ public class TratamentoDados {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String csvDivisor = ";";
             do {
-                String[] dados = linha.split(csvDivisor);
+                String[] dados = linha.split(Constantes.SplitChar);
                 int id = Integer.parseInt(dados[0]);
                 String titulo = dados[1];
                 String editora = dados[2];
-                String issn = dados[3];
+                Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[3]);
                 int anoPub = Integer.parseInt(dados[4]);
-                int codBiblioteca = Integer.parseInt(dados[5]);
+                String issn = dados[5];
                 Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
-                Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[7]);
+                int codBiblioteca = Integer.parseInt(dados[7]);
                 JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
                 if (tipoItem == Constantes.TipoItem.JORNAL)
                     jornais.add(jornalRevista);
@@ -698,15 +697,15 @@ public class TratamentoDados {
      */
     public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
-            fw.write(String.join(";",
+            fw.write(String.join(Constantes.SplitChar,
                     String.valueOf(jornalRevista.getId()),
                     jornalRevista.getTitulo(),
                     jornalRevista.getEditora(),
-                    jornalRevista.getIssn(),
-                    String.valueOf(jornalRevista.getDataPublicacao()),
-                    String.valueOf(jornalRevista.getCodBiblioteca()),
-                    String.valueOf(jornalRevista.getTipo()),
                     String.valueOf(jornalRevista.getCategoria()),
+                    String.valueOf(jornalRevista.getDataPublicacao()),
+                    jornalRevista.getIssn(),
+                    String.valueOf(jornalRevista.getTipo()),
+                    String.valueOf(jornalRevista.getCodBiblioteca()),
                     "\n"));
         }
     }
@@ -1099,7 +1098,8 @@ public class TratamentoDados {
         int idItem=0;
         boolean idValido=false;
         Constantes.Estado estado = null;
-
+        int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA);
+        
         do {
             switch (tipoItem) {
                 case LIVRO:
@@ -1129,7 +1129,7 @@ public class TratamentoDados {
             }
         } while (!idValido);
 
-        return new ReservaLinha(reservaId, tipoItem, idItem, estado);
+        return new ReservaLinha(reservaLinhaId, reservaId, tipoItem, idItem, estado);
     }
 
     /**
@@ -1165,11 +1165,12 @@ public class TratamentoDados {
 
             do {
                 String[] dados = linha.split(Constantes.SplitChar);
-                int idReserva = Integer.parseInt(dados[0]);
-                Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[1]);
-                int idItem = Integer.parseInt(dados[2]);
-                Constantes.Estado estado = Constantes.Estado.valueOf(dados[3]);
-                reservasLinha.add(new ReservaLinha(idReserva, tipoItem, idItem, estado));
+                int reservaLinhaId = Integer.parseInt(dados[0]);
+                int reservaId = Integer.parseInt(dados[1]);
+                Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[2]);
+                int idItem = Integer.parseInt(dados[3]);
+                Constantes.Estado estado = Constantes.Estado.valueOf(dados[4]);
+                reservasLinha.add(new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, estado));
             } while ((linha = readFile.readLine()) != null);
         }
         catch (IOException e){
@@ -1262,11 +1263,12 @@ public class TratamentoDados {
 
             do {
                 String[] dados = linha.split(Constantes.SplitChar);
-                int idEmprestimo = Integer.parseInt(dados[0]);
-                Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[1]);
-                int idItem = Integer.parseInt(dados[2]);
-                Constantes.Estado estado = Constantes.Estado.valueOf(dados[3]);
-                emprestimosLinha.add(new EmprestimoLinha(idEmprestimo, tipoItem, idItem, estado));
+                int emprestimoLinhaId = Integer.parseInt(dados[0]);
+                int idEmprestimo = Integer.parseInt(dados[1]);
+                Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[2]);
+                int idItem = Integer.parseInt(dados[3]);
+                Constantes.Estado estado = Constantes.Estado.valueOf(dados[4]);
+                emprestimosLinha.add(new EmprestimoLinha(emprestimoLinhaId, idEmprestimo, tipoItem, idItem, estado));
             } while ((linha = readFile.readLine()) != null);
         }
         catch (IOException e){
@@ -1374,8 +1376,9 @@ public class TratamentoDados {
         //Talvez se possa criar um boolean nos itens a true/false, para ser mais fácil a validação,
         //ao invés de se ter que percorrer listas.
         int idItem=0;
+        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA);
         boolean idValido=false;
-
+        
         do {
             switch (tipoItem) {
                 case LIVRO:
@@ -1406,7 +1409,7 @@ public class TratamentoDados {
             }
         } while (!idValido);
 
-        return new EmprestimoLinha(emprestimoId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+        return new EmprestimoLinha(emprestimoLinhaId, emprestimoId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
     }
 
     public static void gravarArrayEmprestimo() throws IOException {
@@ -1494,7 +1497,8 @@ public class TratamentoDados {
                     if (reservalinha.getIdReserva() == idReserva) {
                         int idItem = reservalinha.getIdItem();
                         Constantes.TipoItem tipoItem = reservalinha.getTipoItem();
-                        EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+                        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA);
+                        EmprestimoLinha emprestimoLinha = new EmprestimoLinha(emprestimoLinhaId, idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
                         emprestimosLinha.add(emprestimoLinha);
 
                         cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO);
@@ -1626,8 +1630,14 @@ public class TratamentoDados {
                 break;
             case RESERVALINHA:
                 for (ReservaLinha reservaLinha : reservasLinha) {
-                    if (reservaLinha.getIdReserva() >= valor)
-                        valor = reservaLinha.getIdReserva() + 1;
+                    if (reservaLinha.getIdReservaLinha() >= valor)
+                        valor = reservaLinha.getIdReservaLinha() + 1;
+                }
+                break;
+            case EMPRESTIMOLINHA:
+                for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+                    if (emprestimoLinha.getIdEmprestimoLinha() >= valor)
+                        valor = emprestimoLinha.getIdEmprestimoLinha() + 1;
                 }
                 break;
             default:

@@ -4,6 +4,7 @@
  */
 public class EmprestimoLinha {
     private int idEmprestimo;
+    private int idEmprestimoLinha;
     private Constantes.TipoItem tipoItem;
     private int idItem;
     private Constantes.Estado estado;
@@ -11,12 +12,14 @@ public class EmprestimoLinha {
     /**
      * Construtor para criar a linha da reserva.
      *
-     * @param idEmprestimo O Id da Emprestimo
-     * @param tipoItem  O Tipo de item associado à reserva
-     * @param idItem    O Id do item associado à reserva
+     * @param idEmprestimo          O Id do empréstimo
+     * @param idEmprestimoLinha     O Id do empréstimo Linha
+     * @param tipoItem              O Tipo de item associado ao empréstimo
+     * @param idItem                O Id do item associado ao empréstimo
      */
-    public EmprestimoLinha(int idEmprestimo, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
+    public EmprestimoLinha(int idEmprestimo, int idEmprestimoLinha, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
         this.idEmprestimo = idEmprestimo;
+        this.idEmprestimoLinha = idEmprestimoLinha;
         this.tipoItem = tipoItem;
         this.idItem = idItem;
         this.estado = estado;
@@ -46,6 +49,22 @@ public class EmprestimoLinha {
      */
     public void setIdEmprestimo(int idEmprestimo) {
         this.idEmprestimo = idEmprestimo;
+    }
+
+    /**
+     * Obtém o Id do empréstimo linha.
+     *
+     * @return O Id do empréstimo linha.
+     */
+    public int getIdEmprestimoLinha() { return idEmprestimoLinha; }
+
+    /**
+     * Define o Id do empréstimo.
+     *
+     * @param idEmprestimoLinha O Id do emprestimo linha.
+     */
+    public void setIdEmprestimoLinha(int idEmprestimoLinha) {
+        this.idEmprestimoLinha = idEmprestimoLinha;
     }
 
     /**
