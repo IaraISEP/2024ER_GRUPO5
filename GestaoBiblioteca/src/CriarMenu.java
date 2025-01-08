@@ -303,8 +303,12 @@ public class CriarMenu {
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
+            try {
+                TratamentoDados.ConcluirReserva();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             //TODO : A desenvolver
-            TratamentoDados.terminarReserva();
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
@@ -326,10 +330,14 @@ public class CriarMenu {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
 
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Criar Empréstimo", () -> {
-            //TODO : A desenvolver
-            System.out.println("Empréstimo Criado...");
+            try {
+                TratamentoDados.criarEmprestimo();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
+        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Listar Empréstimo", CriarMenu::menuListarEmprestimos));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
             //TODO : A desenvolver
             System.out.println("Empréstimo Editado...");
@@ -356,8 +364,10 @@ public class CriarMenu {
         }));
         menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Detalhada", () -> {
             try {
-                TratamentoDados.listaTodasReservas();
-                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
+                boolean flag = TratamentoDados.listaTodasReservas();
+                if (flag) {
+                    TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -365,5 +375,25 @@ public class CriarMenu {
         }));
 
         menuListarReservas.exibir();
+    }
+
+    private static void menuListarEmprestimos() {
+        Menu menuListarEmprestimos = new Menu("Listar Empréstimos");
+
+        menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Simplificados",  () -> {
+            TratamentoDados.listaTodosEmprestimos();
+            keyPress();
+        }));
+        menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Detalhados", () -> {
+            try {
+                TratamentoDados.listaTodosEmprestimos();
+                TratamentoDados.listarDetalhesEmprestimo(TratamentoDados.lerInt("Insira o Id do empréstimo: ",false,null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+
+        menuListarEmprestimos.exibir();
     }
 }

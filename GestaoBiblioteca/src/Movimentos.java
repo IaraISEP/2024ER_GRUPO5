@@ -14,6 +14,7 @@ public class Movimentos {
     private LocalDate dataFim;
     private Cliente cliente;
     private Constantes.Estado estado;
+
     /**
      * Instancia um novo Movimentos.
      *
@@ -22,7 +23,7 @@ public class Movimentos {
      * @param dataInicio    a data de início
      * @param dataFim       a data de fim
      * @param cliente       o cliente afeto ao movimento
-     * @param estado        o estado afeto ao Item
+     * @param estado       o estado do servico
      */
     public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, Constantes.Estado estado) {
         this.numMovimento = numMovimento;
@@ -31,6 +32,14 @@ public class Movimentos {
         this.dataFim = dataFim;
         this.cliente = cliente;
         this.estado = estado;
+    }
+
+    public void setEstado(Constantes.Estado estado) {
+        this.estado = estado;
+    }
+
+    public Constantes.Estado getEstado() {
+        return estado;
     }
 
     /**
@@ -128,13 +137,5 @@ public class Movimentos {
      */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-    }
-
-    public void setEstado(Constantes.Estado estado) {
-        this.estado = estado;
-    }
-
-    public Constantes.Estado getEstado() {
-        return estado;
     }
 }
