@@ -1040,8 +1040,15 @@ public class TratamentoDados {
                     }
                 }
                 Constantes.Estado estado = Constantes.Estado.valueOf(dados[5]);
-                List<ReservaLinha> reservaLinha = new ArrayList<>(); //TODO : Ir buscar as linhas da reserva
-
+                
+                List<ReservaLinha> reservaLinha = new ArrayList<>();
+                
+                for(ReservaLinha resLinha : reservasLinha) {
+                    if (resLinha.getIdReserva() == codMovimento) {
+                        reservaLinha.add(resLinha);
+                    }
+                }
+                
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
 
                 reservas.add(reserva);
