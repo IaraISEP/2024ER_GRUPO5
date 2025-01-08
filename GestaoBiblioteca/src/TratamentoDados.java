@@ -911,7 +911,7 @@ public class TratamentoDados {
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
         listarDetalhesReserva(idEditar);
 
-        int opcao = lerInt("Escolha uma opção :\n1 - Adiconar Item\n2 - Remover Item\n", false, null);
+        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
         switch (opcao) {
             case 1:
                 criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
@@ -925,8 +925,6 @@ public class TratamentoDados {
             default:
                 System.out.println("Escolha invalida! Tente novamente.");
         }
-
-        System.out.println("ID não encontrado!");
     }
 
     public static void listarDetalhesReserva(int idReserva) throws IOException {
@@ -1113,7 +1111,7 @@ public class TratamentoDados {
                         break;
                     }else {
                         System.out.println("Não existem Livros para mostrar.");
-                        break;
+                        return null;
                     }
                 case REVISTA:
                     if (!revistas.isEmpty()) {
@@ -1124,7 +1122,7 @@ public class TratamentoDados {
                         break;
                     }else {
                         System.out.println("Não existem Revistas para mostrar.");
-                        break;
+                        return null;
                     }
                 case JORNAL:
                     if (!jornais.isEmpty()) {
@@ -1135,7 +1133,7 @@ public class TratamentoDados {
                         break;
                     }else {
                         System.out.println("Não existem Jornais para mostrar.");
-                        break;
+                        return null;
                     }
                 default:
                     throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
