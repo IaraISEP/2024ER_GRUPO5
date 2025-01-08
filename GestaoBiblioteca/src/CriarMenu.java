@@ -308,6 +308,15 @@ public class CriarMenu {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            //TODO : A desenvolver
+            keyPress();
+        }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
+            try {
+                TratamentoDados.cancelarReserva();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
 

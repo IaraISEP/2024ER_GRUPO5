@@ -5,6 +5,7 @@
 public class ReservaLinha {
     private int idReserva;
     private Constantes.TipoItem tipoItem;
+    private Constantes.Estado estado;
     private int idItem;
 
     /**
@@ -14,10 +15,11 @@ public class ReservaLinha {
      * @param tipoItem  O Tipo de item associado à reserva
      * @param idItem    O Id do item associado à reserva
      */
-    public ReservaLinha(int idReserva, Constantes.TipoItem tipoItem, int idItem) {
+    public ReservaLinha(int idReserva, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
         this.idReserva = idReserva;
         this.tipoItem = tipoItem;
         this.idItem = idItem;
+        this.estado = estado;
     }
 
     /**
@@ -72,5 +74,13 @@ public class ReservaLinha {
      */
     public void setIdItem(int idItem) {
         this.idItem = idItem;
+    }
+
+    public void setEstado(Constantes.Estado estado) {
+        this.estado = estado;
+    }
+
+    public Constantes.Estado getEstado() {
+        return estado;
     }
 }
