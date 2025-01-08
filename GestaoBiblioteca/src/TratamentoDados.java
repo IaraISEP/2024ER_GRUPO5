@@ -521,7 +521,6 @@ public class TratamentoDados {
     /**
      * Pesquisa um ISBN na lista de livros.
      */
-
     private static String pesquisarIsbn(String isbn) {
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn)) {
@@ -601,10 +600,8 @@ public class TratamentoDados {
         boolean flag;
         do {
             issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
-
-            if (issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
-                flag = true;
-            }else {
+            flag = validarTamanho(issn, 9);
+            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
                 System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
                 flag = false;
             }
@@ -801,8 +798,8 @@ public class TratamentoDados {
      * */
 
     /**
-     * Método para inserir os dados de uma reserva.
-     * Este método solicita ao utilizador que selecione o cliente e insira as datas da reserva.
+     * Metodo para inserir os dados de uma reserva.
+     * Este metodo solicita ao utilizador que selecione o cliente e insira as datas da reserva.
      * Garante que a data de início não é anterior a hoje e que a data de fim não é anterior à data de início.
      *
      * @param id O ID da reserva.
@@ -813,6 +810,7 @@ public class TratamentoDados {
         LocalDate dataInicio;
         LocalDate dataFim;
         LocalDate hoje = LocalDate.now();
+        Constantes.Estado estado;
 
         // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
         do {
@@ -859,11 +857,12 @@ public class TratamentoDados {
             }
         } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
 
-        return new Reserva(1, id, dataInicio, dataFim, cliente,null);
+
+        return new Reserva(1, id, dataInicio, dataFim, cliente,null, Constantes.Estado.RESERVADO);
     }
 
     /**
-     * Metodo para criar nova Reserva
+     * Metodo para criar a nova Reserva
      * Verifica se existem clientes na Biblioteca
      * */
     public static void criarReserva() throws IOException {
@@ -928,12 +927,29 @@ public class TratamentoDados {
         mostraDetalhesReservas(reservaLinhaDetails);
     }
 
-    /*
-     * TODO:
-     *   Criar metodo para editar os detalhes da reserva
-     *   Escolher livro revista ou jornal
-     *   selecionar as datas
-     */
+    /**
+     * Metodo para cancelar a reserva na totalidade ou apenas algunm
+     * dos itens que lhe pertence
+     *
+     * @param idReserva numero da reserva a ser cancelada
+     * */
+    public static void cancelarReserva(int idReserva) throws IOException {
+        // TODO:
+        //  verificar o id da reserva e alterar a flag de estado da mesma
+        //  na totalidade ou apenas os itens pretendidos
+    }
+
+    /**
+     * Metodo para concluir a reserva. tranformar em emprestimo
+     *
+     * @param idReserva numero da reserva a ser tranformada em emprestimo
+     * */
+    public static void terminarReserva(int idReserva) throws IOException {
+        // TODO:
+        //  verificar o id da reserva e alterar a flag de estado da mesma
+        //  ou de algum dos itens da reserva e passar a reserva para emprestimo
+        //  na totalidade ou apenas os itens pretendidos
+    }
 
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
@@ -963,9 +979,10 @@ public class TratamentoDados {
                         break;
                     }
                 }
+                Constantes.Estado estado = Constantes.Estado.valueOf(dados[5]);
                 List<ReservaLinha> reservaLinha = new ArrayList<>(); //TODO : Ir buscar as linhas da reserva
 
-                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha);
+                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
 
                 reservas.add(reserva);
             }
@@ -1493,124 +1510,29 @@ public class TratamentoDados {
         int idMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
-        int tituloMaxLen = "Titulo".length();
-        int editoraMaxLen = "Editora".length();
-        int categoriaMaxLen = "Categoria".length();
-        int issnMaxLen = "ISSN/ISBN".length();
-        int anoMaxLen = "Data Pub.".length();
-        int autorMaxLen = "Autor".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (ReservaLinha reservaLinha : listaDetalhesReservas) {
             idMaxLen = Math.max(idMaxLen, String.valueOf(reservaLinha.getIdReserva()).length());
             tipoItem = Math.max(tipoItem, String.valueOf(reservaLinha.getTipoItem()).length());
             idItemMaxLen = Math.max(idItemMaxLen, String.valueOf(reservaLinha.getIdItem()).length());
-
-            switch(reservaLinha.getTipoItem())
-            {
-                case LIVRO:
-                    for (Livro livro : livros) {
-                        if (livro.getId() == reservaLinha.getIdItem()) {
-                            tituloMaxLen = Math.max(tituloMaxLen, livro.getTitulo().length());
-                            editoraMaxLen = Math.max(editoraMaxLen, livro.getEditora().length());
-                            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().toString().length());
-                            issnMaxLen = Math.max(issnMaxLen, livro.getIsbn().length());
-                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
-                            autorMaxLen = Math.max(autorMaxLen, livro.getAutor().length());
-                            break;
-                        }
-                    }
-                    break;
-                case REVISTA:
-                    for (JornalRevista jornal : jornais) {
-                        if (jornal.getId() == reservaLinha.getIdItem()) {
-                            tituloMaxLen = Math.max(tituloMaxLen, jornal.getTitulo().length());
-                            editoraMaxLen = Math.max(editoraMaxLen, jornal.getEditora().length());
-                            categoriaMaxLen = Math.max(categoriaMaxLen, jornal.getCategoria().toString().length());
-                            issnMaxLen = Math.max(issnMaxLen, jornal.getIssn().length());
-                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(jornal.getDataPublicacao()).length());
-                            break;
-                        }
-                    }
-                    break;
-                case JORNAL:
-                    for (JornalRevista revista : revistas) {
-                        if (revista.getId() == reservaLinha.getIdItem()) {
-                            tituloMaxLen = Math.max(tituloMaxLen, revista.getTitulo().length());
-                            editoraMaxLen = Math.max(editoraMaxLen, revista.getEditora().length());
-                            categoriaMaxLen = Math.max(categoriaMaxLen, revista.getCategoria().toString().length());
-                            issnMaxLen = Math.max(issnMaxLen, revista.getIssn().length());
-                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(revista.getDataPublicacao()).length());
-                            break;
-                        }
-                    }
-                    break;
-            }
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + tituloMaxLen + "s | %-" 
-                                + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen + "s |\n";
+        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
-                                + "-".repeat(tituloMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-" + "-".repeat(editoraMaxLen) + "-+-" 
-                                + "-".repeat(issnMaxLen) + "-+-" + "-".repeat(anoMaxLen) + "-+";
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor");
+        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item");
         //Imprime a linha de separação
         System.out.println(separador);
 
+        //Imprime os dados dos clientes
         for (ReservaLinha reservaLinha : listaDetalhesReservas) {
-            String titulo = "", editora = "", issn = "", autor = "";
-            Constantes.Categoria categoria = null;
-            int anoEdicao = 0;
-
-            //Imprime os dados dos clientes
-            switch(reservaLinha.getTipoItem())
-            {
-                case LIVRO:
-                    for (Livro livro : livros) {
-                        if (livro.getId() == reservaLinha.getIdItem()) {
-                            titulo = livro.getTitulo();
-                            editora = livro.getEditora();
-                            categoria = livro.getCategoria();
-                            issn = livro.getIsbn();
-                            anoEdicao = livro.getAnoEdicao();
-                            autor = livro.getAutor();
-                            break;
-                        }
-                    }
-                    break;
-                case REVISTA:
-                    for (JornalRevista jornal : jornais) {
-                        if (jornal.getId() == reservaLinha.getIdItem()) {
-                            titulo = jornal.getTitulo();
-                            editora = jornal.getEditora();
-                            categoria = jornal.getCategoria();
-                            issn = jornal.getIssn();
-                            anoEdicao = jornal.getDataPublicacao();
-                            break;
-                        }
-                    }
-                    break;
-                case JORNAL:
-                    for (JornalRevista revista : revistas) {
-                        if (revista.getId() == reservaLinha.getIdItem()) {
-                            titulo = revista.getTitulo();
-                            editora = revista.getEditora();
-                            categoria = revista.getCategoria();
-                            issn = revista.getIssn();
-                            anoEdicao = revista.getDataPublicacao();
-                            break;
-                        }
-                    }
-                    break;
-            }
-            System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
-            
+            System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem());
         }
 
         System.out.println(separador);

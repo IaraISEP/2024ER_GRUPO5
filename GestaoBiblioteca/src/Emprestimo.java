@@ -17,8 +17,8 @@ public class Emprestimo extends Movimentos{
      * @param dataFim A data de devolução do item bibliotecário.
      * @param cliente o cliente associado ao empréstimo.
      */
-    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, LocalDate dataPrevFim, Cliente cliente) {
-        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente);
+    public Emprestimo(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, LocalDate dataPrevFim, Cliente cliente, Constantes.Estado estado) {
+        super(numMovimento, codBiblioteca, dataInicio, dataFim, cliente, estado);
         this.dataPrevFim = dataPrevFim;
     }
 
