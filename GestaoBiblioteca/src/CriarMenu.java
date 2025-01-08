@@ -313,7 +313,7 @@ public class CriarMenu {
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
             try {
-                TratamentoDados.cancelarReserva();
+                TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

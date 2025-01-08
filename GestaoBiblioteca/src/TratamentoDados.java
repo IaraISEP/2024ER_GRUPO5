@@ -985,7 +985,7 @@ public class TratamentoDados {
      * dos itens que lhe pertence
      *
      * */
-    public static void cancelarReserva() throws IOException {
+    public static void cancelarReserva(int idCancelar) throws IOException {
         // Verifica se a lista de clientes está vazia
         if(reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
@@ -994,7 +994,7 @@ public class TratamentoDados {
         // Lista todos os clientes
         listaTodasReservas();
 
-        int idCancelar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        //int idCancelar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
 
         for (Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idCancelar) {
@@ -1577,16 +1577,33 @@ public class TratamentoDados {
     public static void ConcluirReserva() throws IOException {
 
         // ******** MOSTRAR TODAS AS RESERVAS E ESCOLHER 1 *******
+        mostraTabelaReservas(reservas);
+        int idReserva = lerInt("Escolha o id da reserva: ", false, null);
 
         //Atribui automaticamente o Id com base no último Id existente.
         int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO);
 
-        //emprestimos.add(inserirDadosEmprestimo(idEmprestimo, reservaAMandar)); <--- ** Isto Cria o emprestimo sem detalhes **
+        // Faz a procura da reserva pelo id e retorna se encontrar
+        for (Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idReserva) {
+                emprestimos.add(inserirDadosEmprestimo(idEmprestimo, reserva));
+                for (ReservaLinha reservalinha : reservasLinha) {
+                    if (reservalinha.getIdReserva() == idReserva) {
+                        int idItem = reservalinha.getIdItem();
+                        Constantes.TipoItem tipoItem = reservalinha.getTipoItem();
+                        EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+                        emprestimosLinha.add(emprestimoLinha);
 
-        //Chamem aqui uma função para adicionar os detalhes ao array: "emprestimosLinha" 1 por 1 ou todos de uma vez, para já não consigo adicionar a nenhum metodo meu.
+                        cancelarReserva(idReserva);
+                    }
+                }
+            }
+        }
+        //Chamem aqui uma função para adicionar os detalhes ao array: "emprestimosLinha" 1 por 1 ou
+        // todos de uma vez, para já não consigo adicionar a nenhum metodo meu.
 
-        //gravarArrayEmprestimo();
-        //gravarArrayEmprestimoLinha();
+        gravarArrayEmprestimo();
+        gravarArrayEmprestimoLinha();
     }
 
     public static Constantes.TipoItem criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException {
