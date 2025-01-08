@@ -1011,17 +1011,6 @@ public class TratamentoDados {
         gravarArrayReservaLinha();
     }
 
-    /**
-     * Metodo para concluir a reserva. tranformar em emprestimo
-     *
-     * */
-    public static void terminarReserva() {
-        // TODO:
-        //  verificar o id da reserva e alterar a flag de estado da mesma
-        //  ou de algum dos itens da reserva e passar a reserva para emprestimo
-        //  na totalidade ou apenas os itens pretendidos
-        System.out.println("Reclama com o Pedro e a Iara :) :) :)");
-    }
 
     public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {

@@ -304,7 +304,6 @@ public class CriarMenu {
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
             //TODO : A desenvolver
-            TratamentoDados.terminarReserva();
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
