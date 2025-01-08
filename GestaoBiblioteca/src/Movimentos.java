@@ -22,7 +22,7 @@ public class Movimentos {
      * @param dataInicio    a data de início
      * @param dataFim       a data de fim
      * @param cliente       o cliente afeto ao movimento
-     * @param estado
+     * @param estado        o estado afeto ao Item
      */
     public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, Constantes.Estado estado) {
         this.numMovimento = numMovimento;
@@ -128,5 +128,13 @@ public class Movimentos {
      */
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public void setEstado(Constantes.Estado estado) {
+        this.estado = estado;
+    }
+
+    public Constantes.Estado getEstado() {
+        return estado;
     }
 }

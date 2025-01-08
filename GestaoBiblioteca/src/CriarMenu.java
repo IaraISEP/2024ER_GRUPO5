@@ -304,7 +304,15 @@ public class CriarMenu {
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Concluir Reserva", () -> {
             //TODO : A desenvolver
-            System.out.println("Reserva Concluída...");
+            TratamentoDados.terminarReserva();
+            keyPress();
+        }));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
+            try {
+                TratamentoDados.cancelarReserva();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
 
