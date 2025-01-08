@@ -1495,7 +1495,7 @@ public class TratamentoDados {
                 emprestimoLinhaDetails.add(emprestimoLinha);
             }
         }
-        mostraDetalhesEmprestimos(emprestimoLinhaDetails, 0);
+        mostraDetalhesEmprestimos(emprestimoLinhaDetails, 0, null);
     }
 
     /**
@@ -1521,33 +1521,68 @@ public class TratamentoDados {
         }
 
         System.out.println("Quer apagar todos os itens?");
-        int escolha = lerInt("Escolha 1- Sim \n 2-Não", false, null);
+        int escolha = 0;
+        do {
+            escolha = lerInt("Escolha \n1- Sim \n 2-Não ", false, null);
+        }while (escolha < 1 || escolha > 2);
         if (escolha == 1){
             emprestimos.remove(emprestimoRemover);
             for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
                 if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
-                    emprestimos.remove(emprestimoLinha);
+                    emprestimosLinha.remove(emprestimoLinha);
                 }
             }
             gravarArrayEmprestimo();
             gravarArrayEmprestimoLinha();
         }else{
+            Constantes.TipoItem tipoItem=null;
             for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
                 if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
-                    mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo);
+                    mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, null);
                 }
             }
             do {
-                escolha = lerInt("Escolha\n 1- Livro \n 2-Revista \n 3-Jornal", false, null);
+                escolha = lerInt("Escolha\n 1- Livro \n 2-Revista \n 3-Jornal ", false, null);
                 switch (escolha){
                     case 1:
+                        tipoItem=Constantes.TipoItem.LIVRO;
                         break;
+                    case 2:
+                        tipoItem=Constantes.TipoItem.REVISTA;
+                        break;
+                    case 3:
+                        tipoItem=Constantes.TipoItem.JORNAL;
+                        break;
+                    default:
+                        System.out.println("Número Inválido.");
                 }
-
-
             }while (escolha >= 4 || escolha <= 0 );
-            
-
+            mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, tipoItem);
+            boolean flag=false;
+            do {
+                escolha = lerInt("Escolha o id do Item: ", false, null);
+                for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                    if(escolha == emprestimoLinha.getIdItem() && tipoItem==emprestimoLinha.getTipoItem()){
+                        emprestimosLinha.remove(emprestimoLinha);
+                        flag=true;
+                        break;
+                    }
+                }
+                if (!flag)
+                    System.out.println("Número Inválido!");
+            }while (!flag);
+            flag=false;
+            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                if(idEmprestimo == emprestimoLinha.getIdEmprestimo()){
+                    flag=true;
+                }
+            }
+            if (!flag) {
+                emprestimos.remove(emprestimoRemover);
+                System.out.println("Emprestimo Vazio! Apagado com sucesso!");
+                gravarArrayEmprestimo();
+            }
+            gravarArrayEmprestimoLinha();
         }
         System.out.println("Emprestimo apagado(a) com sucesso!");
     }
@@ -2137,7 +2172,7 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo)
+    public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
         //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id Reserva".length();
@@ -2259,11 +2294,10 @@ public class TratamentoDados {
                     }
                     break;
             }
-            if(idEmprestimo==0)
+            if(itemMostrar==null && idEmprestimo==0)
                 System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
-            else if (emprestimoLinha.getIdEmprestimo()==idEmprestimo)
+            else if (emprestimoLinha.getIdEmprestimo()==idEmprestimo && itemMostrar==null || idEmprestimo!=0 && emprestimoLinha.getIdEmprestimo()==idEmprestimo && emprestimoLinha.getTipoItem()==itemMostrar)
                 System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
-
         }
 
         System.out.println(separador);
