@@ -985,7 +985,7 @@ public class TratamentoDados {
      * dos itens que lhe pertence
      *
      * */
-    public static void cancelarReserva(int idCancelar) throws IOException {
+    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException {
         // Verifica se a lista de clientes está vazia
         if(reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
@@ -998,10 +998,10 @@ public class TratamentoDados {
 
         for (Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idCancelar) {
-                reserva.setEstado(Constantes.Estado.CANCELADO);
+                reserva.setEstado(estado);
                 for (ReservaLinha reservaLinha : reservasLinha) {
                     if (reservaLinha.getIdReserva() == idCancelar) {
-                        reservaLinha.setEstado(Constantes.Estado.CANCELADO);
+                        reservaLinha.setEstado(estado);
                     }
                 }
             }
@@ -1469,76 +1469,6 @@ public class TratamentoDados {
         mostraDetalhesEmprestimos(emprestimoLinhaDetails);
     }
 
-    /**
-     * Apaga um Emprestimo pelo ID.
-     */
-    /*public static void apagarEmprestimo() throws IOException {
-        if (emprestimos.isEmpty()) {
-            System.out.println("Não existem Emprestimos nesta Biblioteca.");
-            return;
-        }
-
-        //listaTodosJornalRevista(tipoItem);
-
-        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
-        Emprestimo emprestimoRemover = null;
-        for (Emprestimo emprestimo : emprestimos) {
-            if (emprestimo.getNumMovimento() == idApagar) {
-                emprestimoRemover = emprestimo;
-                break;
-            }
-        }
-        if (emprestimoRemover == null) {
-            System.out.println("ID do empréstimo não encontrado.");
-            return;
-        }
-
-        System.out.println("Quer apagar todos os itens?");
-        int escolha = lerInt("Escolha 1- Sim \n 2-Não", false, null);
-        if (escolha == 1){
-            emprestimos.remove(emprestimoRemover);
-            gravarArrayEmprestimo();
-        }else{
-            //listaEmprestimoLinha(idEmprestimo)
-            escolha = lerInt("Escolha o tipo de item: \n 1- Livro \n 2- Jornal \n 3- Revista", false, null);
-            switch (escolha){
-                case 1:
-
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
-            }
-        }
-        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
-    }*/
-
-    /**
-     * Editar Emprestimo
-     */
-    /*public static void editarEmprestimo() throws IOException {
-        // Verifica se a lista de clientes está vazia
-        if(emprestimos.isEmpty()) {
-            System.out.println("Não há emprestimos nesta biblioteca.");
-            return;
-        }
-
-        // Lista todos os clientes
-        //listaTodasReservas();
-
-
-        // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        Constantes.TipoItem tipoItem = criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
-        emprestimosLinha.add(inserirDetalhesEmprestimo(idEditar, tipoItem));
-        gravarArrayEmprestimo();
-        System.out.println("ID não encontrado!");
-    }*/
-
-
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
      * */
@@ -1567,13 +1497,11 @@ public class TratamentoDados {
                         EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
                         emprestimosLinha.add(emprestimoLinha);
 
-                        cancelarReserva(idReserva);
+                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO);
                     }
                 }
             }
         }
-        //Chamem aqui uma função para adicionar os detalhes ao array: "emprestimosLinha" 1 por 1 ou
-        // todos de uma vez, para já não consigo adicionar a nenhum metodo meu.
 
         gravarArrayEmprestimo();
         gravarArrayEmprestimoLinha();
@@ -2076,7 +2004,7 @@ public class TratamentoDados {
         }
         //
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen +"s | %-" + estadoMaxLen + "s | %-" + tituloMaxLen + "s | %-"
+        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + estadoMaxLen + "s | %-" + tituloMaxLen + "s | %-"
                 + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen +  "s |\n";
         //Esta string cria a linha de separação
         String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
