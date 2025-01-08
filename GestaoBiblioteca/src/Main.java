@@ -20,6 +20,8 @@ public class Main {
             TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.REVISTA.getValue(), Constantes.TipoItem.REVISTA);
             TratamentoDados.lerFicheiroCsvReservas(Constantes.Path.RESERVA.getValue());
             TratamentoDados.lerFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue());
+            TratamentoDados.lerFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue());
+            TratamentoDados.lerFicheiroCsvEmprestimosLinha(Constantes.Path.EMPRESTIMOLINHA.getValue());
             CriarMenu.menuPrincipal();
         } catch (IOException e) {
             System.err.println("Erro durante a execução: " + e.getMessage());
