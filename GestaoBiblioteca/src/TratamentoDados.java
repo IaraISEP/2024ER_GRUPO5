@@ -522,6 +522,7 @@ public class TratamentoDados {
     /**
      * Pesquisa um ISBN na lista de livros.
      */
+
     private static String pesquisarIsbn(String isbn) {
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn)) {
@@ -886,13 +887,12 @@ public class TratamentoDados {
         reservas.add(inserirDadosReserva(idReserva));
         Reserva reserva = reservas.getLast();
 
-
-        // TODO: Chamar metodo de criar detalhes da reserva
-        criarDetalheReserva(reserva.getNumMovimento());
+        criarReservaLinha(reserva.getNumMovimento());
 
         System.out.println("Reserva criada com sucesso!");
 
         gravarArrayReservas();
+        gravarArrayReservaLinha();
 
         // Criar o historico dos movimentos
         //criarFicheiroCsvReservasDtl("Biblioteca_1/Historico/reservas_h.csv", reservaDtl, true);
@@ -910,7 +910,7 @@ public class TratamentoDados {
 
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        Constantes.TipoItem tipoItem = criarDetalheReserva(idEditar);
+        Constantes.TipoItem tipoItem = criarReservaLinha(idEditar);
         reservasLinha.add(inserirDetalhesReserva(idEditar, tipoItem));
         gravarArrayReservaLinha();
         System.out.println("ID não encontrado!");
@@ -1011,7 +1011,7 @@ public class TratamentoDados {
      * Metodo para inserir os detalhes de uma reserva atribuido a algum Cliente
      * @param idReserva Recebe o Id da Reserva
      * */
-    public static Constantes.TipoItem criarDetalheReserva(int idReserva) throws IOException {
+    public static Constantes.TipoItem criarReservaLinha(int idReserva) throws IOException {
         Constantes.TipoItem tipoItem;
         do {
             int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
@@ -1030,7 +1030,7 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
                     continue;
             }
-            inserirDetalhesReserva(idReserva,tipoItem);
+            reservasLinha.add(inserirDetalhesReserva(idReserva, tipoItem));
             int opcao = lerInt("Deseja acrescentar mais Items a Reserva? (1 - Sim, 2 - Não)", false, null);
             if (opcao == 2){
                 break;
@@ -1782,29 +1782,124 @@ public class TratamentoDados {
         int idMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
+        int tituloMaxLen = "Titulo".length();
+        int editoraMaxLen = "Editora".length();
+        int categoriaMaxLen = "Categoria".length();
+        int issnMaxLen = "ISSN/ISBN".length();
+        int anoMaxLen = "Data Pub.".length();
+        int autorMaxLen = "Autor".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (ReservaLinha reservaLinha : listaDetalhesReservas) {
             idMaxLen = Math.max(idMaxLen, String.valueOf(reservaLinha.getIdReserva()).length());
             tipoItem = Math.max(tipoItem, String.valueOf(reservaLinha.getTipoItem()).length());
             idItemMaxLen = Math.max(idItemMaxLen, String.valueOf(reservaLinha.getIdItem()).length());
+
+            switch(reservaLinha.getTipoItem())
+            {
+                case LIVRO:
+                    for (Livro livro : livros) {
+                        if (livro.getId() == reservaLinha.getIdItem()) {
+                            tituloMaxLen = Math.max(tituloMaxLen, livro.getTitulo().length());
+                            editoraMaxLen = Math.max(editoraMaxLen, livro.getEditora().length());
+                            categoriaMaxLen = Math.max(categoriaMaxLen, livro.getCategoria().toString().length());
+                            issnMaxLen = Math.max(issnMaxLen, livro.getIsbn().length());
+                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
+                            autorMaxLen = Math.max(autorMaxLen, livro.getAutor().length());
+                            break;
+                        }
+                    }
+                    break;
+                case REVISTA:
+                    for (JornalRevista jornal : jornais) {
+                        if (jornal.getId() == reservaLinha.getIdItem()) {
+                            tituloMaxLen = Math.max(tituloMaxLen, jornal.getTitulo().length());
+                            editoraMaxLen = Math.max(editoraMaxLen, jornal.getEditora().length());
+                            categoriaMaxLen = Math.max(categoriaMaxLen, jornal.getCategoria().toString().length());
+                            issnMaxLen = Math.max(issnMaxLen, jornal.getIssn().length());
+                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(jornal.getDataPublicacao()).length());
+                            break;
+                        }
+                    }
+                    break;
+                case JORNAL:
+                    for (JornalRevista revista : revistas) {
+                        if (revista.getId() == reservaLinha.getIdItem()) {
+                            tituloMaxLen = Math.max(tituloMaxLen, revista.getTitulo().length());
+                            editoraMaxLen = Math.max(editoraMaxLen, revista.getEditora().length());
+                            categoriaMaxLen = Math.max(categoriaMaxLen, revista.getCategoria().toString().length());
+                            issnMaxLen = Math.max(issnMaxLen, revista.getIssn().length());
+                            anoMaxLen = Math.max(anoMaxLen, String.valueOf(revista.getDataPublicacao()).length());
+                            break;
+                        }
+                    }
+                    break;
+            }
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s |\n";
+        String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + tituloMaxLen + "s | %-" 
+                                + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+";
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
+                                + "-".repeat(tituloMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-" + "-".repeat(editoraMaxLen) + "-+-" 
+                                + "-".repeat(issnMaxLen) + "-+-" + "-".repeat(anoMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item");
+        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor");
         //Imprime a linha de separação
         System.out.println(separador);
 
-        //Imprime os dados dos clientes
         for (ReservaLinha reservaLinha : listaDetalhesReservas) {
-            System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem());
+            String titulo = "", editora = "", issn = "", autor = "";
+            Constantes.Categoria categoria = null;
+            int anoEdicao = 0;
+
+            //Imprime os dados dos clientes
+            switch(reservaLinha.getTipoItem())
+            {
+                case LIVRO:
+                    for (Livro livro : livros) {
+                        if (livro.getId() == reservaLinha.getIdItem()) {
+                            titulo = livro.getTitulo();
+                            editora = livro.getEditora();
+                            categoria = livro.getCategoria();
+                            issn = livro.getIsbn();
+                            anoEdicao = livro.getAnoEdicao();
+                            autor = livro.getAutor();
+                            break;
+                        }
+                    }
+                    break;
+                case REVISTA:
+                    for (JornalRevista jornal : jornais) {
+                        if (jornal.getId() == reservaLinha.getIdItem()) {
+                            titulo = jornal.getTitulo();
+                            editora = jornal.getEditora();
+                            categoria = jornal.getCategoria();
+                            issn = jornal.getIssn();
+                            anoEdicao = jornal.getDataPublicacao();
+                            break;
+                        }
+                    }
+                    break;
+                case JORNAL:
+                    for (JornalRevista revista : revistas) {
+                        if (revista.getId() == reservaLinha.getIdItem()) {
+                            titulo = revista.getTitulo();
+                            editora = revista.getEditora();
+                            categoria = revista.getCategoria();
+                            issn = revista.getIssn();
+                            anoEdicao = revista.getDataPublicacao();
+                            break;
+                        }
+                    }
+                    break;
+            }
+            System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
+            
         }
 
         System.out.println(separador);

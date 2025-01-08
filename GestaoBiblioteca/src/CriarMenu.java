@@ -291,19 +291,9 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", () -> {
-            TratamentoDados.listaTodasReservas();
-            keyPress();
-        }));
-        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Detalhes Reserva", () -> {
-            try {
-                TratamentoDados.listaTodasReservas();
-                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            keyPress();
-        }));
+
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", CriarMenu::menuListarReservas));
+
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             try {
                 TratamentoDados.editarReserva();
@@ -344,5 +334,28 @@ public class CriarMenu {
         }));
 
         menuEmprestimos.exibir();
+    }
+
+    /**
+     * Exibe o menu de listagem de reservas.
+     */
+    private static void menuListarReservas() {
+        Menu menuListarReservas = new Menu("Listar Reservas");
+
+        menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Simplificada",  () -> {
+            TratamentoDados.listaTodasReservas();
+            keyPress();
+        }));
+        menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Detalhada", () -> {
+            try {
+                TratamentoDados.listaTodasReservas();
+                TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ",false,null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+
+        menuListarReservas.exibir();
     }
 }
