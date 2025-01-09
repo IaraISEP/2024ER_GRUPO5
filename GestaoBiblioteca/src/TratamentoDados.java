@@ -185,13 +185,7 @@ public class TratamentoDados {
                 System.out.print("Contribuinte Inválido! ex: 123456789");
         } while (!flag);
 
-        do {
-            nome = lerString("\nPor favor, insira o nome do Cliente: ");
-            if (nome.isEmpty()){
-                System.out.println("Por favor insira um nome valido");
-                flag = false;
-            }else {flag=true;}
-        }while(!flag);
+        nome = lerString("\nPor favor, insira o nome do Cliente: ");
 
         do {
             char gen = lerChar("\nPor favor, insira o Genero do Cliente (M/F): ");
@@ -1829,8 +1823,18 @@ public class TratamentoDados {
      */
     public static String lerString(String mensagem)
     {
+        String campo=null;
+        boolean flag=true;
+        do {
         System.out.print(mensagem);
-        return input.nextLine();
+        campo = input.nextLine().trim();
+            if (campo.isEmpty()) {
+                System.out.println("Campo não pode estar vazio");
+                flag = false;
+            }else {flag=true;}
+        }while (!flag);
+
+        return campo ;
     }
 
     /**
