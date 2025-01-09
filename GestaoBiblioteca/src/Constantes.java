@@ -113,7 +113,9 @@ public class Constantes {
 
     public enum Etapa {
         CRIAR,
-        EDITAR;
+        EDITAR,
+        CONCLUIR,
+        CANCELAR;
     }
 
     public enum ValidacaoCliente {

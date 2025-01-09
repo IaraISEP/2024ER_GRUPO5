@@ -4,6 +4,7 @@
  */
 public class ReservaLinha {
     private int idReserva;
+    private int idReservaLinha;
     private Constantes.TipoItem tipoItem;
     private Constantes.Estado estado;
     private int idItem;
@@ -11,12 +12,14 @@ public class ReservaLinha {
     /**
      * Construtor para criar a linha da reserva.
      *
-     * @param idReserva O Id da Reserva
-     * @param tipoItem  O Tipo de item associado à reserva
-     * @param idItem    O Id do item associado à reserva
+     * @param idReserva         O Id da Reserva
+     * @param idReservaLinha    O Id da Reserva Linha
+     * @param tipoItem          O Tipo de item associado à reserva
+     * @param idItem            O Id do item associado à reserva
      */
-    public ReservaLinha(int idReserva, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
+    public ReservaLinha(int idReserva, int idReservaLinha, Constantes.TipoItem tipoItem, int idItem, Constantes.Estado estado) {
         this.idReserva = idReserva;
+        this.idReservaLinha = idReservaLinha;
         this.tipoItem = tipoItem;
         this.idItem = idItem;
         this.estado = estado;
@@ -38,6 +41,22 @@ public class ReservaLinha {
      */
     public void setIdReserva(int idReserva) {
         this.idReserva = idReserva;
+    }
+
+    /**
+     * Obtém o Id da reserva linha.
+     *
+     * @return O Id da reserva linha.
+     */
+    public int getIdReservaLinha() { return idReservaLinha; }
+
+    /**
+     * Define o Id da reserva linha.
+     *
+     * @param idReservaLinha O Id da reserva linha.
+     */
+    public void setIdReservaLinha(int idReservaLinha) {
+        this.idReservaLinha = idReservaLinha;
     }
 
     /**
