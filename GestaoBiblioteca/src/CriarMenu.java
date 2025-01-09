@@ -370,15 +370,23 @@ public class CriarMenu {
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Listar Empréstimo", CriarMenu::menuListarEmprestimos));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo();
+                TratamentoDados.EditarEmprestimo(Constantes.Etapa.EDITAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             keyPress();
         }));
-        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Apagar Empréstimo", () -> {
+        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Cancelar Empréstimo", () -> {
             try {
-                TratamentoDados.apagarEmprestimo();
+                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CANCELAR);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+        menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
+            try {
+                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CONCLUIR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

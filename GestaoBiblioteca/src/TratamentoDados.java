@@ -1397,7 +1397,6 @@ public class TratamentoDados {
                         break;
                     }
                 }
-                List<EmprestimoLinha> emprestimoLinhas = new ArrayList<>(); //TODO : Ir buscar as linhas da reserva
 
                 Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
 
@@ -1634,113 +1633,15 @@ public class TratamentoDados {
 
     public static void listarDetalhesEmprestimo(int idEmprestimo) throws IOException
     {
-        // Lista de apoio para editar os detalhes
-        List<EmprestimoLinha> emprestimoLinhaDetails = new ArrayList<>();
-
-        // Procura o emprestimo pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-        for(EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-            if (emprestimoLinha.getIdEmprestimo() == idEmprestimo) {
-                emprestimoLinhaDetails.add(emprestimoLinha);
-            }
-        }
-        mostraDetalhesEmprestimos(emprestimoLinhaDetails, 0, null);
-    }
-
-    /**
-     * Apaga um Emprestimo pelo ID.
-     */
-    public static void apagarEmprestimo() throws IOException {
-        if (emprestimos.isEmpty()) {
-            System.out.println("Não existem Emprestimos nesta Biblioteca.");
-            return;
-        }
-        listaTodosEmprestimos();
-        int idEmprestimo = lerInt("Escolha o ID do emprestimo que deseja apagar: ", false, null);
-        Emprestimo emprestimoRemover = null;
-        for (Emprestimo emprestimo : emprestimos) {
-            if (emprestimo.getNumMovimento() == idEmprestimo) {
-                emprestimoRemover = emprestimo;
-                break;
-            }
-        }
-        if (emprestimoRemover == null) {
-            System.out.println("ID do empréstimo não encontrado.");
-            return;
-        }
-
-        System.out.println("Quer apagar todos os itens?");
-        int escolha = 0;
-        do {
-            escolha = lerInt("Escolha \n1- Sim \n 2-Não ", false, null);
-        }while (escolha < 1 || escolha > 2);
-        if (escolha == 1){
-            emprestimos.remove(emprestimoRemover);
-            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
-                    emprestimosLinha.remove(emprestimoLinha);
-                }
-            }
-            gravarArrayEmprestimo();
-            gravarArrayEmprestimoLinha();
-        }else{
-            Constantes.TipoItem tipoItem=null;
-            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                if (emprestimoLinha.getIdEmprestimo() == idEmprestimo){
-                    mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, null);
-                }
-            }
-            do {
-                escolha = lerInt("Escolha\n 1- Livro \n 2-Revista \n 3-Jornal ", false, null);
-                switch (escolha){
-                    case 1:
-                        tipoItem=Constantes.TipoItem.LIVRO;
-                        break;
-                    case 2:
-                        tipoItem=Constantes.TipoItem.REVISTA;
-                        break;
-                    case 3:
-                        tipoItem=Constantes.TipoItem.JORNAL;
-                        break;
-                    default:
-                        System.out.println("Número Inválido.");
-                }
-            }while (escolha >= 4 || escolha <= 0 );
-            mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, tipoItem);
-            boolean flag=false;
-            do {
-                escolha = lerInt("Escolha o id do Item: ", false, null);
-                for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                    if(escolha == emprestimoLinha.getIdItem() && tipoItem==emprestimoLinha.getTipoItem()){
-                        emprestimosLinha.remove(emprestimoLinha);
-                        flag=true;
-                        break;
-                    }
-                }
-                if (!flag)
-                    System.out.println("Número Inválido!");
-            }while (!flag);
-            flag=false;
-            for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                if(idEmprestimo == emprestimoLinha.getIdEmprestimo()){
-                    flag=true;
-                }
-            }
-            if (!flag) {
-                emprestimos.remove(emprestimoRemover);
-                System.out.println("Emprestimo Vazio! Apagado com sucesso!");
-                gravarArrayEmprestimo();
-            }
-            gravarArrayEmprestimoLinha();
-        }
-        System.out.println("Emprestimo apagado(a) com sucesso!");
+        mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, null);
     }
 
     /**
      * Editar Emprestimo
      */
-    public static void EditarEmprestimo() throws IOException {
+    public static void EditarEmprestimo(Constantes.Etapa etapa) throws IOException {
         boolean flag = false;
-        int idEditar;
+        int idEditar, opcao;
         LocalDate dataPrevFim;
         // Verifica se a lista de clientes está vazia
         if(emprestimos.isEmpty()) {
@@ -1754,42 +1655,74 @@ public class TratamentoDados {
             for (Emprestimo emprestimo : emprestimos) {
                 if (emprestimo.getNumMovimento() == idEditar) {
                     flag = true;
+                    if (etapa == Constantes.Etapa.CANCELAR) {
+                        emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
+                                emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                            }
+                        }
+                    }
+                    else if (etapa == Constantes.Etapa.CONCLUIR) {
+                        emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
+                        emprestimo.setDataFim(Constantes.getDatahoje());
+                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
+                                emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
+                            }
+                        }
+                    }
                 }
             }
             if(!flag){
                 System.out.println("Id Inválido!");
             }
-        }while (!flag);
-
-        listarDetalhesEmprestimo(idEditar);
-
-        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n3 - Editar Data Final Prevista", false, null);
-        switch (opcao) {
-            case 1:
-                criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
-                gravarArrayEmprestimoLinha();
-                break;
-            case 2:
-                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO);
-                gravarArrayEmprestimoLinha();
-                break;
-            case 3:
-                do {
-                    dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
-                    if (dataPrevFim.isBefore(Constantes.getDatahoje())) {
-                        System.out.println("A data final prevista não pode ser anterior à data de início.");
-                    } else if (dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30))) {
-                        System.out.println("O empréstimo não pode ser superior a 30 dias.");
-                    }
-                } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-                emprestimos.get(idEditar -1).setDataPrevFim(dataPrevFim);
-                emprestimos.get(idEditar -1).setDataFim(dataPrevFim);
-                break;
-            default:
-                System.out.println("Escolha Inválida! Tente novamente.");
+        } while (!flag);
+        if(etapa== Constantes.Etapa.EDITAR) {
+            listarDetalhesEmprestimo(idEditar);
+            do{
+                opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n3 - Editar Data Final Prevista\n", false, null);
+                switch (opcao) {
+                    case 1:
+                        criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
+                        break;
+                    case 2:
+                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO);
+                        break;
+                    case 3:
+                        do {
+                            dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
+                            if (dataPrevFim.isBefore(Constantes.getDatahoje())) {
+                                System.out.println("A data final prevista não pode ser anterior à data de início.");
+                            } else if (dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30))) {
+                                System.out.println("O empréstimo não pode ser superior a 30 dias.");
+                            }
+                        } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
+                        emprestimos.get(idEditar -1).setDataPrevFim(dataPrevFim);
+                        emprestimos.get(idEditar -1).setDataFim(dataPrevFim);
+                        break;
+                    default:
+                        System.out.println("Opção Inválida! Tente novamente.");
+                }
+            } while (opcao<1 || opcao>3);
         }
+        gravarArrayEmprestimo();
+        gravarArrayEmprestimoLinha();
     }
 
+    public static void AtualizarAtrasoEmprestimo() throws IOException
+    {
+        if(!emprestimos.isEmpty()) {
+            for(Emprestimo emprestimo : emprestimos)
+            {
+                if(emprestimo.getDataFim().isBefore(Constantes.getDatahoje()) && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO)
+                {
+                    emprestimo.setEstado(Constantes.Estado.ATRASADO);
+                    gravarArrayEmprestimo();
+                }
+            }
+        }
+    }
 
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
@@ -2301,6 +2234,7 @@ public class TratamentoDados {
         int dataInicioLen = "Data Início".length();
         int dataPrevFimLen = "Data Final Prevista".length();
         int clienteMaxLen = "Cliente".length();
+        int estadoMaxLen = "Cliente".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Emprestimo emprestimo : listaEmprestimos) {
@@ -2309,23 +2243,24 @@ public class TratamentoDados {
             dataInicioLen = Math.max(dataInicioLen, String.valueOf(emprestimo.getDataInicio()).length());
             dataPrevFimLen = Math.max(dataPrevFimLen, String.valueOf(emprestimo.getDataFim()).length());
             clienteMaxLen = Math.max(clienteMaxLen, String.valueOf(emprestimo.getClienteNome()).length());
+            estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(emprestimo.getEstado()).length());
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s |\n";
+        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s | %-" + clienteMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+";
+        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-".repeat(estadoMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Biblioteca", "Id", "Data Início", "Data Final Prevista", "Cliente");
+        System.out.printf(formato, "Biblioteca", "Id", "Data Início", "Data Final Prevista", "Cliente", "Estado");
         //Imprime a linha de separação
         System.out.println(separador);
 
         //Imprime os dados dos clientes
         for (Emprestimo emprestimo : listaEmprestimos) {
-            System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome());
+            System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
 
         System.out.println(separador);
@@ -2477,12 +2412,14 @@ public class TratamentoDados {
         int issnMaxLen = "ISSN/ISBN".length();
         int anoMaxLen = "Data Pub.".length();
         int autorMaxLen = "Autor".length();
+        int estadoMaxLen = "Estado".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (EmprestimoLinha emprestimoLinha : listaDetalhesEmprestimos) {
             idMaxLen = Math.max(idMaxLen, String.valueOf(emprestimoLinha.getIdEmprestimo()).length());
             tipoItem = Math.max(tipoItem, String.valueOf(emprestimoLinha.getTipoItem()).length());
             idItemMaxLen = Math.max(idItemMaxLen, String.valueOf(emprestimoLinha.getIdItem()).length());
+            estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(emprestimoLinha.getEstado()).length());
 
             switch(emprestimoLinha.getTipoItem())
             {
@@ -2495,6 +2432,7 @@ public class TratamentoDados {
                             issnMaxLen = Math.max(issnMaxLen, livro.getIsbn().length());
                             anoMaxLen = Math.max(anoMaxLen, String.valueOf(livro.getAnoEdicao()).length());
                             autorMaxLen = Math.max(autorMaxLen, livro.getAutor().length());
+                            estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(emprestimoLinha.getEstado()).length());
                             break;
                         }
                     }
@@ -2507,6 +2445,7 @@ public class TratamentoDados {
                             categoriaMaxLen = Math.max(categoriaMaxLen, jornal.getCategoria().toString().length());
                             issnMaxLen = Math.max(issnMaxLen, jornal.getIssn().length());
                             anoMaxLen = Math.max(anoMaxLen, String.valueOf(jornal.getDataPublicacao()).length());
+                            estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(emprestimoLinha.getEstado()).length());
                             break;
                         }
                     }
@@ -2519,6 +2458,7 @@ public class TratamentoDados {
                             categoriaMaxLen = Math.max(categoriaMaxLen, revista.getCategoria().toString().length());
                             issnMaxLen = Math.max(issnMaxLen, revista.getIssn().length());
                             anoMaxLen = Math.max(anoMaxLen, String.valueOf(revista.getDataPublicacao()).length());
+                            estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(emprestimoLinha.getEstado()).length());
                             break;
                         }
                     }
@@ -2528,21 +2468,21 @@ public class TratamentoDados {
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
         String formato = "| %-" + idMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + tituloMaxLen + "s | %-"
-                + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen + "s |\n";
+                + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen + "s | %-" + estadoMaxLen + "s |\n";
         //Esta string cria a linha de separação
         String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
                 + "-".repeat(tituloMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-" + "-".repeat(editoraMaxLen) + "-+-"
-                + "-".repeat(issnMaxLen) + "-+-" + "-".repeat(anoMaxLen) + "-+";
+                + "-".repeat(issnMaxLen) + "-+-" + "-".repeat(anoMaxLen) + "-+-" + "-".repeat(estadoMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor");
+        System.out.printf(formato, "Id Reserva", "Tipo Item", "Id Item", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor", "Estado");
         //Imprime a linha de separação
         System.out.println(separador);
 
         for (EmprestimoLinha emprestimoLinha : listaDetalhesEmprestimos) {
-            String titulo = "", editora = "", issn = "", autor = "";
+            String titulo = "", editora = "", issn = "", autor = "", estado = "";
             Constantes.Categoria categoria = null;
             int anoEdicao = 0;
 
@@ -2558,6 +2498,7 @@ public class TratamentoDados {
                             issn = livro.getIsbn();
                             anoEdicao = livro.getAnoEdicao();
                             autor = livro.getAutor();
+                            estado = emprestimoLinha.getEstado().toString();
                             break;
                         }
                     }
@@ -2570,6 +2511,7 @@ public class TratamentoDados {
                             categoria = jornal.getCategoria();
                             issn = jornal.getIssn();
                             anoEdicao = jornal.getDataPublicacao();
+                            estado = emprestimoLinha.getEstado().toString();
                             break;
                         }
                     }
@@ -2582,15 +2524,16 @@ public class TratamentoDados {
                             categoria = revista.getCategoria();
                             issn = revista.getIssn();
                             anoEdicao = revista.getDataPublicacao();
+                            estado = emprestimoLinha.getEstado().toString();
                             break;
                         }
                     }
                     break;
             }
             if(itemMostrar==null && idEmprestimo==0)
-                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
+                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor, estado);
             else if (emprestimoLinha.getIdEmprestimo()==idEmprestimo && itemMostrar==null || idEmprestimo!=0 && emprestimoLinha.getIdEmprestimo()==idEmprestimo && emprestimoLinha.getTipoItem()==itemMostrar)
-                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor);
+                System.out.printf(formato, emprestimoLinha.getIdEmprestimo(), emprestimoLinha.getTipoItem(), emprestimoLinha.getIdItem(), titulo, categoria, editora, issn, anoEdicao, autor, estado);
         }
 
         System.out.println(separador);

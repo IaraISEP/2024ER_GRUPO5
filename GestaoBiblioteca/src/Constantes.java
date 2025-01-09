@@ -3,7 +3,7 @@ import java.time.LocalDate;
 public class Constantes {
     public static String SplitChar = ";";
     public static int TempoMaxReservaDias = 7;
-    private static final LocalDate datahoje = LocalDate.now();
+    private static final LocalDate datahoje = getDatahoje();
 
     public enum Categoria {
         ARTE(1),
