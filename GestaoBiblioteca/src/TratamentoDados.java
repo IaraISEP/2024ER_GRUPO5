@@ -1563,24 +1563,35 @@ public class TratamentoDados {
     /**
      * Editar Emprestimo
      */
-    /*public static void editarEmprestimo() throws IOException {
+    public static void editarEmprestimo() throws IOException {
         // Verifica se a lista de clientes está vazia
         if(emprestimos.isEmpty()) {
-            System.out.println("Não há emprestimos nesta biblioteca.");
+            System.out.println("Não há reservas nesta biblioteca.");
             return;
         }
 
-        // Lista todos os clientes
-        //listaTodasReservas();
-
+        listaTodosEmprestimos();
 
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        Constantes.TipoItem tipoItem = criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
-        emprestimosLinha.add(inserirDetalhesEmprestimo(idEditar, tipoItem));
-        gravarArrayEmprestimo();
-        System.out.println("ID não encontrado!");
-    }*/
+        listarDetalhesReserva(idEditar);
+
+        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
+        switch (opcao) {
+            case 1:
+                criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
+                gravarArrayEmprestimoLinha();
+                break;
+            case 2:
+                //removerItemReserva(idEditar);
+                //removerItemReservaEmprestimo(idEditar);
+                gravarArrayEmprestimoLinha();
+                listarDetalhesEmprestimo(idEditar);
+                break;
+            default:
+                System.out.println("Escolha invalida! Tente novamente.");
+        }
+    }
 
 
     /*
