@@ -23,7 +23,7 @@ public class Movimentos {
      * @param dataInicio    a data de início
      * @param dataFim       a data de fim
      * @param cliente       o cliente afeto ao movimento
-     * @param estado       o estado do servico
+     * @param estado        o estado do Item
      */
     public Movimentos(int codBiblioteca, int numMovimento, LocalDate dataInicio, LocalDate dataFim, Cliente cliente, Constantes.Estado estado) {
         this.numMovimento = numMovimento;

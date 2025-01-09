@@ -1,4 +1,5 @@
 import java.io.IOException;
+
 /**
  * Classe principal da aplicação de gestão da biblioteca.
  * @author ER_GRUPO_5
@@ -12,8 +13,13 @@ public class Main {
      * @param args Argumentos da linha de comando.
      */
     public static void main(String[] args) {
+
+        //int idBiblioteca = TratamentoDados.lerInt("Escolha o Id da biblioteca",false,null);
+        //Biblioteca biblioteca = new Biblioteca("Biblioteca 1", "Morada 1", idBiblioteca);
+
         try {
             TratamentoDados.criarSistemaFicheiros();
+            TratamentoDados.lerFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue());
             TratamentoDados.lerFicheiroCsvClientes(Constantes.Path.CLIENTE.getValue());
             TratamentoDados.lerFicheiroCsvLivros(Constantes.Path.LIVRO.getValue());
             TratamentoDados.lerFicheiroCsvJornaisRevistas(Constantes.Path.JORNAL.getValue(), Constantes.TipoItem.JORNAL);

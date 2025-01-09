@@ -3,7 +3,7 @@ import java.time.LocalDate;
 public class Constantes {
     public static String SplitChar = ";";
     public static int TempoMaxReservaDias = 7;
-    private static LocalDate datahoje = LocalDate.now();
+    private static final LocalDate datahoje = LocalDate.now();
 
     public enum Categoria {
         ARTE(1),
@@ -54,6 +54,22 @@ public class Constantes {
         CANCELADO
     }
 
+    public enum Morada {
+        PORTO(1),
+        COIMBRA(2),
+        LISBOA(3),
+        ALGARVE(4);
+
+        private final int morada;
+
+        Morada(int morada) {
+            this.morada = morada;
+        }
+        public int getMorada() {
+            return morada;
+        }
+    }
+
     public enum Genero {
         MASCULINO('M'),
         FEMININO('F');
@@ -79,6 +95,7 @@ public class Constantes {
     }
 
     public enum TipoItem {
+        BIBLIOTECA,
         CLIENTE,
         LIVRO,
         JORNAL,
@@ -90,14 +107,15 @@ public class Constantes {
     }
 
     public enum Path {
-        CLIENTE("Biblioteca_1/Clientes/clientes.csv"),
-        LIVRO("Biblioteca_1/Livros/livros.csv"),
-        JORNAL("Biblioteca_1/Jornais/jornais.csv"),
-        REVISTA("Biblioteca_1/Revistas/revistas.csv"),
-        EMPRESTIMO("Biblioteca_1/Emprestimos/emprestimos.csv"),
-        EMPRESTIMOLINHA("Biblioteca_1/Emprestimos/emprestimolinha.csv"),
-        RESERVA("Biblioteca_1/Reservas/reservas.csv"),
-        RESERVALINHA("Biblioteca_1/Reservas/Details/reservalinha.csv");
+        BIBLIOTECA("Dados/Bibliotecas/bibliotecas.csv"),
+        CLIENTE("Dados/Clientes/clientes.csv"),
+        LIVRO("Dados/Livros/livros.csv"),
+        JORNAL("Dados/Jornais/jornais.csv"),
+        REVISTA("Dados/Revistas/revistas.csv"),
+        EMPRESTIMO("Dados/Emprestimos/emprestimos.csv"),
+        EMPRESTIMOLINHA("Dados/Emprestimos/emprestimolinha.csv"),
+        RESERVA("Dados/Reservas/reservas.csv"),
+        RESERVALINHA("Dados/Reservas/Details/reservalinha.csv");
 
         private final String value;
 
@@ -115,12 +133,12 @@ public class Constantes {
         CRIAR,
         EDITAR,
         CONCLUIR,
-        CANCELAR;
+        CANCELAR
     }
 
     public enum ValidacaoCliente {
         ID,
         NIF,
-        CONTACTO;
+        CONTACTO
     }
 }
