@@ -54,6 +54,22 @@ public class Constantes {
         CANCELADO
     }
 
+    public enum Morada {
+        PORTO(1),
+        COIMBRA(2),
+        LISBOA(3),
+        ALGARVE(4);
+
+        private final int morada;
+
+        Morada(int morada) {
+            this.morada = morada;
+        }
+        public int getMorada() {
+            return morada;
+        }
+    }
+
     public enum Genero {
         MASCULINO('M'),
         FEMININO('F');

@@ -9,7 +9,7 @@ public class Biblioteca {
     /** Representa o nome da biblioteca */
     private String nome;
     /** Representa a morada da biblioteca */
-    private String morada;
+    private Constantes.Morada morada;
     /** Representa o código da biblioteca */
     private int codBiblioteca;
     /** Representa a lista de Livros da respetiva biblioteca */
@@ -33,7 +33,7 @@ public class Biblioteca {
      * @param codBiblioteca O código da biblioteca.
      *
      */
-    public Biblioteca(String nome, String morada, int codBiblioteca) {
+    public Biblioteca(String nome, Constantes.Morada morada, int codBiblioteca) {
         this.nome = nome;
         this.morada = morada;
         this.codBiblioteca = codBiblioteca;
@@ -62,7 +62,7 @@ public class Biblioteca {
      *
      * @return A morada da biblioteca.
      */
-    public String getMorada() {
+    public Constantes.Morada getMorada() {
         return morada;
     }
 
@@ -71,7 +71,7 @@ public class Biblioteca {
      *
      * @param morada A morada da biblioteca.
      */
-    public void setMorada(String morada) {
+    public void setMorada(Constantes.Morada morada) {
         this.morada = morada;
     }
 
