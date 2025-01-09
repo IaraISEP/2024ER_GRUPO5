@@ -914,7 +914,7 @@ public class TratamentoDados {
                 gravarArrayReservaLinha();
                 break;
             case 2:
-                removerItemReserva(idEditar);
+                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                 gravarArrayReservaLinha();
                 listarDetalhesReserva(idEditar);
                 break;
@@ -933,12 +933,13 @@ public class TratamentoDados {
                 reservaLinhaDetails.add(reservaLinha);
             }
         }
-        mostraDetalhesReservas(reservaLinhaDetails);
+        mostraDetalhesReservas(reservaLinhaDetails, 0,null);
     }
 
-    public static void removerItemReserva(int idReserva) throws IOException {
+    public static void RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) throws IOException {
         Constantes.TipoItem tipoItem;
-        int idItem=0;
+        int idItem=0, opcao=0;
+        boolean flag=false;
         do {
             int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
 
@@ -956,24 +957,40 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
                     continue;
             }
-            idItem = lerInt("Escolha o ID do Item: ", false, null);
-
-            int opcao = lerInt("Deseja remover mais Items da Reserva? (1 - Sim, 2 - Não)", false, null);
-            if (opcao == 2){
-                break;
+            if(tipoServico == Constantes.TipoItem.RESERVA) {
+                mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                do {
+                    idItem = lerInt("Escolha o ID do Item: ", false, null);
+                    // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
+                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
+                            reservaLinha.setEstado(Constantes.Estado.CANCELADO);
+                            flag=true;
+                        }
+                    }
+                    if (!flag)
+                        System.out.println("Número Inválido!");
+                }while (!flag);
             }
-        } while(true);
-
-        // Lista de apoio para editar os detalhes
-        List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
-
-        // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-        for(ReservaLinha reservaLinha : reservasLinha) {
-            if (reservaLinha.getIdReserva() == idReserva && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
-                reservaLinha.setEstado(Constantes.Estado.CANCELADO);
+            else {
+                mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
+                do {
+                    idItem = lerInt("Escolha o ID do Item: ", false, null);
+                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                        if (emprestimoLinha.getIdItem() == id && emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
+                            emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                            flag=true;
+                        }
+                    }
+                    if (!flag)
+                        System.out.println("Número Inválido!");
+                }while (!flag);
             }
-        }
-        mostraDetalhesReservas(reservaLinhaDetails);
+            opcao = lerInt("Deseja remover mais Items da Reserva? (1 - Sim, 2 - Não)", false, null);
+            if (opcao < 1 || opcao > 2) {
+                System.out.println("Valor inválido! Tente novamente.");
+            }
+        } while(opcao!=2);
     }
 
     /**
@@ -2076,7 +2093,7 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas)
+    public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
         //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idReservaLinhaMaxLen = "Id Reserva Linha".length();
@@ -2202,10 +2219,11 @@ public class TratamentoDados {
                     }
                     break;
             }
-            System.out.printf(formato, reservaLinha.getIdReservaLinha(), reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
-
+            if(itemMostrar==null && idEmprestimo==0)
+                System.out.printf(formato, reservaLinha.getIdReservaLinha(), reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
+            else if (reservaLinha.getIdReserva()==idEmprestimo && itemMostrar==null || idEmprestimo!=0 && reservaLinha.getIdItem()==idEmprestimo && reservaLinha.getTipoItem()==itemMostrar)
+                System.out.printf(formato, reservaLinha.getIdReservaLinha(), reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
         }
-
         System.out.println(separador);
     }
 
