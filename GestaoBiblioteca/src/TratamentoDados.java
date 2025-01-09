@@ -1381,7 +1381,6 @@ public class TratamentoDados {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String csvDivisor = ";";
             do {
                 String[] dados = linha.split(Constantes.SplitChar);
                 int codBiblioteca = Integer.parseInt(dados[0]);
@@ -2234,7 +2233,7 @@ public class TratamentoDados {
         int dataInicioLen = "Data Início".length();
         int dataPrevFimLen = "Data Final Prevista".length();
         int clienteMaxLen = "Cliente".length();
-        int estadoMaxLen = "Cliente".length();
+        int estadoMaxLen = "Estado".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Emprestimo emprestimo : listaEmprestimos) {
@@ -2247,9 +2246,9 @@ public class TratamentoDados {
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s | %-" + clienteMaxLen + "s |\n";
+        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s | %-" + estadoMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-".repeat(estadoMaxLen) + "-+";
+        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+-" + "-".repeat(estadoMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
