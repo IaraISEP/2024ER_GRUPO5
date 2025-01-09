@@ -1228,28 +1228,49 @@ public class TratamentoDados {
                     listaTodosLivros();
                     idItem = lerInt("Insira o ID do Livro: ", false, null);
                     idValido = validarIdLivro(idItem);
-/*                    for (ReservaLinha reservaLinha : reservasLinha) {
+                    for (ReservaLinha reservaLinha : reservasLinha) {
                         if (reservaLinha.getIdItem() == idItem ) {
-                            if (reservaLinha.getEstado() != Constantes.Estado.RESERVADO){
+                            if (reservaLinha.getEstado() != estado){
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
+                                reservas.remove(reservas.getLast());
+                                break;
                             }
                         }
-                    }*/
-                    estado = Constantes.Estado.RESERVADO;
+                    }
                     break;
                 case REVISTA:
                     listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
                     idItem = lerInt("Insira o ID da Revista: ", false, null);
                     idValido = validarIdRevista(idItem);
-                    estado = Constantes.Estado.RESERVADO;
+                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdItem() == idItem ) {
+                            if (reservaLinha.getEstado() != estado){
+                                estado = Constantes.Estado.RESERVADO;
+                            }else{
+                                System.out.println("Já se encontra numa Reserva!");
+                                reservas.remove(reservas.getLast());
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case JORNAL:
                     listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
                     idItem = lerInt("Insira o ID do Jornal: ", false, null);
                     idValido = validarIdJornal(idItem);
-                    estado = Constantes.Estado.RESERVADO;
+                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdItem() == idItem ) {
+                            if (reservaLinha.getEstado() != estado){
+                                estado = Constantes.Estado.RESERVADO;
+                            }else{
+                                System.out.println("Já se encontra numa Reserva!");
+                                reservas.remove(reservas.getLast());
+                                break;
+                            }
+                        }
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
