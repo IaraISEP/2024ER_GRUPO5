@@ -1580,7 +1580,10 @@ public class TratamentoDados {
     /**
      * Editar Emprestimo
      */
-    public static void editarEmprestimo() throws IOException {
+    public static void EditarEmprestimo() throws IOException {
+        boolean flag = false;
+        int idEditar;
+        LocalDate dataPrevFim;
         // Verifica se a lista de clientes está vazia
         if(emprestimos.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
@@ -1588,25 +1591,44 @@ public class TratamentoDados {
         }
 
         listaTodosEmprestimos();
+        do {
+            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
+            for (Emprestimo emprestimo : emprestimos) {
+                if (emprestimo.getNumMovimento() == idEditar) {
+                    flag = true;
+                }
+            }
+            if(!flag){
+                System.out.println("Id Inválido!");
+            }
+        }while (!flag);
 
-        // Lê o ID do cliente a ser apagado
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        listarDetalhesReserva(idEditar);
+        listarDetalhesEmprestimo(idEditar);
 
-        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
+        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n3 - Editar Data Final Prevista", false, null);
         switch (opcao) {
             case 1:
                 criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
                 gravarArrayEmprestimoLinha();
                 break;
             case 2:
-                //removerItemReserva(idEditar);
-                //removerItemReservaEmprestimo(idEditar);
+                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO);
                 gravarArrayEmprestimoLinha();
-                listarDetalhesEmprestimo(idEditar);
+                break;
+            case 3:
+                do {
+                    dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
+                    if (dataPrevFim.isBefore(Constantes.getDatahoje())) {
+                        System.out.println("A data final prevista não pode ser anterior à data de início.");
+                    } else if (dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30))) {
+                        System.out.println("O empréstimo não pode ser superior a 30 dias.");
+                    }
+                } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
+                emprestimos.get(idEditar -1).setDataPrevFim(dataPrevFim);
+                emprestimos.get(idEditar -1).setDataFim(dataPrevFim);
                 break;
             default:
-                System.out.println("Escolha invalida! Tente novamente.");
+                System.out.println("Escolha Inválida! Tente novamente.");
         }
     }
 

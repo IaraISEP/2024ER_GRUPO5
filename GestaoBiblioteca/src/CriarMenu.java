@@ -339,12 +339,14 @@ public class CriarMenu {
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Listar Empréstimo", CriarMenu::menuListarEmprestimos));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
-            //TODO : A desenvolver
-            System.out.println("Empréstimo Editado...");
+            try {
+                TratamentoDados.EditarEmprestimo();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Apagar Empréstimo", () -> {
-            //TODO : A desenvolver
             try {
                 TratamentoDados.apagarEmprestimo();
             } catch (IOException e) {
