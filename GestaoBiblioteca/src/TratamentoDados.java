@@ -1217,6 +1217,7 @@ public class TratamentoDados {
         int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
         
         do {
+            estado = Constantes.Estado.RESERVADO;
             switch (tipoItem) {
                 case LIVRO:
                     listaTodosLivros();
@@ -1228,7 +1229,7 @@ public class TratamentoDados {
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
@@ -1244,7 +1245,7 @@ public class TratamentoDados {
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
@@ -1260,7 +1261,7 @@ public class TratamentoDados {
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
