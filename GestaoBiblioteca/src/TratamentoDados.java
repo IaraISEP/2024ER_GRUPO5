@@ -171,18 +171,26 @@ public class TratamentoDados {
      * */
     public static Cliente inserirDadosCliente(int id, Constantes.Etapa etapa)
     {
-        int nif, contacto;
+        int contacto;
         boolean flag;
         Constantes.Genero genero = null;
-        String nome = null;
+        String nome, nif;
 
         do {
-            nif = lerInt("\nPor favor, insira o Contribuinte do Cliente: ", false, null);
-            nif = pesquisarNifArrayCliente(nif, etapa, id);
-            flag = validarTamanho(String.valueOf(nif),9);
-
-            if(!flag)
-                System.out.print("Contribuinte Inválido! ex: 123456789");
+            flag = true;
+            nif = lerString("\nPor favor, insira o Contribuinte do Cliente:");
+            if ( !nif.matches("^\\d{9}$")) {
+                System.out.println("Contribuinte Inválido! ( Ex: 252252252 )");
+                flag = false;
+            }
+            if(!clientes.isEmpty() && flag){
+                for (Cliente cliente : clientes) {
+                    if (cliente.getNif() == Integer.parseInt(nif)) {
+                        System.out.println("Contribuinte já existente! Tente novamente.");
+                        flag = false;
+                    }
+                }
+            }
         } while (!flag);
 
         nome = lerString("\nPor favor, insira o nome do Cliente: ");
@@ -205,7 +213,7 @@ public class TratamentoDados {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
         } while (!flag);
 
-        return new Cliente(id, nome, genero, nif, contacto,1);
+        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
     }
 
     /**
