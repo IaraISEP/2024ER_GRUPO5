@@ -144,6 +144,9 @@ public class TratamentoDados {
             mostraTabelaBibliotecas(bibliotecas);
     }
 
+    /**
+     * Metodo para gravar a lista de bibliotecas em ficheiro
+     * */
     public static void gravarArrayBibliotecas() throws IOException
     {
         // Verifica se a lista de clientes está vazia
@@ -166,10 +169,9 @@ public class TratamentoDados {
      * */
 
     /**
-     * Metodo para apresentar ao utilizador os dados
-     * que deve introduzir para criar ou editar um Cliente
+     * Metodo para requisitar ao utilizador os dados do Cliente
      * */
-    public static Cliente inserirDadosCliente(int id, Constantes.Etapa etapa)
+    public static Cliente inserirDadosCliente(int id)
     {
         int contacto;
         boolean flag;
@@ -209,19 +211,28 @@ public class TratamentoDados {
             contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
             flag=validarTamanho(String.valueOf(contacto),9);
 
-            if(!flag)
+            if(!flag) {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
+                continue;
+            }
+
+            for(Cliente cliente : clientes){
+                if(cliente.getContacto() == contacto){
+                    System.out.println("Contacto já existente! Tente novamente.");
+                    flag = false;
+                }
+            }
         } while (!flag);
 
         return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
     }
 
     /**
-     * Metodo para criar novo Cliente
+     * Metodo para adicionar um novo Cliente à lista.
      * */
     public static void criarCliente() throws IOException
     {
-        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1), Constantes.Etapa.CRIAR));
+        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1)));
         gravarArrayClientes();
     }
 
@@ -232,30 +243,23 @@ public class TratamentoDados {
      */
     public static void editarCliente() throws IOException
     {
-        // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()) {
             System.out.println("Não há clientes nesta biblioteca.");
             return;
         }
-
-        // Lista todos os clientes
         listaTodosClientes();
 
-        // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID do cliente que deseja editar: ", false, null);
 
-        // Procura o cliente pelo ID e, caso encontre, edita o cliente
-        for(int index = 0; index < clientes.size(); index++) {
-            if (clientes.get(index).getId() == idEditar) {
-                Cliente cliente = inserirDadosCliente(idEditar, Constantes.Etapa.EDITAR);
-                // Grava as alterações na Array dos clientes
-                clientes.set(index, cliente);
+        for(int i = 0; i < clientes.size(); i++) {
+            if (clientes.get(i).getId() == idEditar) {
+                Cliente cliente = inserirDadosCliente(idEditar);
+                clientes.set(i, cliente);
                 System.out.println("Cliente editado com sucesso!");
                 gravarArrayClientes();
                 return;
             }
         }
-
         System.out.println("ID não encontrado!");
     }
 
@@ -351,7 +355,6 @@ public class TratamentoDados {
      */
     public static void apagarClientePeloId() throws IOException
     {
-        // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()) {
             System.out.println("Não há clientes nesta biblioteca.");
             return;
@@ -383,6 +386,14 @@ public class TratamentoDados {
         for (Reserva reserva : reservas) {
            if (reserva.getCliente().equals(clienteApagar)) {
                 System.out.println("Não pode apagar um cliente com reservas ativas.");
+                return;
+            }
+        }
+
+        // Verifica se o cliente possui empréstimos ativos, caso tenha, o programa salta fora e não apaga cliente
+        for (Emprestimo emprestimo : emprestimos) {
+            if (emprestimo.getCliente().equals(clienteApagar)) {
+                System.out.println("Não pode apagar um cliente com empréstimos ativos.");
                 return;
             }
         }
@@ -1585,7 +1596,7 @@ public class TratamentoDados {
         //ao invés de se ter que percorrer listas.
         int idItem=0;
         int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
-        boolean idValido=false;
+        boolean idValido;
         
         do {
             switch (tipoItem) {
