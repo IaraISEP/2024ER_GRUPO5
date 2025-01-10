@@ -104,8 +104,8 @@ public class CriarMenu {
             TratamentoDados.listaTodosClientes();
             keyPress();
         }));
-        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por NIF", () -> {
-            TratamentoDados.listaClientePorNif();
+        menuListarClientes.adicionarOpcao(new OpcaoMenu("Listar Clientes por parâmetro.", () -> {
+            TratamentoDados.listaClientePorParametro();
             keyPress();
         }));
 

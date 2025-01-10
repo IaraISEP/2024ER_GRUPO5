@@ -276,38 +276,72 @@ public class TratamentoDados {
     public static void listaTodosClientes()
     {
         if (clientes.isEmpty())
-            System.out.println("Não existem clientes para mostrar.");
+            System.out.println("Não existem Clientes para mostrar.");
         else
             mostraTabelaClientes(clientes);
     }
 
     /**
-     * Lista um cliente pelo NIF fornecido.
+     * Lista um cliente pelo Nome, NIF ou Contacto fornecido.
      * Se o cliente for encontrado, exibe os detalhes do cliente.
-     * Caso contrário, exibe uma mensagem a informar que o NIF não existe.
      */
-    public static void listaClientePorNif()
+    public static void listaClientePorParametro()
     {
-        // Lê o NIF do cliente a ser encontrado
-        int idNif = lerInt("Digite o NIF do cliente que deseja encontrar: ", false, null);
-
-        // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
             System.out.println("Array vazio");
             return;
         }
-
-        // Procura o cliente pelo NIF
-        for(Cliente cliente : clientes) {
-            if (cliente.getNif() == idNif) {
-                List<Cliente> clienteComNif = new ArrayList<>();
-                clienteComNif.add(cliente);
-                mostraTabelaClientes(clienteComNif);
-                return;
+        do{
+            System.out.println("Escolha o parâmetro que deseja pesquisar: ");
+            System.out.println("1 - Nome\n2 - Contribuinte\n3 - Contacto\n0 - Sair");
+            int escolha = lerInt("Escolha uma opção: ", false, null);
+            switch (escolha){
+                case 1:
+                    String nome = lerString("Digite o Nome do Cliente que deseja encontrar: ");
+                    for (Cliente cliente : clientes) {
+                        if (cliente.getNome().toLowerCase().contains(nome.toLowerCase())) {
+                            mostraTabelaClientes(Collections.singletonList(cliente));
+                        }
+                    }
+                    break;
+                case 2:
+                    String nif;
+                    do {
+                        nif = lerString("\nPor favor, insira o Contribuinte do Cliente:");
+                        if ( !nif.matches("^\\d{9}$"))
+                            System.out.println("Contribuinte Inválido! ( Ex: 252252252 )");
+                        else
+                            break;
+                    } while (true);
+                    for (Cliente cliente : clientes) {
+                        if (cliente.getNif() == Integer.parseInt(nif)) {
+                            mostraTabelaClientes(Collections.singletonList(cliente));
+                        }
+                    }
+                    break;
+                case 3:
+                    String contacto;
+                    do {
+                        contacto = lerString("\nPor favor, insira o Contacto do Cliente:");
+                        if ( !contacto.matches("^\\d{9}$"))
+                            System.out.println("Contacto Inválido! ( Ex: 252252252 )");
+                        else
+                            break;
+                    } while (true);
+                    for (Cliente cliente : clientes) {
+                        if (cliente.getContacto() == Integer.parseInt(contacto)) {
+                            mostraTabelaClientes(Collections.singletonList(cliente));
+                        }
+                    }
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.\nPrima Enter para continuar...");
+                    input.nextLine();
+                    break;
             }
-        }
-
-        System.out.println("O NIF que inseriu não existe.");
+        }while (true);
     }
 
     /**
@@ -1976,7 +2010,7 @@ public class TratamentoDados {
                     isInt = true;
                 }
             } catch (Exception e) {
-                System.out.print("Número inserido não é válido.");
+                System.out.print("Número inserido não é válido.\n");
                 input.nextLine(); // necessário para limpar buffer
             }
         }
