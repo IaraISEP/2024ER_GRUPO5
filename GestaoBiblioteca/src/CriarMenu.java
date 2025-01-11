@@ -14,6 +14,14 @@ public class CriarMenu {
      */
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
+        //TODO : para passarmos a gerir a biblioteca, criar esta estrutura :
+        // Iniciar sessão na biblioteca
+        // Editar dados da biblioteca
+        // Criar nova biblioteca
+        // Fechar nova biblioteca
+        //o inicio de sessão na biblioteca é-nos levado a escolher qual a biblioteca, e mostra o demais menu (com cliente, livro, ...)
+        //após abrir a biblioteca, deve ser criada uma variável constante que guardará o id da biblioteca em "sessão"
+        //De forma a se utilizar em todos os métodos para separar a informação
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Bilioteca", CriarMenu::menuBiblioteca));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", CriarMenu::menuCliente));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", CriarMenu::menuLivro));
