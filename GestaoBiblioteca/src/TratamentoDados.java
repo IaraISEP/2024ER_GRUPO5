@@ -187,7 +187,7 @@ public class TratamentoDados {
             }
             if(!clientes.isEmpty() && flag){
                 for (Cliente cliente : clientes) {
-                    if (cliente.getNif() == Integer.parseInt(nif)) {
+                    if (cliente.getNif() == Integer.parseInt(nif) && cliente.getId() != id) {
                         System.out.println("Contribuinte já existente! Tente novamente.");
                         flag = false;
                     }
@@ -302,11 +302,14 @@ public class TratamentoDados {
             switch (escolha){
                 case 1:
                     String nome = lerString("Digite o Nome do Cliente que deseja encontrar: ");
+                    List<Cliente> clienteComNome = new ArrayList<>();
                     for (Cliente cliente : clientes) {
                         if (cliente.getNome().toLowerCase().contains(nome.toLowerCase())) {
-                            mostraTabelaClientes(Collections.singletonList(cliente));
+                            clienteComNome.add(cliente);
                         }
                     }
+
+                    mostraTabelaClientes(clienteComNome);
                     break;
                 case 2:
                     String nif;
@@ -332,11 +335,16 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
+                    
+                    List<Cliente> clienteComContacto = new ArrayList<>();
+                    
                     for (Cliente cliente : clientes) {
                         if (cliente.getContacto() == Integer.parseInt(contacto)) {
-                            mostraTabelaClientes(Collections.singletonList(cliente));
+                            clienteComContacto.add(cliente);
                         }
                     }
+                    
+                    mostraTabelaClientes(clienteComContacto);
                     break;
                 case 0:
                     return;
