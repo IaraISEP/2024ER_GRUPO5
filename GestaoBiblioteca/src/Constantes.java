@@ -134,6 +134,13 @@ public class Constantes {
     public enum Etapa {
         CRIAR,
         EDITAR,
+        LISTAR,
+        EXISTE,
+        EXISTEEDITAR,
+        APAGAR,
+        NOME,
+        CONTRIBUINTE,
+        CONTACTO,
         CONCLUIR,
         CANCELAR
     }

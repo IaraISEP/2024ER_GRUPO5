@@ -461,32 +461,6 @@ public class TratamentoDados {
         }
     }
 
-    /**
-     * Metodo para verificar se o NIF já se encontra
-     * atribuido a algum Cliente
-     * @param nif Recebe o valor introduzido pelo utilizador
-     * @param etapa Recebe o enum da etapa em questão (criação ou edição de utilizador)
-     * @param idCliente Recebe o id do cliente, para validar se ao editar está a repetir o ID dele mesmo ou a colocar um já existente mas de outro cliente
-     * */
-    public static int pesquisarNifArrayCliente(int nif, Constantes.Etapa etapa, int idCliente) {
-        if (!clientes.isEmpty()) {
-            for (Cliente cliente : clientes) {
-                if (cliente.getNif() == nif) {
-                    //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
-                    //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
-                    if (etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
-                        System.out.println("Contribuinte existente!");
-                        return 0;
-                    } else if (cliente.getNif() == nif) {
-                        return nif;
-                    }
-                }
-            }
-        }
-
-        return nif;
-    }
-
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - FIM #################################################
      * */
@@ -731,7 +705,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL, Constantes.Etapa.CRIAR));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -740,7 +714,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA, Constantes.Etapa.CRIAR));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -748,27 +722,23 @@ public class TratamentoDados {
     /**
      * Solicita os dados do usuário para criar ou editar um jornal/revista.
      */
-    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem) {
+    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem, Constantes.Etapa etapa) {
         String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
         String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
         Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
         int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
-        String issn;
-        boolean flag;
         do {
-            issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
-            flag = validarTamanho(issn, 9);
-            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
-                System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
-                flag = false;
+            String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+            if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
+                System.out.println("ISNN Invalido! ( Ex: 1111-111X )");
+                continue;
             }
-            if (issn.equals(pesquisarIssn(issn, tipoItem)) && flag) {
-                System.out.println("ISNN já existe! Tente novamente.");
-                flag = false;
+            if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
+                System.out.println("ISSN já existe! Tente novamente.");
             }
-        }while(!flag);
-
-        return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+            else
+                return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+        }while(true);
     }
 
     public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
@@ -805,7 +775,7 @@ public class TratamentoDados {
         if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
                 if (jornal.getIssn().equals(issn)) {
-                    mostraTabelaJornalRevista(Collections.singletonList(jornal));
+
                     return;
                 }
             }
@@ -870,79 +840,55 @@ public class TratamentoDados {
      * Edita os dados de uma REVISTA ou JORNAL existente.
      */
     public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
-        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
-            System.out.println("Não existem Revistas nesta Biblioteca.");
-            return;
-        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem Jornais nesta Biblioteca.");
-        }
-
-
         listaTodosJornalRevista(tipoItem);
-        int idEditarJornalRevista = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar: ", false, null);
-
-        if (tipoItem == Constantes.TipoItem.REVISTA) {
-            for (JornalRevista jornalRevista : revistas) {
-                if (jornalRevista.getId() == idEditarJornalRevista) {
-                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
-                    System.out.println("Revista editada com sucesso!");
-                    gravarArrayRevista();
-                    return;
-                }
+        do {
+            int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar\n0 - Sair\n", false, null);
+            if(idEditar == 0)
+                return;
+            if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
+                System.out.println("O(A) " + tipoItem.toString().toLowerCase() + " não existe.");
+                continue;
             }
-        }else{
-            for (JornalRevista jornalRevista : jornais) {
-                if (jornalRevista.getId() == idEditarJornalRevista) {
-                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
-                    System.out.println("Jornal editado com sucesso!");
-                    gravarArrayJornal();
-                    return;
-                }
+            if (pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.APAGAR)) {
+                System.out.println("Não pode editar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
+                continue;
             }
-        }
-        System.out.println("ID do " + tipoItem.toString().toLowerCase() + " não encontrado.");
+            else
+                pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTEEDITAR);
+            break;
+        }while(true);
+        if (tipoItem == Constantes.TipoItem.REVISTA)
+            gravarArrayRevista();
+        else
+            gravarArrayJornal();
+        System.out.println("ID do(a) " + tipoItem.toString().toLowerCase() + " editado(a) com sucesso.");
     }
 
     /**
      * Apaga uma REVISTA e JORNAL pelo ID.
      */
     public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
-        if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
-            System.out.println("Não existem Revistas nesta Biblioteca.");
-            return;
-        } else if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem Jornais nesta Biblioteca.");
-        }
         listaTodosJornalRevista(tipoItem);
-
-        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar: ", false, null);
-        JornalRevista jornalRevistaRemover = null;
-        if (tipoItem == Constantes.TipoItem.REVISTA) {
-            for (JornalRevista jornalRevista : revistas) {
-                if (jornalRevista.getId() == idApagar) {
-                    jornalRevistaRemover = jornalRevista;
-                    break;
-                }
+        do {
+            int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar\n0 - Sair\n", false, null);
+            if(idApagar == 0)
+                return;
+            if (!pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.EXISTE)) {
+                System.out.println("O " + tipoItem.toString().toLowerCase() + " não existe.");
+                continue;
             }
-        } else if (tipoItem == Constantes.TipoItem.JORNAL) {
-            for (JornalRevista jornalRevista : jornais) {
-                if (jornalRevista.getId() == idApagar) {
-                    jornalRevistaRemover = jornalRevista;
-                    break;
-                }
+            if (pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR)) {
+                System.out.println("Não pode apagar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
+                continue;
             }
-        }
-        if (jornalRevistaRemover == null) {
-            System.out.println("ID "+ tipoItem.toString().toLowerCase() +" não encontrado.");
-            return;
-        }
-        if(tipoItem == Constantes.TipoItem.REVISTA){
-            revistas.remove(jornalRevistaRemover);
+            else
+                pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR);
+            break;
+        }while(true);
+        if(tipoItem == Constantes.TipoItem.REVISTA)
             gravarArrayRevista();
-        }else if (tipoItem == Constantes.TipoItem.JORNAL){
-            jornais.remove(jornalRevistaRemover);
+        else
             gravarArrayJornal();
-        }
         System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
     }
 
@@ -1327,8 +1273,9 @@ public class TratamentoDados {
                     idValido = validarIdJornal(idItem);
                     for (ReservaLinha reservaLinha : reservasLinha) {
                         if (reservaLinha.getIdItem() == idItem ) {
-                            if (reservaLinha.getEstado() != estado){
+                            if (reservaLinha.getEstado() != estado){ //???????????????????????????????
                                 estado = Constantes.Estado.RESERVADO;
+                                break;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
                                 reservas.remove(reservas.getLast());
@@ -1336,6 +1283,7 @@ public class TratamentoDados {
                             }
                         }
                     }
+                    estado=Constantes.Estado.RESERVADO; //FIX TEMPORARIO
                     break;
                 default:
                     throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
@@ -1364,7 +1312,7 @@ public class TratamentoDados {
                     Integer.toString(reservaLinha.getIdReserva()),
                     reservaLinha.getTipoItem().toString(),
                     Integer.toString(reservaLinha.getIdItem()),
-                    reservaLinha.getEstado() + "\n"));
+                    reservaLinha.getEstado().toString() + "\n"));
         }
     }
 
@@ -2688,25 +2636,57 @@ public class TratamentoDados {
     }
 
     /**
-     * Pesquisa um ISnN na lista de jornais ou revistas.
+     * Efetua algum tipo de pesquisa nos jornais ou revistas.
      */
-    private static String pesquisarIssn(String issn, Constantes.TipoItem tipoItem)
+    public static Boolean pesquisarJornalRevista(int id, String issn, Constantes.TipoItem tipoItem, Constantes.Etapa etapa)
     {
         if(tipoItem==Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornalRevista : jornais) {
-                if (jornalRevista.getIssn().equals(issn)) {
-                    return issn;
+                if (etapa == Constantes.Etapa.EXISTE && jornalRevista.getId() == id)
+                    return true;
+                if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
+                    return true;
+                if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
+                    mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
+                if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
+                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
+                if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
+                    return jornalRevista.getId() != id;
+                if(etapa == Constantes.Etapa.APAGAR) {
+                    for(ReservaLinha reservaLinha : reservasLinha)
+                        if(reservaLinha.getIdItem()==id && reservaLinha.getTipoItem()==tipoItem && reservaLinha.getEstado()==Constantes.Estado.RESERVADO)
+                            return true;
+                    for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                        if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
+                            return true;
+                    jornais.remove(jornalRevista);
                 }
             }
         }
         else {
             for (JornalRevista jornalRevista : revistas) {
-                if (jornalRevista.getIssn().equals(issn)) {
-                    return issn;
+                if (etapa == Constantes.Etapa.EXISTE && jornalRevista.getId() == id)
+                    return true;
+                if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
+                    return true;
+                if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
+                    mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
+                if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
+                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
+                if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
+                    return jornalRevista.getId() != id;
+                if(etapa == Constantes.Etapa.APAGAR) {
+                    for(ReservaLinha reservaLinha : reservasLinha)
+                        if(reservaLinha.getIdItem()==id && reservaLinha.getTipoItem()==tipoItem && reservaLinha.getEstado()==Constantes.Estado.RESERVADO)
+                            return true;
+                    for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                        if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
+                            return true;
+                    revistas.remove(jornalRevista);
                 }
             }
         }
-        return null;
+        return false;
     }
 
     public static Cliente validarCliente(Constantes.ValidacaoCliente validacaoCliente, int valor)
