@@ -141,6 +141,9 @@ public class Constantes {
         NOME,
         CONTRIBUINTE,
         CONTACTO,
+        JORNAL,
+        REVISTA,
+        CLIENTE,
         CONCLUIR,
         CANCELAR
     }
