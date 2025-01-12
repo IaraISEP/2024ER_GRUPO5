@@ -1980,19 +1980,17 @@ public class TratamentoDados {
                 valor = input.nextInt();
                 input.nextLine(); // necessário para limpar buffer
                 if (isDate) {
-                    //TODO :
-                    //  Podemos criar um easter egg aqui, com base no tipo de item (livro, revista, jornal)
-                    //  Primeiro livro impresso, assim como os conhecemos, em 1455 em Mainz, foi a A Bíblia de Gutenberg
-                    //  Primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605 em Strasbourg.
-                    //  Primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731 em Londres.
-                    if (valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO)
+                    if (valor > 0 && 
+                        ((valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO) || 
+                        (valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL) ||
+                        (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
                         isInt = true;
-                    else if(valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL)
-                        isInt = true;
-                    else if(valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)
-                        isInt = true;
-                    else
-                        System.out.print("Por favor, insira um ano válido (yyyy): ");
+                    else if(valor > 0 && valor <= 1455 && tipoItem == Constantes.TipoItem.LIVRO)
+                        System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha.\nPor favor, insira um ano válido (>= 1455): ");
+                    else if(valor > 0 && valor <= 1605 && tipoItem == Constantes.TipoItem.JORNAL)
+                        System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França.\nPor favor, insira um ano válido (>= 1605): ");
+                    else if(valor > 0 && valor <= 1731 && tipoItem == Constantes.TipoItem.REVISTA)
+                        System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra.\nPor favor, insira um ano válido (>= 1731): ");
                 } else {
                     isInt = true;
                 }
