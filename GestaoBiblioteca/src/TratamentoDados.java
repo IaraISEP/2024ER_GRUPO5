@@ -209,11 +209,11 @@ public class TratamentoDados {
 
         do {
             contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
-            flag=validarTamanho(String.valueOf(contacto),9);
-
-            if(!flag) {
+            if (!String.valueOf(contacto).matches("^[29]\\d{8}$")) {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
+                flag = false;
             }
+            flag=true;
         } while (!flag);
 
         return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
@@ -634,9 +634,9 @@ public class TratamentoDados {
         boolean flag;
         do {
             isbn = lerString("Insira o ISBN do livro: ");
-            flag = validarTamanho(isbn, 9);
+            flag = isbn.matches("\\d{9}[\\dX]") || isbn.matches("\\d{13}");
             if (!flag) {
-                System.out.println("ISBN Invalido! ( Ex: 1111-1111 )");
+                System.out.println("ISBN Invalido! ( Ex: 0306406152 ou 9780306406157 )");
                 continue;
             }
             if (isbn.equals(pesquisarIsbn(isbn, id))) {
