@@ -1310,7 +1310,7 @@ public class TratamentoDados {
             }
         } while (!idValido);
 
-        return new ReservaLinha(reservaLinhaId, reservaId, tipoItem, idItem, estado);
+        return new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, estado);
     }
 
     /**
@@ -1324,8 +1324,8 @@ public class TratamentoDados {
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
-                    Integer.toString(reservaLinha.getIdReservaLinha()),
                     Integer.toString(reservaLinha.getIdReserva()),
+                    Integer.toString(reservaLinha.getIdReservaLinha()),
                     reservaLinha.getTipoItem().toString(),
                     Integer.toString(reservaLinha.getIdItem()),
                     reservaLinha.getEstado().toString() + "\n"));
@@ -1349,8 +1349,8 @@ public class TratamentoDados {
 
             do {
                 String[] dados = linha.split(Constantes.SplitChar);
-                int reservaLinhaId = Integer.parseInt(dados[0]);
-                int reservaId = Integer.parseInt(dados[1]);
+                int reservaId = Integer.parseInt(dados[0]);
+                int reservaLinhaId = Integer.parseInt(dados[1]);
                 Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[2]);
                 int idItem = Integer.parseInt(dados[3]);
                 Constantes.Estado estado = Constantes.Estado.valueOf(dados[4]);
@@ -2352,8 +2352,8 @@ public class TratamentoDados {
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (ReservaLinha reservaLinha : listaDetalhesReservas) {
-            idReservaLinhaMaxLen = Math.max(idReservaLinhaMaxLen, String.valueOf(reservaLinha.getIdReservaLinha()).length());
             idReservaMaxLen = Math.max(idReservaMaxLen, String.valueOf(reservaLinha.getIdReserva()).length());
+            idReservaLinhaMaxLen = Math.max(idReservaLinhaMaxLen, String.valueOf(reservaLinha.getIdReservaLinha()).length());
             tipoItem = Math.max(tipoItem, String.valueOf(reservaLinha.getTipoItem()).length());
             idItemMaxLen = Math.max(idItemMaxLen, String.valueOf(reservaLinha.getIdItem()).length());
             estadoMaxLen = Math.max(estadoMaxLen, String.valueOf(reservaLinha.getEstado()).length());
@@ -2401,17 +2401,17 @@ public class TratamentoDados {
         }
         //
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + idReservaLinhaMaxLen + "s | %-" + idReservaMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + estadoMaxLen + "s | %-" + tituloMaxLen + "s | %-"
+        String formato = "| %-" + idReservaMaxLen + "s | %-" + idReservaLinhaMaxLen + "s | %-" + tipoItem + "s | %-" + idItemMaxLen + "s | %-" + estadoMaxLen + "s | %-" + tituloMaxLen + "s | %-"
                 + categoriaMaxLen + "s | %-" + editoraMaxLen + "s | %-" + issnMaxLen + "s | %-" + anoMaxLen +  "s | %-" + autorMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(idReservaLinhaMaxLen) + "-+-" + "-".repeat(idReservaMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
+        String separador = "+-" + "-".repeat(idReservaMaxLen) + "-+-" + "-".repeat(idReservaLinhaMaxLen) + "-+-" + "-".repeat(tipoItem) + "-+-" + "-".repeat(idItemMaxLen) + "-+-"
                 + "-".repeat(estadoMaxLen) + "-+-" + "-".repeat(tituloMaxLen) + "-+-" + "-".repeat(categoriaMaxLen) + "-+-"
                 + "-".repeat(editoraMaxLen) + "-+-" + "-".repeat(issnMaxLen) + "-+-" + "-".repeat(anoMaxLen) + "-+-" + "-".repeat(autorMaxLen)  + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Id Reserva Linha", "Id Reserva", "Tipo Item", "Id Item", "Estado", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor");
+        System.out.printf(formato, "Id Reserva", "Id Reserva Linha", "Tipo Item", "Id Item", "Estado", "Titulo", "Categoria", "Editora", "ISSN/ISBN", "Data Pub.", "Autor");
         //Imprime a linha de separação
         System.out.println(separador);
 
@@ -2462,9 +2462,9 @@ public class TratamentoDados {
                     break;
             }
             if(itemMostrar==null && idEmprestimo==0)
-                System.out.printf(formato, reservaLinha.getIdReservaLinha(), reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
+                System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getIdReservaLinha(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
             else if (reservaLinha.getIdReserva()==idEmprestimo && itemMostrar==null || idEmprestimo!=0 && reservaLinha.getIdItem()==idEmprestimo && reservaLinha.getTipoItem()==itemMostrar)
-                System.out.printf(formato, reservaLinha.getIdReservaLinha(), reservaLinha.getIdReserva(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
+                System.out.printf(formato, reservaLinha.getIdReserva(), reservaLinha.getIdReservaLinha(), reservaLinha.getTipoItem(), reservaLinha.getIdItem(), reservaLinha.getEstado(), titulo, categoria, editora, issn, anoEdicao, autor);
         }
         System.out.println(separador);
     }
