@@ -1258,7 +1258,7 @@ public class TratamentoDados {
         //ao invés de se ter que percorrer listas.
         int idItem=0;
         boolean idValido=false;
-        Constantes.Estado estado = Constantes.Estado.DISPONIVEL;
+        Constantes.Estado estado = Constantes.Estado.CONCLUIDO;
         int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
         
         do {
@@ -1269,7 +1269,7 @@ public class TratamentoDados {
                     idValido = validarIdLivro(idItem);
                     for (ReservaLinha reservaLinha : reservasLinha) {
                         if (reservaLinha.getIdItem() == idItem ) {
-                            if (reservaLinha.getEstado() == estado){
+                            if (reservaLinha.getEstado() != estado){
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
@@ -1300,7 +1300,7 @@ public class TratamentoDados {
                     idItem = lerInt("Insira o ID do Jornal: ", false, null);
                     idValido = validarIdJornal(idItem);
                     for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdItem() == idItem ) {
+                        if (reservaLinha.getIdItem() == idItem && reservaLinha.getIdReserva() == reservaId) {
                             if (reservaLinha.getEstado() != estado){ //???????????????????????????????
                                 estado = Constantes.Estado.RESERVADO;
                                 break;
@@ -1572,7 +1572,7 @@ public class TratamentoDados {
         //ao invés de se ter que percorrer listas.
         int idItem=0;
         int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
-        boolean idValido;
+        boolean idValido, avaiable;
         
         do {
             switch (tipoItem) {
@@ -1580,29 +1580,52 @@ public class TratamentoDados {
                     listaTodosLivros();
                     idItem = lerInt("Insira o ID do Livro: ", false, null);
                     idValido = validarIdLivro(idItem);
+                    avaiable = true;
+                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
+                            if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
+                                avaiable = false;
+                                break;
+                            }
+                        }
+                    }
                     for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
+                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
                             if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
                                 emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
                             }else{
                                 System.out.println("Já se encontra num Emprestimo!");
                                 break;
                             }
+                        }else {
+                            System.out.println("Jś se encontra numa Reserva");
                         }
                     }
+
                     break;
                 case REVISTA:
                         listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
                         idItem = lerInt("Insira o ID da Revista: ", false, null);
                         idValido = validarIdRevista(idItem);
+                        avaiable = true;
+                        for (ReservaLinha reservaLinha : reservasLinha) {
+                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem ) {
+                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
+                                    avaiable = false;
+                                    break;
+                                }
+                            }
+                        }
                         for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
+                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
                                 if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
                                     emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
                                 }else{
                                     System.out.println("Já se encontra num Emprestimo!");
                                     break;
                                 }
+                            }else {
+                                System.out.println("Jś se encontra numa Reserva");
                             }
                         }
                     break;
@@ -1610,6 +1633,15 @@ public class TratamentoDados {
                         listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
                         idItem = lerInt("Insira o ID do Jornal: ", false, null);
                         idValido = validarIdJornal(idItem);
+                        avaiable = true;
+                        for (ReservaLinha reservaLinha : reservasLinha) {
+                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && avaiable) {
+                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
+                                    avaiable = false;
+                                    break;
+                                }
+                            }
+                        }
                         for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
                             if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
                                 if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
@@ -1618,6 +1650,8 @@ public class TratamentoDados {
                                     System.out.println("Já se encontra num Emprestimo!");
                                     break;
                                 }
+                            }else {
+                                System.out.println("Jś se encontra numa Reserva");
                             }
                         }
                     break;
