@@ -213,14 +213,6 @@ public class TratamentoDados {
 
             if(!flag) {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
-                continue;
-            }
-
-            for(Cliente cliente : clientes){
-                if(cliente.getContacto() == contacto){
-                    System.out.println("Contacto já existente! Tente novamente.");
-                    flag = false;
-                }
             }
         } while (!flag);
 
@@ -483,7 +475,7 @@ public class TratamentoDados {
                     //Se o NIF existir, valida se a etapa em que estamos é a de criação de utilizador. Caso seja, não permite inserir esse NIF
                     //Caso a etapa seja Editar e o NIF existir, valida se o user em questão é o mesmo que estamos a editar, e permite o NIF, caso contrário retorna o erro
                     if (etapa == Constantes.Etapa.CRIAR || (etapa == Constantes.Etapa.EDITAR && cliente.getId() != idCliente)) {
-                        System.out.println("Nif existente!");
+                        System.out.println("Contribuinte existente!");
                         return 0;
                     } else if (cliente.getNif() == nif) {
                         return nif;
@@ -673,7 +665,7 @@ public class TratamentoDados {
                 System.out.println("ISBN Invalido! ( Ex: 1111-1111 )");
                 continue;
             }
-            if (isbn.equals(pesquisarIsbn(isbn))) {
+            if (isbn.equals(pesquisarIsbn(isbn, id))) {
                 System.out.println("ISBN já existe! Tente novamente.");
                 flag = false;
             }
@@ -687,9 +679,9 @@ public class TratamentoDados {
      * Pesquisa um ISBN na lista de livros.
      */
 
-    private static String pesquisarIsbn(String isbn) {
+    private static String pesquisarIsbn(String isbn, int id) {
         for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn)) {
+            if (livro.getIsbn().equals(isbn) && livro.getId() != id) {
                 return isbn;
             }
         }
@@ -975,7 +967,7 @@ public class TratamentoDados {
 
         // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
         do {
-            int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - NIF, 3 - Contacto): ", false, null);
+            int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - Contribuinte, 3 - Contacto): ", false, null);
             Constantes.ValidacaoCliente validacaoCliente;
             switch (opcao) {
                 case 1:
@@ -1545,7 +1537,7 @@ public class TratamentoDados {
         // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
         if(reserva == null) {
             do {
-                int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - NIF, 3 - Contacto): ", false, null);
+                int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - Contribuinte, 3 - Contacto): ", false, null);
                 Constantes.ValidacaoCliente validacaoCliente;
                 switch (opcao) {
                     case 1:
