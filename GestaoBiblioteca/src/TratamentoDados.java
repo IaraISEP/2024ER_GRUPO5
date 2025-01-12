@@ -798,24 +798,12 @@ public class TratamentoDados {
             return;
         }
 
-        String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar: ");
-
-        if (tipoItem == Constantes.TipoItem.JORNAL) {
-            for (JornalRevista jornal : jornais) {
-                if (jornal.getIssn().equals(issn)) {
-
-                    return;
-                }
-            }
-        } else {
-            for (JornalRevista revista : revistas) {
-                if (revista.getIssn().equals(issn)) {
-                    mostraTabelaJornalRevista(Collections.singletonList(revista));
-                    return;
-                }
-            }
-        }
-        System.out.println("O ISSN que inseriu não existe.");
+        do{
+            String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar\n0 - Sair\n");
+            if(issn.equals("0"))
+                return;
+            pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
+        }while (true);
     }
 
     /**
