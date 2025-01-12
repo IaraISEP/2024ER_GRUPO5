@@ -152,18 +152,6 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        /*
-        TODO:
-            Penso que seja possivel retirar estes menus daqui
-            e apenas usar o menu principal das Reservas / Emprestimos
-        menuLivro.adicionarOpcao(new OpcaoMenu("Reservar Livro", () -> {
-            System.out.println("Reservar Livro...");
-            keyPress();
-        }));
-        menuLivro.adicionarOpcao(new OpcaoMenu("Empréstimo Livro", () -> {
-            System.out.println("Empréstimo Livro...");
-            keyPress();
-        }));*/
 
         menuLivro.exibir();
     }
@@ -217,18 +205,6 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        /*
-        TODO:
-            Penso que seja possivel retirar estes menus daqui
-            e apenas usar o menu principal das Reservas / Emprestimos
-        menuJornal.adicionarOpcao(new OpcaoMenu("Reservar Jornal", () -> {
-            System.out.println("Reservar Jornal...");
-            keyPress();
-        }));
-        menuJornal.adicionarOpcao(new OpcaoMenu("Empréstimo Jornal", () -> {
-            System.out.println("Empréstimo Jornal...");
-            keyPress();
-        }));*/
 
         menuJornal.exibir();
     }
@@ -282,19 +258,6 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        /*
-        TODO:
-            Penso que seja possivel retirar estes menus daqui
-            e apenas usar o menu principal das Reservas / Emprestimos
-        menuRevista.adicionarOpcao(new OpcaoMenu("Reservar Revista", () -> {
-            System.out.println("Reservar Revista...");
-            keyPress();
-        }));
-        menuRevista.adicionarOpcao(new OpcaoMenu("Empréstimo Revista", () -> {
-            System.out.println("Empréstimo Revista...");
-            keyPress();
-        }));
-        */
         menuRevista.exibir();
     }
 
@@ -331,7 +294,13 @@ public class CriarMenu {
             keyPress();
         }));
 
-        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", CriarMenu::menuListarReservas));
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", () -> {
+            boolean flag = TratamentoDados.listaTodasReservas(null);
+            if (flag) {
+                CriarMenu.menuListarReservas();
+            }
+            keyPress();
+        }));
 
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             try {
@@ -347,12 +316,14 @@ public class CriarMenu {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            //TODO : A desenvolver
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
             try {
-                TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null), Constantes.Estado.CANCELADO, Constantes.Etapa.CANCELAR);
+                boolean flag = TratamentoDados.listaTodasReservas(null);
+                if (flag) {
+                    TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null), Constantes.Estado.CANCELADO, Constantes.Etapa.CANCELAR);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
