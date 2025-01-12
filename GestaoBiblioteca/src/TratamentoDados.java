@@ -1273,7 +1273,7 @@ public class TratamentoDados {
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
@@ -1284,12 +1284,12 @@ public class TratamentoDados {
                     idItem = lerInt("Insira o ID da Revista: ", false, null);
                     idValido = validarIdRevista(idItem);
                     for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdItem() == idItem ) {
+                        if (reservaLinha.getIdItem() == idItem && reservaLinha.getIdReserva() == reservaId) {
                             if (reservaLinha.getEstado() != estado){
                                 estado = Constantes.Estado.RESERVADO;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
@@ -1306,7 +1306,7 @@ public class TratamentoDados {
                                 break;
                             }else{
                                 System.out.println("Já se encontra numa Reserva!");
-                                reservas.remove(reservas.getLast());
+                                //reservas.remove(reservas.getLast());
                                 break;
                             }
                         }
@@ -1461,8 +1461,8 @@ public class TratamentoDados {
 
             do {
                 String[] dados = linha.split(Constantes.SplitChar);
-                int emprestimoLinhaId = Integer.parseInt(dados[0]);
-                int idEmprestimo = Integer.parseInt(dados[1]);
+                int idEmprestimo = Integer.parseInt(dados[0]);
+                int emprestimoLinhaId = Integer.parseInt(dados[1]);
                 Constantes.TipoItem tipoItem = Constantes.TipoItem.valueOf(dados[2]);
                 int idItem = Integer.parseInt(dados[3]);
                 Constantes.Estado estado = Constantes.Estado.valueOf(dados[4]);
@@ -1604,7 +1604,7 @@ public class TratamentoDados {
             }
         } while (!idValido);
 
-        return new EmprestimoLinha(emprestimoLinhaId, emprestimoId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+        return new EmprestimoLinha(emprestimoId, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
     }
 
     public static void gravarArrayEmprestimo() throws IOException
@@ -1637,8 +1637,8 @@ public class TratamentoDados {
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
-                    Integer.toString(emprestimoLinha.getIdEmprestimoLinha()),
                     Integer.toString(emprestimoLinha.getIdEmprestimo()),
+                    Integer.toString(emprestimoLinha.getIdEmprestimoLinha()),
                     emprestimoLinha.getTipoItem().toString(),
                     Integer.toString(emprestimoLinha.getIdItem()),
                     emprestimoLinha.getEstado().toString()+ "\n"));
