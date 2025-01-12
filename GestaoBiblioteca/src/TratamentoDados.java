@@ -198,7 +198,7 @@ public class TratamentoDados {
         nome = lerString("\nPor favor, insira o nome do Cliente: ");
 
         do {
-            char gen = lerChar("\nPor favor, insira o Genero do Cliente (M/F): ");
+            char gen = lerChar("\nPor favor, insira o Gênero do Cliente (M/F): ");
             flag = (gen == 'M' || gen == 'F');
             if (flag)
                 genero = Constantes.Genero.fromGenero(gen);
@@ -284,27 +284,38 @@ public class TratamentoDados {
     public static void listaClientePorParametro()
     {
         if(clientes.isEmpty()){
-            System.out.println("Array vazio");
+            System.out.println("Esta biblioteca não contém clientes.");
             return;
         }
+        
         do{
+            boolean hasClient = false;
             System.out.println("Escolha o parâmetro que deseja pesquisar: ");
             System.out.println("1 - Nome\n2 - Contribuinte\n3 - Contacto\n0 - Sair");
             int escolha = lerInt("Escolha uma opção: ", false, null);
             switch (escolha){
                 case 1:
-                    String nome = lerString("Digite o Nome do Cliente que deseja encontrar: ");
+                    String nome = lerString("\nDigite o Nome do Cliente que deseja encontrar: ");
+                    
                     List<Cliente> clienteComNome = new ArrayList<>();
                     for (Cliente cliente : clientes) {
                         if (cliente.getNome().toLowerCase().contains(nome.toLowerCase())) {
                             clienteComNome.add(cliente);
                         }
                     }
-
-                    mostraTabelaClientes(clienteComNome);
+                    
+                    if(clienteComNome.isEmpty()) {
+                        System.out.println("Cliente não encontrado."); 
+                        keyPress();
+                    }
+                    else {
+                        mostraTabelaClientes(clienteComNome);
+                        keyPress();
+                    }
                     break;
                 case 2:
                     String nif;
+                    
                     do {
                         nif = lerString("\nPor favor, insira o Contribuinte do Cliente:");
                         if ( !nif.matches("^\\d{9}$"))
@@ -312,10 +323,20 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
+                    
                     for (Cliente cliente : clientes) {
                         if (cliente.getNif() == Integer.parseInt(nif)) {
                             mostraTabelaClientes(Collections.singletonList(cliente));
+                            keyPress();
+                            hasClient = true;
+                            break;
                         }
+                    }
+                    
+                    if(!hasClient)
+                    {
+                        System.out.println("Cliente não encontrado.");
+                        keyPress();
                     }
                     break;
                 case 3:
@@ -335,14 +356,21 @@ public class TratamentoDados {
                             clienteComContacto.add(cliente);
                         }
                     }
-                    
-                    mostraTabelaClientes(clienteComContacto);
+
+                    if(clienteComContacto.isEmpty()){
+                        System.out.println("Cliente(s) não encontrado(s).");
+                        keyPress();
+                    }
+                    else {
+                        mostraTabelaClientes(clienteComContacto);
+                        keyPress();
+                    }
                     break;
                 case 0:
                     return;
                 default:
-                    System.out.println("Opção inválida! Tente novamente.\nPrima Enter para continuar...");
-                    input.nextLine();
+                    System.out.println("Opção inválida! Tente novamente.");
+                    keyPress();
                     break;
             }
         }while (true);
@@ -730,7 +758,7 @@ public class TratamentoDados {
         do {
             String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
             if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
-                System.out.println("ISNN Invalido! ( Ex: 1111-111X )");
+                System.out.println("ISSN Invalido! ( Ex: 1111-111X )");
                 continue;
             }
             if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
@@ -2012,15 +2040,6 @@ public class TratamentoDados {
     }
 
     /**
-     * Função para validar tamanho
-     * @param valor valor introduzido pelo utilizador
-     * @param tamanho Tamanho pre definido
-     * */
-    public static boolean validarTamanho(String valor, int tamanho){
-        return valor.length()==tamanho;
-    }
-
-    /**
      * Função para mostrar a lista de clientes da biblioteca
      * @param listaBibliotecas Recebe a lista de clientes, que pode ser inteira, ou apenas uma parte dela
      * */
@@ -2066,7 +2085,7 @@ public class TratamentoDados {
         int idMaxLen = "Id".length();
         int nifMaxLen = "NIF".length();
         int nomeMaxLen = "Nome".length();
-        int generoMaxLen = "Genero".length();
+        int generoMaxLen = "Gênero".length();
         int contactoMaxLen = "Contacto".length();
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
@@ -2086,7 +2105,7 @@ public class TratamentoDados {
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Id", "NIF", "Nome", "Genero", "Contacto");
+        System.out.printf(formato, "Id", "NIF", "Nome", "Gênero", "Contacto");
         //Imprime a linha de separação
         System.out.println(separador);
 
@@ -2794,6 +2813,10 @@ public class TratamentoDados {
         return true;
     }
 
+    private static void keyPress() {
+        System.out.println("\nPressione Enter para continuar...");
+        input.nextLine();
+    }
     /*
      * ########################################## HELPERS - FIM ########################################################
      * */
