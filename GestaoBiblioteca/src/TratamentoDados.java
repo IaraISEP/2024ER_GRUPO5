@@ -739,7 +739,7 @@ public class TratamentoDados {
      * Adiciona um novo jornal ao sistema.
      */
     public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL));
+        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL, Constantes.Etapa.CRIAR));
         System.out.println("Jornal criado com sucesso!");
         gravarArrayJornal();
     }
@@ -748,7 +748,7 @@ public class TratamentoDados {
      * Adiciona uma nova revista ao sistema.
      */
     public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA));
+        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA, Constantes.Etapa.CRIAR));
         System.out.println("Revista criada com sucesso!");
         gravarArrayRevista();
     }
@@ -756,27 +756,23 @@ public class TratamentoDados {
     /**
      * Solicita os dados do usuário para criar ou editar um jornal/revista.
      */
-    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem) {
+    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem, Constantes.Etapa etapa) {
         String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
         String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
         Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
         int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
-        String issn;
-        boolean flag;
         do {
-            issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
-            flag = validarTamanho(issn, 9);
-            if (!flag || !issn.matches("^\\d{4}-\\d{3}[A-Z0-9]$")) {
-                System.out.println("ISNN Invalido! ( Ex: 1111-111A )");
-                flag = false;
+            String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+            if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
+                System.out.println("ISNN Invalido! ( Ex: 1111-111X )");
+                continue;
             }
-            if (issn.equals(pesquisarIssn(issn, tipoItem)) && flag) {
-                System.out.println("ISNN já existe! Tente novamente.");
-                flag = false;
+            if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
+                System.out.println("ISSN já existe! Tente novamente.");
             }
-        }while(!flag);
-
-        return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+            else
+                return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+        }while(true);
     }
 
     public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
@@ -892,7 +888,7 @@ public class TratamentoDados {
         if (tipoItem == Constantes.TipoItem.REVISTA) {
             for (JornalRevista jornalRevista : revistas) {
                 if (jornalRevista.getId() == idEditarJornalRevista) {
-                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem, Constantes.Etapa.EDITAR));
                     System.out.println("Revista editada com sucesso!");
                     gravarArrayRevista();
                     return;
@@ -901,7 +897,7 @@ public class TratamentoDados {
         }else{
             for (JornalRevista jornalRevista : jornais) {
                 if (jornalRevista.getId() == idEditarJornalRevista) {
-                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem));
+                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(idEditarJornalRevista, tipoItem, Constantes.Etapa.EDITAR));
                     System.out.println("Jornal editado com sucesso!");
                     gravarArrayJornal();
                     return;
@@ -2698,7 +2694,7 @@ public class TratamentoDados {
     /**
      * Pesquisa um ISnN na lista de jornais ou revistas.
      */
-    private static String pesquisarIssn(String issn, Constantes.TipoItem tipoItem)
+    private static String pesquisarJornalRevista(int id, String issn, Constantes.TipoItem tipoItem, Constantes.Etapa etapa)
     {
         if(tipoItem==Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornalRevista : jornais) {

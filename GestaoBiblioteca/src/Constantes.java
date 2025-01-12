@@ -134,6 +134,9 @@ public class Constantes {
     public enum Etapa {
         CRIAR,
         EDITAR,
+        JORNAL,
+        REVISTA,
+        CLIENTE,
         CONCLUIR,
         CANCELAR
     }
