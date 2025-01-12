@@ -1364,7 +1364,7 @@ public class TratamentoDados {
                     Integer.toString(reservaLinha.getIdReserva()),
                     reservaLinha.getTipoItem().toString(),
                     Integer.toString(reservaLinha.getIdItem()),
-                    reservaLinha.getEstado().toString()) + "\n");
+                    reservaLinha.getEstado() + "\n"));
         }
     }
 
