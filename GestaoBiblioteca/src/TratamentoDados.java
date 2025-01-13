@@ -908,10 +908,9 @@ public class TratamentoDados {
             }
             if (pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR)) {
                 System.out.println("Não pode apagar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
-                continue;
             }
-            else
-                break;
+
+            break;
         }while(true);
         if(tipoItem == Constantes.TipoItem.REVISTA)
             gravarArrayRevista();
