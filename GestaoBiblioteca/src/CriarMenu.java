@@ -381,15 +381,15 @@ public class CriarMenu {
             keyPress();
         }));
         menuListagens.adicionarOpcao(new OpcaoMenu("Total de Reservas / Emprestimos por data", () -> {
-            System.out.println("Total de Reservas / Emprestimos ");
+            TratamentoDados.listarTodasReservasEmprestimoData();
             keyPress();
         }));
         menuListagens.adicionarOpcao(new OpcaoMenu("Tempo medio Reservas / Emprestimos por data", () -> {
-            System.out.println("Tempo medio Reservas / Emprestimos");
+            TratamentoDados.emprestimoMedioData();
             keyPress();
         }));
         menuListagens.adicionarOpcao(new OpcaoMenu("Tipo Item mais Reservado / Emprestado ( Data )", () -> {
-            System.out.println("Tipo Item mais Reservado / Emprestado");
+            TratamentoDados.itemMaisRequisitadoData();
             keyPress();
         }));
         menuListagens.exibir();

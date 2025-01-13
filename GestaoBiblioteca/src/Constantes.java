@@ -74,7 +74,8 @@ public class Constantes {
 
     public enum Genero {
         MASCULINO('M'),
-        FEMININO('F');
+        FEMININO('F'),
+        INDEFINIDO('I');
 
         private final char genero;
 

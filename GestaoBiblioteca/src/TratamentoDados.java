@@ -3,10 +3,9 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
-import java.util.Scanner;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
 /**
  * Representa Classe responsavel pelo tratamento de dados
  * @author ER_GRUPO_5
@@ -1162,8 +1161,8 @@ public class TratamentoDados {
     {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha;
-            Cliente cliente = null;
             while ((linha = readFile.readLine()) != null) {
+                Cliente cliente = null;
                 String[] dados = linha.split(Constantes.SplitChar);
                 int codBiblioteca = Integer.parseInt(dados[0]);
                 int codMovimento = Integer.parseInt(dados[1]);
@@ -1185,9 +1184,9 @@ public class TratamentoDados {
                         reservaLinha.add(resLinha);
                     }
                 }
-                
+                if(cliente == null)
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
-
                 reservas.add(reserva);
             }
         }
@@ -1513,12 +1512,12 @@ public class TratamentoDados {
     {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
-            Cliente cliente = null;
             if (linha == null) {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
             do {
+                Cliente cliente = null;
                 String[] dados = linha.split(Constantes.SplitChar);
                 int codBiblioteca = Integer.parseInt(dados[0]);
                 int codMovimento = Integer.parseInt(dados[1]);
@@ -1533,18 +1532,16 @@ public class TratamentoDados {
                         break;
                     }
                 }
+                if(cliente == null)
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
 
                 Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
-
                 emprestimos.add(emprestimo);
             }while ((linha = readFile.readLine()) != null);
         }
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-/*        for (Emprestimo emprestimo : emprestimos) {
-            System.out.println(emprestimo);
-        }*/
     }
 
     public static void listaTodosEmprestimos()
@@ -1978,8 +1975,8 @@ public class TratamentoDados {
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
-        LocalDate dataInicio = lerData("Insira a data inicio do intrevalo: ");
-        LocalDate dataFim = lerData("Insira a data fim do intrevalo: ");
+        LocalDate dataInicio = lerData("Insira a data inicio do intervalo: ");
+        LocalDate dataFim = lerData("Insira a data fim do intervalo: ");
 
         for (Reserva reserva : reservas){
             if (reserva.getCliente().getId() == idCliente && (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio) )&& (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim) )) {
@@ -2539,6 +2536,112 @@ public class TratamentoDados {
         }
 
         System.out.println(separador);
+    }
+
+    public static void itemMaisRequisitadoData(){
+        if(emprestimos.isEmpty() && reservas.isEmpty()) {
+            System.out.println("Não existem Emprestimos ou Reservas!");
+            return;
+        }
+        LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
+        LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
+
+
+        int diasMax=0, diasTemp=0, idItem=0;
+        Constantes.TipoItem tipoItem=null;
+        for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+            for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
+                if(emprestimoLinha.getIdItem()==emprestimoLinha1.getIdItem()&&emprestimoLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                    diasTemp++;
+            }
+            for (ReservaLinha reservaLinha : reservasLinha){
+                if(emprestimoLinha.getIdItem()==reservaLinha.getIdItem()&&emprestimoLinha.getTipoItem()==reservaLinha.getTipoItem())
+                    diasTemp++;
+            }
+            if(diasTemp>diasMax) {
+                diasMax = diasTemp;
+                idItem = emprestimoLinha.getIdItem();
+                tipoItem = emprestimoLinha.getTipoItem();
+            }
+            diasTemp=0;
+        }
+        for (ReservaLinha reservaLinha : reservasLinha){
+            for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
+                if(reservaLinha.getIdItem()==emprestimoLinha1.getIdItem()&&reservaLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                    diasTemp++;
+            }
+            for (ReservaLinha reservaLinha1 : reservasLinha){
+                if(reservaLinha1.getIdItem()==reservaLinha.getIdItem()&&reservaLinha1.getTipoItem()==reservaLinha.getTipoItem())
+                    diasTemp++;
+            }
+            if(diasTemp>diasMax) {
+                diasMax = diasTemp;
+                idItem = reservaLinha.getIdItem();
+                tipoItem = reservaLinha.getTipoItem();
+            }
+            diasTemp=0;
+        }
+        System.out.println("O item mais requisitado foi um(a) " + tipoItem.toString().toLowerCase() + " com um total de "+diasMax+" requisições:");
+        if (tipoItem == Constantes.TipoItem.LIVRO) {
+            for (Livro livro : livros) {
+                if (livro.getId() == idItem) {
+                    mostraTabelaLivros(Collections.singletonList(livro));
+                    break;
+                }
+            }
+        } else {
+            for (JornalRevista jornal : jornais) {
+                if (jornal.getId() == idItem) {
+                    mostraTabelaJornalRevista(Collections.singletonList(jornal));
+                    break;
+                }
+            }
+        }
+
+
+    }
+
+    public static void emprestimoMedioData(){
+        if(emprestimos.isEmpty()) {
+            System.out.println("Não existem Emprestimos!");
+            return;
+        }
+        LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
+        LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
+
+        int dias=0, i=0;
+        for(Emprestimo emprestimo : emprestimos)
+            if(emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim)){
+                dias+= (int) ChronoUnit.DAYS.between(emprestimo.getDataInicio(), emprestimo.getDataFim());
+                i++;
+            }
+        if(i!=0)
+            dias/=i;
+        System.out.println("O tempo médio foi de "+dias+" dias.");
+    }
+
+
+    public static void listarTodasReservasEmprestimoData(){
+        if(emprestimos.isEmpty() && reservas.isEmpty()) {
+            System.out.println("Não existem Emprestimos ou Reservas!");
+            return;
+        }
+        LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
+        LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
+
+        List<Reserva> listagemReserva = new ArrayList<>();
+        List<Emprestimo> listagemEmprestimo = new ArrayList<>();
+        for(Reserva reserva : reservas)
+            if(reserva.getDataInicio().isAfter(dataInicio) && reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataInicio) || reserva.getDataInicio().isEqual(dataFim))
+                listagemReserva.add(reserva);
+        for(Emprestimo emprestimo : emprestimos)
+            if(emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim))
+                listagemEmprestimo.add(emprestimo);
+
+        System.out.println("Reservas");
+        mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+        System.out.println("Emprestimos");
+        mostraTabelaEmprestimos(listagemEmprestimo);
     }
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
