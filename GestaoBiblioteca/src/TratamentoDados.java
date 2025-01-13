@@ -794,13 +794,17 @@ public class TratamentoDados {
             System.out.println("Não existem revistas para mostrar.");
             return;
         }
-
+        
+        boolean exists = false;
+                
         do{
-            String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar\n0 - Sair\n");
+            String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar (0 para voltar ao menu anterior) :");
+            
             if(issn.equals("0"))
                 return;
-            pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
-        }while (true);
+            
+            exists = pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
+        }while (!exists);
     }
 
     /**
@@ -3050,7 +3054,10 @@ public class TratamentoDados {
                 if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
                     return true;
                 if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
+                {
                     mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
+                    return true;
+                }
                 if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
                     jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
                 if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
@@ -3074,7 +3081,10 @@ public class TratamentoDados {
                 if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
                     return true;
                 if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
+                {
                     mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
+                    return true;
+                }
                 if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
                     revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
                 if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
