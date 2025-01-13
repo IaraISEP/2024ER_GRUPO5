@@ -29,6 +29,7 @@ public class CriarMenu {
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Revista", CriarMenu::menuRevista));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Reservas", CriarMenu::menuReservas));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Emprestimos", CriarMenu::menuEmprestimos));
+        menuPrincipal.adicionarOpcao(new OpcaoMenu("Listagens", CriarMenu::menuListagens));
         menuPrincipal.exibir();
     }
 
@@ -367,6 +368,31 @@ public class CriarMenu {
         }));
 
         menuEmprestimos.exibir();
+    }
+    private static void menuListagens(){
+        Menu menuListagens = new Menu("Listagens de Reservas / Emprestimos");
+
+        menuListagens.adicionarOpcao(new OpcaoMenu("Listar Reservas / Emprestimos do Cliente", () -> {
+            TratamentoDados.listarTodasReservasEmprestimoCliente();
+            keyPress();
+        }));
+        menuListagens.adicionarOpcao(new OpcaoMenu("Listar Reservas / Emprestimos do Cliente por data", () -> {
+            TratamentoDados.listarTodasReservasEmprestimoClienteData();
+            keyPress();
+        }));
+        menuListagens.adicionarOpcao(new OpcaoMenu("Total de Reservas / Emprestimos por data", () -> {
+            System.out.println("Total de Reservas / Emprestimos ");
+            keyPress();
+        }));
+        menuListagens.adicionarOpcao(new OpcaoMenu("Tempo medio Reservas / Emprestimos por data", () -> {
+            System.out.println("Tempo medio Reservas / Emprestimos");
+            keyPress();
+        }));
+        menuListagens.adicionarOpcao(new OpcaoMenu("Tipo Item mais Reservado / Emprestado ( Data )", () -> {
+            System.out.println("Tipo Item mais Reservado / Emprestado");
+            keyPress();
+        }));
+        menuListagens.exibir();
     }
 
     /**

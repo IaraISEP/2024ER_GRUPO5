@@ -127,10 +127,10 @@ public class TratamentoDados {
             System.out.println(e.getMessage());
         }
 
-        // Imprime todos os clientes
-        for (Biblioteca biblioteca : bibliotecas) {
+        // Imprime todos as Bibliotecas
+/*        for (Biblioteca biblioteca : bibliotecas) {
             System.out.println(biblioteca);
-        }
+        }*/
     }
 
     /**
@@ -484,9 +484,9 @@ public class TratamentoDados {
         }
 
         // Imprime todos os clientes
-        for (Cliente cliente : clientes) {
+/*        for (Cliente cliente : clientes) {
             System.out.println(cliente);
-        }
+        }*/
     }
 
     /*
@@ -996,6 +996,8 @@ public class TratamentoDados {
         if (clientes.isEmpty()){
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
+        }else {
+            mostraTabelaClientes(clientes);
         }
 
         //Atribui automaticamente o Id com base no último Id existente.
@@ -1192,9 +1194,9 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-        for (Reserva reserva : reservas) {
+/*        for (Reserva reserva : reservas) {
             System.out.println(reserva);
-        }
+        }*/
     }
 
     public static boolean listaTodasReservas(Constantes.Etapa etapa)
@@ -1478,9 +1480,9 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-        for (Reserva reserva : reservas) {
+/*        for (Reserva reserva : reservas) {
             System.out.println(reserva);
-        }
+        }*/
     }
 
     /**
@@ -1540,9 +1542,9 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-        for (Emprestimo emprestimo : emprestimos) {
+/*        for (Emprestimo emprestimo : emprestimos) {
             System.out.println(emprestimo);
-        }
+        }*/
     }
 
     public static void listaTodosEmprestimos()
@@ -1578,9 +1580,9 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+/*        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
             System.out.println(emprestimoLinha);
-        }
+        }*/
     }
 
     /**
@@ -1924,6 +1926,91 @@ public class TratamentoDados {
      * */
 
     /*
+     * ############################### TRATAMENTO DE DADOS LISTAGENS - INICIO ##############################################
+     * */
+
+    public static void listarTodasReservasEmprestimoCliente() {
+        if (clientes.isEmpty())
+        {
+            System.out.println("Não existem Clientes !");
+        }else
+        {
+            mostraTabelaClientes(clientes);
+        }
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos: ",false,null);
+
+        List<Reserva> listagemReserva = new ArrayList<>();
+        List<Emprestimo> listagemEmprestimo = new ArrayList<>();
+
+        for (Reserva reserva : reservas){
+            if (reserva.getCliente().getId() == idCliente) {
+                listagemReserva.add(reserva);
+            }
+        }
+        for (Emprestimo emprestimo : emprestimos){
+            if (emprestimo.getCliente().getId() == idCliente) {
+                listagemEmprestimo.add(emprestimo);
+            }
+        }
+        if (listagemReserva.isEmpty()){
+            System.out.println("Não existem Reservas desse cliente!");
+        }else{
+            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+        }
+        if (listagemEmprestimo.isEmpty()){
+            System.out.println("Não existem Emprestimos desse cliente!");
+        }else{
+            mostraTabelaEmprestimos(listagemEmprestimo);
+        }
+
+    }
+
+    public static void listarTodasReservasEmprestimoClienteData() {
+        if (clientes.isEmpty())
+        {
+            System.out.println("Não existem Clientes !");
+        }else
+        {
+            mostraTabelaClientes(clientes);
+        }
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos",false,null);
+
+        List<Reserva> listagemReserva = new ArrayList<>();
+        List<Emprestimo> listagemEmprestimo = new ArrayList<>();
+
+        LocalDate dataInicio = lerData("Insira a data inicio do intrevalo: ");
+        LocalDate dataFim = lerData("Insira a data fim do intrevalo: ");
+
+        for (Reserva reserva : reservas){
+            if (reserva.getCliente().getId() == idCliente && (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio) )&& (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim) )) {
+                listagemReserva.add(reserva);
+            }
+        }
+        for (Emprestimo emprestimo : emprestimos){
+            if (emprestimo.getCliente().getId() == idCliente && (emprestimo.getDataInicio().isAfter(dataInicio) || emprestimo.getDataInicio().isEqual(dataInicio) )&& (emprestimo.getDataFim().isBefore(dataFim) || emprestimo.getDataFim().isEqual(dataFim) )) {
+                listagemEmprestimo.add(emprestimo);
+            }
+        }
+        if (listagemReserva.isEmpty()){
+            System.out.println("Não existem Reservas desse cliente nessas datas!");
+        }else{
+            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+        }
+        if (listagemEmprestimo.isEmpty()){
+            System.out.println("Não existem Emprestimos desse cliente nessas datas!");
+        }else{
+            mostraTabelaEmprestimos(listagemEmprestimo);
+        }
+
+    }
+
+    /*
+     * ############################### TRATAMENTO DE DADOS LISTAGENS - FIM ##############################################
+     * */
+
+
+
+    /*
      * ######################################## HELPERS - INICIO #######################################################
      * */
 
@@ -2017,8 +2104,13 @@ public class TratamentoDados {
                     flag=false;
                 }
             else{
+                try{
                 reservasLinha.add(inserirDetalhesReserva(id, tipoItem));
                 flag=true;
+                }catch (IllegalArgumentException e){
+                    System.out.println("Item já emprestado/reservado.");
+                    flag=false;
+                }
             }
             if(flag) {
                 int opcao = lerInt("Deseja acrescentar mais Items a(o) " + emprestimoReserva.toString().toLowerCase() + "? (1 - Sim, 2 - Não): ", false, null);
@@ -2721,6 +2813,7 @@ public class TratamentoDados {
 
         System.out.println(separador);
     }
+
 
     public static Constantes.Categoria selecionaCategoria(String mensagem)
     {
