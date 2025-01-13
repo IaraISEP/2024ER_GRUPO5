@@ -1124,14 +1124,9 @@ public class TratamentoDados {
      * */
     public static void cancelarReserva(int idCancelar, Constantes.Estado estado, Constantes.Etapa etapa) throws IOException
     {
-        
         boolean hasReservas = hasReservas();        
         if(!hasReservas) return;
         
-        // Lista todos os clientes
-        listaTodasReservas(etapa);
-
-        //int idCancelar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
         for (Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idCancelar) {
                 reserva.setEstado(estado);
@@ -1142,7 +1137,7 @@ public class TratamentoDados {
                 }
             }
         }
-        
+
         gravarArrayReservas();
         gravarArrayReservaLinha();
     }
@@ -1446,7 +1441,7 @@ public class TratamentoDados {
     public static void criarFicheiroCsvReservasLinha(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
-            fw.write(String.join(";",
+            fw.write(String.join(Constantes.SplitChar,
                     Integer.toString(reservaLinha.getIdReserva()),
                     Integer.toString(reservaLinha.getIdReservaLinha()),
                     reservaLinha.getTipoItem().toString(),
@@ -2375,7 +2370,6 @@ public class TratamentoDados {
 
     public static void mostraTabelaReservas(List<Reserva> listaReservas, Constantes.Etapa etapa)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id".length();
         int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
@@ -2405,9 +2399,10 @@ public class TratamentoDados {
         //Imprime a linha de separação
         System.out.println(separador);
 
-        //Imprime os dados dos clientes
+        //Imprime os dados das Reservas
         for (Reserva reserva : listaReservas) {
-            if ((etapa != Constantes.Etapa.CONCLUIR && etapa != Constantes.Etapa.CANCELAR) || ((etapa == Constantes.Etapa.CONCLUIR || etapa == Constantes.Etapa.CANCELAR) && reserva.getEstado() == Constantes.Estado.RESERVADO))
+            if ((etapa != Constantes.Etapa.CONCLUIR && etapa != Constantes.Etapa.CANCELAR) || 
+                ((etapa == Constantes.Etapa.CONCLUIR || etapa == Constantes.Etapa.CANCELAR) && reserva.getEstado() == Constantes.Estado.RESERVADO))
                 System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
         }
 
