@@ -794,15 +794,15 @@ public class TratamentoDados {
             System.out.println("Não existem revistas para mostrar.");
             return;
         }
-        
+
         boolean exists = false;
-                
+
         do{
             String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar (0 para voltar ao menu anterior) :");
-            
+
             if(issn.equals("0"))
                 return;
-            
+
             exists = pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
         }while (!exists);
     }
@@ -1612,13 +1612,11 @@ public class TratamentoDados {
      * */
     public static void criarEmprestimo() throws IOException
     {
-        //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
+        int opcao=0;
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
             System.out.println("Não existem Items nesta Biblioteca");
             return;
         }
-        //Mostra mensagem a informar que não tem cliente.
-        //TODO : Ao invés de não deixar prosseguir, pode perguntar se deseja criar um novo cliente e prosseguir para a sua criação.
         if (clientes.isEmpty()){
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
@@ -1631,7 +1629,10 @@ public class TratamentoDados {
         emprestimos.add(inserirDadosEmprestimo(idEmprestimo, null));
         Emprestimo emprestimo = emprestimos.getLast();
 
-        criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO);
+        do{
+            criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO);
+            opcao= lerInt("Deseja adicionar mais Items ao Emprestimo? (1 - Sim, 2 - Não)", false, null);
+        }while(opcao!=2);
 
         System.out.println("Emprestimo criada com sucesso!");
 
@@ -1669,9 +1670,6 @@ public class TratamentoDados {
                     System.out.println("Cliente não encontrado. Tente novamente.");
                 }
             } while (cliente == null);
-
-            // Introdução das datas.
-            // É validado se a data final prevista introduzida é inferior à início e superior ao limite estipulado.
             do {
                 dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
                 if (dataPrevFim.isBefore(Constantes.getDatahoje())) {
@@ -1725,10 +1723,9 @@ public class TratamentoDados {
                                 break;
                             }
                         }else {
-                            System.out.println("Jś se encontra numa Reserva");
+                            System.out.println("Já se encontra numa Reserva");
                         }
                     }
-
                     break;
                 case REVISTA:
                         listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
@@ -1995,13 +1992,18 @@ public class TratamentoDados {
         {
             mostraTabelaClientes(clientes);
         }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos",false,null);
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Emprestimos",false,null);
 
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
         LocalDate dataInicio = lerData("Insira a data inicio do intervalo: ");
         LocalDate dataFim = lerData("Insira a data fim do intervalo: ");
+
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         for (Reserva reserva : reservas){
             if (reserva.getCliente().getId() == idCliente && (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio) )&& (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim) )) {
@@ -2073,16 +2075,15 @@ public class TratamentoDados {
     public static Constantes.TipoItem criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException
     {
         Constantes.TipoItem tipoItem = null;
-        boolean flag=false, itemExists = true;
+        boolean flag=false, itemExists = false;
         do {
             do {
                 int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-
                 switch (tipoItemOpcao) {
                     case 1:
                         if (livros.isEmpty()) {
                             System.out.println("Não existem Livros para mostrar.");
-                            itemExists = false;
+                            continue;
                         }
                         else {
                             tipoItem = Constantes.TipoItem.LIVRO;
@@ -2092,17 +2093,15 @@ public class TratamentoDados {
                     case 2:
                         if (revistas.isEmpty()) {
                             System.out.println("Não existem Revistas para mostrar.");
-                            itemExists = false;
                         }
                         else {
                             tipoItem = Constantes.TipoItem.REVISTA;
                             itemExists = true;
                         }
-                    break;
+                        break;
                     case 3:
                         if (jornais.isEmpty()) {
                             System.out.println("Não existem Jornais para mostrar.");
-                            itemExists = false;
                         }
                         else {
                             tipoItem = Constantes.TipoItem.JORNAL;
@@ -2111,7 +2110,6 @@ public class TratamentoDados {
                         break;
                     default:
                         System.out.println("Opção inválida! Tente novamente.");
-                        itemExists = false;
                         break;
                 }
             } while (!itemExists);
@@ -2123,7 +2121,6 @@ public class TratamentoDados {
                     flag=true;
                 }catch (IllegalArgumentException e){
                     System.out.println("Item já emprestado/reservado.");
-                    flag=false;
                 }
             else{
                 try{
@@ -2131,7 +2128,6 @@ public class TratamentoDados {
                 flag=true;
                 }catch (IllegalArgumentException e){
                     System.out.println("Item já emprestado/reservado.");
-                    flag=false;
                 }
             }
             if(flag) {
@@ -2573,6 +2569,10 @@ public class TratamentoDados {
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
 
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         int diasMax=0, diasTemp=0, idItem=0;
         Constantes.TipoItem tipoItem=null;
@@ -2636,6 +2636,11 @@ public class TratamentoDados {
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
 
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
+
         int dias=0, i=0;
         for(Emprestimo emprestimo : emprestimos)
             if(emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim)){
@@ -2655,6 +2660,11 @@ public class TratamentoDados {
         }
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
+
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
@@ -3068,7 +3078,8 @@ public class TratamentoDados {
                     for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
-                    jornais.remove(jornalRevista);
+                    if(jornalRevista.getId()==id)
+                        jornais.remove(jornalRevista);
                     return false;
                 }
             }
@@ -3095,7 +3106,8 @@ public class TratamentoDados {
                     for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
-                    revistas.remove(jornalRevista);
+                    if(jornalRevista.getId()==id)
+                        revistas.remove(jornalRevista);
                     return false;
                 }
             }
