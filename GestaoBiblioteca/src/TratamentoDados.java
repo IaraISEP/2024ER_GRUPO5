@@ -1122,7 +1122,7 @@ public class TratamentoDados {
      * dos itens que lhe pertence
      *
      * */
-    public static void cancelarReserva(int idCancelar, Constantes.Estado estado, Constantes.Etapa etapa) throws IOException
+    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException
     {
         boolean hasReservas = hasReservas();        
         if(!hasReservas) return;
@@ -1951,7 +1951,7 @@ public class TratamentoDados {
                         EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
                         emprestimosLinha.add(emprestimoLinha);
 
-                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO, Constantes.Etapa.CONCLUIR);
+                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO);
                     }
                 }
             }
