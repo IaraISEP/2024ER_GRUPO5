@@ -1006,10 +1006,23 @@ public class TratamentoDados {
 
         criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA);
 
-        System.out.println("Reserva criada com sucesso!");
+        boolean reservaLinhaValida = false;
+        for (ReservaLinha reservalinha : reservasLinha){
+            if (reservalinha.getIdReserva() == reserva.getNumMovimento() && reservalinha.getEstado() != null){
+                reservaLinhaValida = true;
+            }
+        }
+        if (!reservaLinhaValida) {
+            System.out.println("Sem detalhes da reserva.");
+            reservas.remove(reservas.getLast());
+            reservasLinha.remove(reservasLinha.getLast());
+        }else{
+            System.out.println("Reserva criada com sucesso!");
+            gravarArrayReservaLinha();
+            gravarArrayReservas();
+        }
 
-        gravarArrayReservas();
-        gravarArrayReservaLinha();
+
     }
 
     public static void editarReserva() throws IOException
