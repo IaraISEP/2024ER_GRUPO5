@@ -29,7 +29,8 @@ public class Main {
             TratamentoDados.lerFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue());
             TratamentoDados.lerFicheiroCsvEmprestimosLinha(Constantes.Path.EMPRESTIMOLINHA.getValue());
             TratamentoDados.AtualizarAtrasoEmprestimo();
-            CriarMenu.menuPrincipal();
+
+            CriarMenu.menuLogin();
         } catch (IOException e) {
             System.err.println("Erro durante a execução: " + e.getMessage());
             e.printStackTrace();

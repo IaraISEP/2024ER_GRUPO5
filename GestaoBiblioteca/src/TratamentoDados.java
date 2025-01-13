@@ -26,6 +26,7 @@ public class TratamentoDados {
     private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<ReservaLinha> reservasLinha = new ArrayList<>();
+    private static int codBibliotecaLogin=0;
 
     /**
      * Metodo para criar a estrutura de ficheiros para
@@ -66,6 +67,32 @@ public class TratamentoDados {
             }
         }
     }
+
+    /*
+     * ########################### TRATAMENTO DE DADOS LOGIN - INICIO #################################################
+     * */
+
+    public static void fazerLogin() throws IOException {
+
+
+        if (!bibliotecas.isEmpty()){
+            int opcao = lerInt("Escolha a Biblioteca: ", false, null);
+            for (Biblioteca biblioteca : bibliotecas) {
+                if (biblioteca.getCodBiblioteca() == opcao){
+                    biblioteca.setCodBiblioteca(opcao);
+                    codBibliotecaLogin = biblioteca.getCodBiblioteca();
+                    CriarMenu.menuPrincipal();
+                }
+            }
+        }else {
+            criarBiblioteca();
+        }
+
+    }
+
+    /*
+     * ########################### TRATAMENTO DE DADOS LOGIN - FIM #################################################
+     * */
 
     /*
      * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
@@ -215,7 +242,7 @@ public class TratamentoDados {
             flag=true;
         } while (!flag);
 
-        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
+        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,codBibliotecaLogin);
     }
 
     /**
@@ -261,7 +288,7 @@ public class TratamentoDados {
     public static void criarFicheiroCsvCliente(String ficheiro, Cliente cliente, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
-            fw.write(cliente.getId() + ";" + cliente.getNome() + ";" + cliente.getGenero() + ";" + cliente.getNif() + ";" + cliente.getContacto() + "\n");
+            fw.write(cliente.getId() + ";" + cliente.getNome() + ";" + cliente.getGenero() + ";" + cliente.getNif() + ";" + cliente.getContacto() + ";" + cliente.getCodBiblioteca() + "\n");
         }
     }
 
@@ -440,6 +467,8 @@ public class TratamentoDados {
     public static void gravarArrayClientes() throws IOException {
         // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
+/*            File file = new File("Biblioteca_1/Clientes/clientes.csv");
+            file.delete();*/
             System.out.println("Array vazio");
         }
 
@@ -471,9 +500,10 @@ public class TratamentoDados {
                 Constantes.Genero genero = Constantes.Genero.fromGenero(dados[2].charAt(0));
                 int nif = Integer.parseInt(dados[3]);
                 int contacto = Integer.parseInt(dados[4]);
+                int codBibliotecaLogin = Integer.parseInt(dados[5]);
 
                 // Cria um novo objeto Cliente e adiciona à lista
-                Cliente cliente = new Cliente(id, nome, genero, nif, contacto, 1); //TODO : codBiblioteca a ser desenvolvido posteriormente
+                Cliente cliente = new Cliente(id, nome, genero, nif, contacto, codBibliotecaLogin); //TODO : codBiblioteca a ser desenvolvido posteriormente
                 clientes.add(cliente);
             }while ((linha = readFile.readLine()) != null);
         } catch (IOException e){
@@ -1196,7 +1226,7 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBibliotecaLogin);
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
                 reservas.add(reserva);
             }
@@ -1544,7 +1574,7 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBibliotecaLogin);
 
                 Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
                 emprestimos.add(emprestimo);
@@ -2257,8 +2287,6 @@ public class TratamentoDados {
                         System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França.\nPor favor, insira um ano válido (>= 1605): ");
                     else if(valor > 0 && valor <= 1731 && tipoItem == Constantes.TipoItem.REVISTA)
                         System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra.\nPor favor, insira um ano válido (>= 1731): ");
-                    else
-                        System.out.print("O ano não pode ser um número negativo...\nPor favor, insira um número válido (>= 0): ");
                 } else {
                     isInt = true;
                 }

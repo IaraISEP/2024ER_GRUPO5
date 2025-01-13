@@ -41,6 +41,23 @@ public class CriarMenu {
         input.nextLine();
     }
 
+    public static void menuLogin(){
+        Menu menuLogin = new Menu("Login");
+        menuLogin.adicionarOpcao(new OpcaoMenu("Listar Bibliotecas", () -> {
+            TratamentoDados.listaTodasBibliotecas();
+            try {
+                TratamentoDados.fazerLogin();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            //menuPrincipal();
+            keyPress();
+        }));
+        menuLogin.exibir();
+
+
+    }
+
     /**
      * Cria e exibe o menu de gestão de Bibliotecas.
      */
