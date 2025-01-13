@@ -853,6 +853,14 @@ public class TratamentoDados {
      * Edita os dados de uma REVISTA ou JORNAL existente.
      */
     public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais nesta Biblioteca.");
+            return;
+        }
+        else if(revistas.isEmpty()){
+            System.out.println("Não existem revistas nesta Biblioteca.");
+            return;
+        }
         listaTodosJornalRevista(tipoItem);
         do {
             int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar\n0 - Sair\n", false, null);
@@ -860,10 +868,6 @@ public class TratamentoDados {
                 return;
             if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
                 System.out.println("O(A) " + tipoItem.toString().toLowerCase() + " não existe.");
-                continue;
-            }
-            if (pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.APAGAR)) {
-                System.out.println("Não pode editar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
                 continue;
             }
             else
@@ -881,6 +885,14 @@ public class TratamentoDados {
      * Apaga uma REVISTA e JORNAL pelo ID.
      */
     public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais nesta Biblioteca.");
+            return;
+        }
+        else if(revistas.isEmpty()){
+            System.out.println("Não existem revistas nesta Biblioteca.");
+            return;
+        }
         listaTodosJornalRevista(tipoItem);
         do {
             int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar\n0 - Sair\n", false, null);
@@ -895,8 +907,7 @@ public class TratamentoDados {
                 continue;
             }
             else
-                pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR);
-            break;
+                break;
         }while(true);
         if(tipoItem == Constantes.TipoItem.REVISTA)
             gravarArrayRevista();
@@ -3052,6 +3063,7 @@ public class TratamentoDados {
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
                     jornais.remove(jornalRevista);
+                    return false;
                 }
             }
         }
@@ -3075,6 +3087,7 @@ public class TratamentoDados {
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
                     revistas.remove(jornalRevista);
+                    return false;
                 }
             }
         }
