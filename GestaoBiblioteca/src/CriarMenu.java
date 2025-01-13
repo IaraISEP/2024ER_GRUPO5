@@ -220,7 +220,7 @@ public class CriarMenu {
             keyPress();
         }));
         menuListarJornais.adicionarOpcao(new OpcaoMenu("Listar jornais por ISSN", () -> {
-            TratamentoDados.pesquisarJornalRevista(0,null, Constantes.TipoItem.JORNAL, Constantes.Etapa.LISTAR);
+            TratamentoDados.listaJornalRevistaPorIssn(Constantes.TipoItem.JORNAL);
             keyPress();
         }));
 
