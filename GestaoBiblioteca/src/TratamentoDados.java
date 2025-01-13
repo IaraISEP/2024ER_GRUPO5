@@ -2073,74 +2073,61 @@ public class TratamentoDados {
         gravarArrayEmprestimoLinha();
     }
 
-    public static Constantes.TipoItem criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException
+    public static void criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException
     {
         Constantes.TipoItem tipoItem = null;
-        boolean flag=false, itemExists = false;
+        boolean itemExists = false;
         do {
-            do {
-                int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-                switch (tipoItemOpcao) {
-                    case 1:
-                        if (livros.isEmpty()) {
-                            System.out.println("Não existem Livros para mostrar.");
-                            continue;
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.LIVRO;
-                            itemExists = true;
-                        }
-                        break;
-                    case 2:
-                        if (revistas.isEmpty()) {
-                            System.out.println("Não existem Revistas para mostrar.");
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.REVISTA;
-                            itemExists = true;
-                        }
-                        break;
-                    case 3:
-                        if (jornais.isEmpty()) {
-                            System.out.println("Não existem Jornais para mostrar.");
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.JORNAL;
-                            itemExists = true;
-                        }           
-                        break;
-                    default:
-                        System.out.println("Opção inválida! Tente novamente.");
-                        break;
-                }
-            } while (!itemExists);
-            
-            if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO)
-                try
-                {
-                    emprestimosLinha.add(inserirDetalhesEmprestimo(id,tipoItem));
-                    flag=true;
-                }catch (IllegalArgumentException e){
-                    System.out.println("Item já emprestado/reservado.");
-                }
-            else{
-                try{
-                reservasLinha.add(inserirDetalhesReserva(id, tipoItem));
-                flag=true;
-                }catch (IllegalArgumentException e){
-                    System.out.println("Item já emprestado/reservado.");
-                }
+            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            switch (tipoItemOpcao) {
+                case 1:
+                    if (livros.isEmpty()) {
+                        System.out.println("Não existem Livros para mostrar.");
+                        continue;
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.LIVRO;
+                        itemExists = true;
+                    }
+                    break;
+                case 2:
+                    if (revistas.isEmpty()) {
+                        System.out.println("Não existem Revistas para mostrar.");
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.REVISTA;
+                        itemExists = true;
+                    }
+                    break;
+                case 3:
+                    if (jornais.isEmpty()) {
+                        System.out.println("Não existem Jornais para mostrar.");
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.JORNAL;
+                        itemExists = true;
+                    }
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    break;
             }
-            if(flag) {
-                int opcao = lerInt("Deseja acrescentar mais Items a(o) " + emprestimoReserva.toString().toLowerCase() + "? (1 - Sim, 2 - Não): ", false, null);
+        } while (!itemExists);
 
-                if (opcao == 2)
-                    flag=true;
-                else
-                    flag=false;
+        if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO)
+            try
+            {
+                emprestimosLinha.add(inserirDetalhesEmprestimo(id,tipoItem));
+            }catch (IllegalArgumentException e){
+                System.out.println("Item já emprestado/reservado.");
             }
-        } while(!flag);
-        return tipoItem;
+        else{
+            try{
+            reservasLinha.add(inserirDetalhesReserva(id, tipoItem));
+            }catch (IllegalArgumentException e){
+                System.out.println("Item já emprestado/reservado.");
+            }
+        }
     }
 
     /**
@@ -3079,9 +3066,10 @@ public class TratamentoDados {
                     for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
-                    if(jornalRevista.getId()==id)
+                    if(jornalRevista.getId()==id) {
                         jornais.remove(jornalRevista);
-                    return false;
+                        return false;
+                    }
                 }
             }
         }
@@ -3107,9 +3095,10 @@ public class TratamentoDados {
                     for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
                         if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
                             return true;
-                    if(jornalRevista.getId()==id)
+                    if(jornalRevista.getId()==id) {
                         revistas.remove(jornalRevista);
-                    return false;
+                        return false;
+                    }
                 }
             }
         }
