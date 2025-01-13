@@ -294,14 +294,7 @@ public class CriarMenu {
             keyPress();
         }));
 
-        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", () -> {
-            boolean flag = TratamentoDados.listaTodasReservas(null);
-            if (flag) {
-                CriarMenu.menuListarReservas();
-            }
-            keyPress();
-        }));
-
+        menuReservas.adicionarOpcao(new OpcaoMenu("Listar Reservas", CriarMenu::menuListarReservas));
         menuReservas.adicionarOpcao(new OpcaoMenu("Editar Reserva", () -> {
             try {
                 TratamentoDados.editarReserva();
