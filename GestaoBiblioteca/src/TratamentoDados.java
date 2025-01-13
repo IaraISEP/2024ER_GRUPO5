@@ -863,7 +863,7 @@ public class TratamentoDados {
         }
         listaTodosJornalRevista(tipoItem);
         do {
-            int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar\n0 - Sair\n", false, null);
+            int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar (0 para voltar ao menu anterior) :", false, null);
             if(idEditar == 0)
                 return;
             if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
@@ -895,7 +895,7 @@ public class TratamentoDados {
         }
         listaTodosJornalRevista(tipoItem);
         do {
-            int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar\n0 - Sair\n", false, null);
+            int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar (0 para voltar ao menu anterior) :", false, null);
             if(idApagar == 0)
                 return;
             if (!pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.EXISTE)) {
@@ -2268,7 +2268,7 @@ public class TratamentoDados {
                         System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França.\nPor favor, insira um ano válido (>= 1605): ");
                     else if(valor > 0 && valor <= 1731 && tipoItem == Constantes.TipoItem.REVISTA)
                         System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra.\nPor favor, insira um ano válido (>= 1731): ");
-                    else
+                    else if(valor < 0)
                         System.out.print("O ano não pode ser um número negativo...\nPor favor, insira um número válido (>= 0): ");
                 } else {
                     isInt = true;
