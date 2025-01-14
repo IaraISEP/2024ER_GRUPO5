@@ -203,17 +203,16 @@ public class TratamentoDados {
                 genero = Constantes.Genero.fromGenero(gen);
             else
                 System.out.print("O gênero introduzido não é válido!");
-
         } while (!flag);
 
         do {
             contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
             if (!String.valueOf(contacto).matches("^[29]\\d{8}$")) {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
-                flag = false;
+                continue;
             }
-            flag=true;
-        } while (!flag);
+            break;
+        } while (true);
 
         return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
     }
@@ -589,14 +588,8 @@ public class TratamentoDados {
      * Grava a lista de livros em um arquivo CSV.
      */
     public static void gravarArrayLivros() throws IOException {
-        if (livros.isEmpty()) {
-            new File(Constantes.Path.LIVRO.getValue()).delete();
-            System.out.println("Biblioteca não tem contem livros.");
-            return;
-        }
-        for (int i = 0; i < livros.size(); i++) {
+        for (int i = 0; i < livros.size(); i++)
             criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
-        }
     }
 
     /**
@@ -811,28 +804,16 @@ public class TratamentoDados {
      * Grava a lista de jornais em um arquivo CSV.
      */
     public static void gravarArrayJornal() throws IOException {
-        if (jornais.isEmpty()) {
-            new File(Constantes.Path.JORNAL.getValue()).delete();
-            System.out.println("Lista de jornais vazia. Arquivo excluído.");
-            return;
-        }
-        for (int i = 0; i < jornais.size(); i++) {
+        for (int i = 0; i < jornais.size(); i++)
             criarFicheiroCsvJornalRevista(Constantes.Path.JORNAL.getValue(), jornais.get(i), i != 0);
-        }
     }
 
     /**
      * Grava a lista de revistas em um arquivo CSV.
      */
     public static void gravarArrayRevista() throws IOException {
-        if (revistas.isEmpty()) {
-            new File(Constantes.Path.REVISTA.getValue()).delete();
-            System.out.println("Lista de revistas vazia. Arquivo excluído.");
-            return;
-        }
-        for (int i = 0; i < revistas.size(); i++) {
+        for (int i = 0; i < revistas.size(); i++)
             criarFicheiroCsvJornalRevista(Constantes.Path.REVISTA.getValue(), revistas.get(i), i != 0);
-        }
     }
 
     /**
@@ -1140,8 +1121,7 @@ public class TratamentoDados {
 
     /**
      * Metodo para cancelar a reserva na totalidade ou apenas algunm
-     * dos itens que lhe pertence
-     *
+     * dos itens que lhe pertencem.
      * */
     public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException
     {
@@ -1205,7 +1185,7 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
                 Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
                 reservas.add(reserva);
             }
@@ -1231,11 +1211,6 @@ public class TratamentoDados {
 
     public static void gravarArrayReservas() throws IOException
     {
-        if(reservas.isEmpty()) {
-            new File(Constantes.Path.RESERVA.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
 
         for(int i = 0; i < reservas.size(); i++){
             criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
@@ -1350,11 +1325,6 @@ public class TratamentoDados {
      * */
     public static void gravarArrayReservaLinha() throws IOException
     {
-        if (reservasLinha.isEmpty()) {
-            new File(Constantes.Path.RESERVALINHA.getValue()).delete();
-            System.out.println("Array vazio");
-        }
-
         for (int i = 0; i < reservasLinha.size(); i++) {
             criarFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
         }
@@ -1393,7 +1363,7 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBiblioteca);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
 
                 Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
                 emprestimos.add(emprestimo);
@@ -1572,28 +1542,14 @@ public class TratamentoDados {
 
     public static void gravarArrayEmprestimo() throws IOException
     {
-        if(emprestimos.isEmpty()) {
-            new File(Constantes.Path.EMPRESTIMO.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
-
-        for(int i = 0; i < emprestimos.size(); i++){
+        for(int i = 0; i < emprestimos.size(); i++)
             criarFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue(), emprestimos.get(i), i != 0);
-        }
     }
 
     public static void gravarArrayEmprestimoLinha() throws IOException
     {
-        if(emprestimosLinha.isEmpty()) {
-            new File(Constantes.Path.EMPRESTIMOLINHA.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
-
-        for(int i = 0; i < emprestimosLinha.size(); i++){
+        for(int i = 0; i < emprestimosLinha.size(); i++)
             criarFicheiroCsvEmprestimosLinha(Constantes.Path.EMPRESTIMOLINHA.getValue(), emprestimosLinha.get(i), i != 0);
-        }
     }
 
     public static void criarFicheiroCsvEmprestimosLinha(String ficheiro, EmprestimoLinha emprestimoLinha, Boolean firstLine) throws IOException
@@ -2060,7 +2016,6 @@ public class TratamentoDados {
 
     /**
      * Lê uma data e hora preenchida pelo utilizador.
-     *
      * Este método solicita ao utilizador que insira uma data no formato "yyyy-MM-dd".
      * Continua a solicitar ao utilizador até que uma data válida seja introduzida.
      *
