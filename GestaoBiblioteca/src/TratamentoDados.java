@@ -1601,21 +1601,12 @@ public class TratamentoDados {
     }
 
     /**
-     * Editar Emprestimo
+     * Metodo para concluir empréstimo
      */
-    public static void EditarEmprestimo(Constantes.Etapa etapa) throws IOException {
+    public static void concluirCancelarEmprestimo(Constantes.Etapa etapa) throws IOException {
         boolean flag = false;
-        int idEditar, opcao;
-        LocalDate dataPrevFim;
-        // Verifica se a lista de clientes está vazia
-        if(emprestimos.isEmpty()) {
-            System.out.println("Não há reservas nesta biblioteca.");
-            return;
-        }
-
-        listaTodosEmprestimos();
         do {
-            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
+            int idEditar = lerInt("Escolha o ID do emprestimo que deseja " + etapa.toString().toLowerCase() + ": ", false, null);
             for (Emprestimo emprestimo : emprestimos) {
                 if (emprestimo.getNumMovimento() == idEditar) {
                     flag = true;
@@ -1636,6 +1627,37 @@ public class TratamentoDados {
                             }
                         }
                     }
+                }
+            }
+            if(!flag){
+                System.out.println("Id Inválido!");
+            }
+        } while (!flag);
+        System.out.println("Empréstimo "+ etapa.toString().toLowerCase() + " com sucesso!");
+        gravarArrayEmprestimo();
+        gravarArrayEmprestimoLinha();
+    }
+
+    /**
+     * Editar Emprestimo
+     */
+    public static void editarEmprestimo(Constantes.Etapa etapa) throws IOException {
+        boolean flag = false;
+        int idEditar, opcao;
+        LocalDate dataPrevFim;
+        // Verifica se a lista de clientes está vazia
+        if(emprestimos.isEmpty()) {
+            System.out.println("Não há reservas nesta biblioteca.");
+            return;
+        }
+
+        listaTodosEmprestimos();
+        do {
+            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
+            for (Emprestimo emprestimo : emprestimos) {
+                if (emprestimo.getNumMovimento() == idEditar) {
+                    flag = true;
+                    break;
                 }
             }
             if(!flag){

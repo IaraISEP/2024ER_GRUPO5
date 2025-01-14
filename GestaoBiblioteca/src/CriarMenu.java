@@ -344,7 +344,7 @@ public class CriarMenu {
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Listar Empréstimo", CriarMenu::menuListarEmprestimos));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.EDITAR);
+                TratamentoDados.editarEmprestimo(Constantes.Etapa.EDITAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -352,7 +352,7 @@ public class CriarMenu {
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Cancelar Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CANCELAR);
+                TratamentoDados.concluirCancelarEmprestimo(Constantes.Etapa.CANCELAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -360,7 +360,7 @@ public class CriarMenu {
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CONCLUIR);
+                TratamentoDados.concluirCancelarEmprestimo(Constantes.Etapa.CONCLUIR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
