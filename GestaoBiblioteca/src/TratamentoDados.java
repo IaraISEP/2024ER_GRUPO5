@@ -977,7 +977,7 @@ public class TratamentoDados {
      * */
     public static void criarReserva() throws IOException
     {
-        int opcao;
+        int opcao = 1;
         //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
             System.out.println("Não existem Items nesta Biblioteca");
@@ -1000,11 +1000,16 @@ public class TratamentoDados {
 
         boolean firstEntry = true;
         do{
-            if(!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry){
-                reservas.remove(reservas.getLast());
-                return;
+            if(opcao < 1 || opcao > 2){
+                System.out.println("Opção inválida! Tente novamente.");
             }
-            firstEntry = false;
+            else {
+                if(!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry){
+                    reservas.remove(reservas.getLast());
+                    return;
+                }
+                firstEntry = false;
+            }
             opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
         }while(opcao!=2);
 
@@ -1416,7 +1421,8 @@ public class TratamentoDados {
      * */
     public static void criarEmprestimo() throws IOException
     {
-        int opcao=0;
+        //opcao a 1 para que na condição abaixo entre na primeira vez, e só teste posteriormente, após o valor da opcao ser lido
+        int opcao=1;
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
             System.out.println("Não existem Items nesta Biblioteca");
             return;
@@ -1435,11 +1441,17 @@ public class TratamentoDados {
 
         boolean firstEntry = true;
         do{
-            if(!criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO) && firstEntry){
-                emprestimos.remove(emprestimos.getLast());
-                return;
+            if(opcao < 1 || opcao > 2){
+                System.out.println("Opção inválida! Tente novamente.");
             }
-            firstEntry = false;
+            else {
+                if(!criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO) && firstEntry){
+                    emprestimos.remove(emprestimos.getLast());
+                    return;
+                }
+                firstEntry = false;
+            }
+            
             opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
         }while(opcao!=2);
 
