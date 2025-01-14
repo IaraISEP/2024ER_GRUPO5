@@ -2315,11 +2315,13 @@ public class TratamentoDados {
         Constantes.TipoItem tipoItem=null;
         for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
             for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
-                if(emprestimoLinha.getIdItem()==emprestimoLinha1.getIdItem()&&emprestimoLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                if(emprestimoLinha.getIdItem()==emprestimoLinha1.getIdItem()&&emprestimoLinha.getTipoItem()==emprestimoLinha1.getTipoItem()
+                        &&emprestimoLinha1.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             for (ReservaLinha reservaLinha : reservasLinha){
-                if(emprestimoLinha.getIdItem()==reservaLinha.getIdItem()&&emprestimoLinha.getTipoItem()==reservaLinha.getTipoItem())
+                if(emprestimoLinha.getIdItem()==reservaLinha.getIdItem()&&emprestimoLinha.getTipoItem()==reservaLinha.getTipoItem()
+                        &&emprestimoLinha.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             if(diasTemp>diasMax) {
@@ -2331,11 +2333,13 @@ public class TratamentoDados {
         }
         for (ReservaLinha reservaLinha : reservasLinha){
             for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
-                if(reservaLinha.getIdItem()==emprestimoLinha1.getIdItem()&&reservaLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                if(reservaLinha.getIdItem()==emprestimoLinha1.getIdItem()&&reservaLinha.getTipoItem()==emprestimoLinha1.getTipoItem()
+                        &&emprestimoLinha1.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             for (ReservaLinha reservaLinha1 : reservasLinha){
-                if(reservaLinha1.getIdItem()==reservaLinha.getIdItem()&&reservaLinha1.getTipoItem()==reservaLinha.getTipoItem())
+                if(reservaLinha1.getIdItem()==reservaLinha.getIdItem()&&reservaLinha1.getTipoItem()==reservaLinha.getTipoItem()
+                        &&reservaLinha.getEstado()!=Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             if(diasTemp>diasMax) {
