@@ -110,10 +110,9 @@ public class TratamentoDados {
                 System.out.println("O arquivo está vazio.");
                 return;
             }
-            String csvDivisor = ";";
             do {
                 // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
-                String[] dados = linha.split(csvDivisor);
+                String[] dados = linha.split(Constantes.SplitChar);
                 String nome = dados[0];
                 Constantes.Morada morada = Constantes.Morada.valueOf(dados[1]);
                 int id = Integer.parseInt(dados[2]);
@@ -1116,7 +1115,7 @@ public class TratamentoDados {
             if (opcao < 1 || opcao > 2) {
                 System.out.println("Valor inválido! Tente novamente.");
             }
-        } while(opcao!=2);
+        } while(opcao <1 || opcao > 2);
     }
 
     /**
