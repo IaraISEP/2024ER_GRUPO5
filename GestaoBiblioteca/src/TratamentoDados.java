@@ -1994,13 +1994,15 @@ public class TratamentoDados {
                         (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
                         isInt = true;
                     else if(valor > 0 && valor <= 1455 && tipoItem == Constantes.TipoItem.LIVRO)
-                        System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha.\nPor favor, insira um ano válido (>= 1455): ");
+                        System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha... Por favor, insira um ano válido (>= 1455).\n");
                     else if(valor > 0 && valor <= 1605 && tipoItem == Constantes.TipoItem.JORNAL)
-                        System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França.\nPor favor, insira um ano válido (>= 1605): ");
+                        System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França... Por favor, insira um ano válido (>= 1605).\n");
                     else if(valor > 0 && valor <= 1731 && tipoItem == Constantes.TipoItem.REVISTA)
-                        System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra.\nPor favor, insira um ano válido (>= 1731): ");
+                        System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra... Por favor, insira um ano válido (>= 1731).\n");
                     else if(valor < 0)
-                        System.out.print("O ano não pode ser um número negativo...\nPor favor, insira um número válido (>= 0): ");
+                        System.out.print("O ano não pode ser um número negativo... Por favor, insira um ano válido (>= 0 e < " + LocalDateTime.now().getYear() + ").\n");
+                    else if(valor > LocalDateTime.now().getYear())
+                        System.out.print("O ano não pode ser superior ao atual...Por favor, insira um ano válido (>= 0 e < " + LocalDateTime.now().getYear() + ").\n");
                 } else {
                     isInt = true;
                 }
