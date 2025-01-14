@@ -1032,6 +1032,12 @@ public class TratamentoDados {
 
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        for (Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
+                System.out.println("Não é possivel editar a reserva.");
+                return;
+            }
+        }
         listarDetalhesReserva(idEditar);
 
         int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
