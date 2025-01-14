@@ -2357,10 +2357,17 @@ public class TratamentoDados {
                     break;
                 }
             }
-        } else {
+        } else if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
                 if (jornal.getId() == idItem) {
                     mostraTabelaJornalRevista(Collections.singletonList(jornal));
+                    break;
+                }
+            }
+        } else{
+            for (JornalRevista revista : revistas) {
+                if (revista.getId() == idItem) {
+                    mostraTabelaJornalRevista(Collections.singletonList(revista));
                     break;
                 }
             }
