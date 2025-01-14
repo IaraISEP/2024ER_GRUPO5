@@ -997,6 +997,7 @@ public class TratamentoDados {
      * */
     public static void criarReserva() throws IOException
     {
+        int opcao;
         //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
             System.out.println("Não existem Items nesta Biblioteca");
@@ -1007,9 +1008,8 @@ public class TratamentoDados {
         if (clientes.isEmpty()){
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
-        }else {
-            mostraTabelaClientes(clientes);
         }
+        mostraTabelaClientes(clientes);
 
         //Atribui automaticamente o Id com base no último Id existente.
         int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA, -1);
@@ -1018,25 +1018,20 @@ public class TratamentoDados {
         reservas.add(inserirDadosReserva(idReserva));
         Reserva reserva = reservas.getLast();
 
-        criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA);
-
-        boolean reservaLinhaValida = false;
-        for (ReservaLinha reservalinha : reservasLinha){
-            if (reservalinha.getIdReserva() == reserva.getNumMovimento() && reservalinha.getEstado() != null){
-                reservaLinhaValida = true;
+        boolean firstEntry = true;
+        do{
+            if(!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry){
+                reservas.remove(reservas.getLast());
+                return;
             }
-        }
-        if (!reservaLinhaValida) {
-            System.out.println("Sem detalhes da reserva.");
-            reservas.remove(reservas.getLast());
-            reservasLinha.remove(reservasLinha.getLast());
-        }else{
-            System.out.println("Reserva criada com sucesso!");
-            gravarArrayReservaLinha();
-            gravarArrayReservas();
-        }
+            firstEntry = false;
+            opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
+        }while(opcao!=2);
 
+        System.out.println("Reserva criada com sucesso!");
 
+        gravarArrayReservas();
+        gravarArrayReservaLinha();
     }
 
     public static void editarReserva() throws IOException
@@ -1260,201 +1255,41 @@ public class TratamentoDados {
      * @param reservaId Recebe o Id da Reserva
      * @param tipoItem Recebe o Tipo de Item a ser inserido
      * */
-    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem)
+    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem, LocalDate dataInicio, LocalDate dataFim)
     {
-        int idItem;
-        boolean idValido;
+        int idItem=0;
         int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
-        Constantes.Estado estado = null;
-        boolean isReservado = false;
-        boolean isEmprestado = false;        
-        do {
-            switch (tipoItem) {
-                case LIVRO:
-                    listaTodosLivros();
-                    idItem = lerInt("Insira o ID do Livro: ", false, null);
-                    idValido = validarIdLivro(idItem);
-                    //Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
 
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-                        }
-                    }
+        switch (tipoItem){
+            case LIVRO:
+                listaTodosLivros();
+                break;
+            case JORNAL:
+                listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                break;
+            case REVISTA:
+                listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                break;
+        }
+        idItem = lerInt("Insira o ID do Item: ", false, null);
 
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
+        for (Reserva reserva : reservas)
+            for (ReservaLinha reservaLinha : reservasLinha)
+                if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem)
+                    if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO && reservaLinha.getIdReserva() == reserva.getNumMovimento())
+                        if ((reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataFim)) &&
+                                (reserva.getDataFim().isAfter(dataInicio) || reserva.getDataFim().isEqual(dataInicio)))
+                            throw new IllegalArgumentException("Item já reservado!");
 
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else 
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
-                    break;
-                case REVISTA:
-                    listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
-                    idItem = lerInt("Insira o ID da Revista: ", false, null);
-                    idValido = validarIdRevista(idItem);
+        for (Emprestimo emprestimo : emprestimos)
+            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem &&
+                        emprestimo.getEstado() == Constantes.Estado.EMPRESTADO && emprestimoLinha.getIdEmprestimo() == emprestimo.getNumMovimento() &&
+                        (emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataFim)) &&
+                        (emprestimo.getDataFim().isAfter(dataInicio) || emprestimo.getDataFim().isEqual(dataInicio)))
+                    throw new IllegalArgumentException("Item já emprestado!");
 
-                    //Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
-                    break;
-                case JORNAL:
-                    listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
-                    idItem = lerInt("Insira o ID do Jornal: ", false, null);
-                    idValido = validarIdJornal(idItem);
-//Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
-                    break;
-                default:
-                    throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
-            }
-
-            if (!idValido) {
-                System.out.println("ID inválido. Tente novamente.");
-            }
-        } while (!idValido);
-
-        return new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, estado);
+        return new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, Constantes.Estado.RESERVADO);
     }
 
     /**
@@ -1629,9 +1464,14 @@ public class TratamentoDados {
         emprestimos.add(inserirDadosEmprestimo(idEmprestimo, null));
         Emprestimo emprestimo = emprestimos.getLast();
 
+        boolean firstEntry = true;
         do{
-            criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO);
-            opcao= lerInt("Deseja adicionar mais Items ao Emprestimo? (1 - Sim, 2 - Não)", false, null);
+            if(!criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO) && firstEntry){
+                emprestimos.remove(emprestimos.getLast());
+                return;
+            }
+            firstEntry = false;
+            opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
         }while(opcao!=2);
 
         System.out.println("Emprestimo criada com sucesso!");
@@ -1693,104 +1533,39 @@ public class TratamentoDados {
         }
     }
 
-    public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem)
+    public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem, LocalDate dataFim)
     {
         int idItem=0;
         int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
-        boolean idValido, avaiable;
-        
-        do {
-            switch (tipoItem) {
-                case LIVRO:
-                    listaTodosLivros();
-                    idItem = lerInt("Insira o ID do Livro: ", false, null);
-                    idValido = validarIdLivro(idItem);
-                    avaiable = true;
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
-                            if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                avaiable = false;
-                                break;
-                            }
-                        }
-                    }
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
-                            if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                            }else{
-                                System.out.println("Já se encontra num Emprestimo!");
-                                break;
-                            }
-                        }else {
-                            System.out.println("Já se encontra numa Reserva");
-                        }
-                    }
-                    break;
-                case REVISTA:
-                        listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
-                        idItem = lerInt("Insira o ID da Revista: ", false, null);
-                        idValido = validarIdRevista(idItem);
-                        avaiable = true;
-                        for (ReservaLinha reservaLinha : reservasLinha) {
-                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem ) {
-                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                    avaiable = false;
-                                    break;
-                                }
-                            }
-                        }
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
-                                if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                    emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                                }else{
-                                    System.out.println("Já se encontra num Emprestimo!");
-                                    break;
-                                }
-                            }else {
-                                System.out.println("Jś se encontra numa Reserva");
-                            }
-                        }
-                    break;
-                case JORNAL:
-                        listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
-                        idItem = lerInt("Insira o ID do Jornal: ", false, null);
-                        idValido = validarIdJornal(idItem);
-                        avaiable = true;
-                        for (ReservaLinha reservaLinha : reservasLinha) {
-                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && avaiable) {
-                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                    avaiable = false;
-                                    break;
-                                }
-                            }
-                        }
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
-                                if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                    emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                                }else{
-                                    System.out.println("Já se encontra num Emprestimo!");
-                                    break;
-                                }
-                            }else {
-                                System.out.println("Jś se encontra numa Reserva");
-                            }
-                        }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
-            }
-            if (!idValido) {
-                System.out.println("ID inválido. Tente novamente.");
-            }
-            for(EmprestimoLinha emprestimoLinha: emprestimosLinha){
-                if(emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO || emprestimoLinha.getEstado() == Constantes.Estado.RESERVADO){
-                    throw new IllegalArgumentException("Item já " + emprestimoLinha.getEstado().toString().toLowerCase());
-                }
-            }
-        } while (!idValido);
+
+        switch (tipoItem){
+            case LIVRO:
+                listaTodosLivros();
+                break;
+            case JORNAL:
+                listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                break;
+            case REVISTA:
+                listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                break;
+        }
+        idItem = lerInt("Insira o ID do Item: ", false, null);
+
+        for (Reserva reserva : reservas)
+            for (ReservaLinha reservaLinha : reservasLinha)
+                if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem)
+                    if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO && reservaLinha.getIdReserva() == reserva.getNumMovimento())
+                        if ((reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataFim)) &&
+                                (reserva.getDataFim().isAfter(Constantes.getDatahoje()) || reserva.getDataFim().isEqual(Constantes.getDatahoje())))
+                            throw new IllegalArgumentException("Item já reservado!");
+
+        for (Emprestimo emprestimo : emprestimos)
+            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem &&
+                    emprestimo.getEstado() == Constantes.Estado.EMPRESTADO && emprestimoLinha.getIdEmprestimo() == emprestimo.getNumMovimento() &&
+                        (emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataFim)) &&
+                        (emprestimo.getDataFim().isAfter(Constantes.getDatahoje()) || emprestimo.getDataFim().isEqual(Constantes.getDatahoje())))
+                            throw new IllegalArgumentException("Item já emprestado!");
 
         return new EmprestimoLinha(emprestimoId, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
     }
@@ -2072,7 +1847,7 @@ public class TratamentoDados {
         gravarArrayEmprestimoLinha();
     }
 
-    public static void criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException
+    public static Boolean criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva)
     {
         Constantes.TipoItem tipoItem = null;
         boolean itemExists = false;
@@ -2113,18 +1888,21 @@ public class TratamentoDados {
             }
         } while (!itemExists);
 
-        if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO)
-            try
-            {
-                emprestimosLinha.add(inserirDetalhesEmprestimo(id,tipoItem));
-            }catch (IllegalArgumentException e){
+        if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO) {
+            try {
+                emprestimosLinha.add(inserirDetalhesEmprestimo(id, tipoItem, emprestimos.getLast().getDataFim()));
+                return true;
+            } catch (IllegalArgumentException e) {
                 System.out.println("Item já emprestado/reservado.");
+                return false;
             }
-        else{
+        }else{
             try{
-            reservasLinha.add(inserirDetalhesReserva(id, tipoItem));
+            reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
+            return true;
             }catch (IllegalArgumentException e){
                 System.out.println("Item já emprestado/reservado.");
+                return false;
             }
         }
     }
