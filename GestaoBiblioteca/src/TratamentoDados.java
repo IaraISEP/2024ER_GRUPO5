@@ -1049,7 +1049,7 @@ public class TratamentoDados {
             case 2:
                 RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                 gravarArrayReservaLinha();
-                listarDetalhesReserva(idEditar);
+                //listarDetalhesReserva(idEditar);
                 break;
             default:
                 System.out.println("Escolha invalida! Tente novamente.");
@@ -1093,8 +1093,20 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
                     continue;
             }
+
             if(tipoServico == Constantes.TipoItem.RESERVA) {
-                mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                for (ReservaLinha reservaLinha : reservasLinha) {
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
+                        flag=true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    System.out.println("Este reserva não tem este tipo de item");
+                    break;
+                }else{
+                    mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                }
                 do {
                     idItem = lerInt("Escolha o ID do Item: ", false, null);
                     // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
@@ -1106,7 +1118,7 @@ public class TratamentoDados {
                     }
                     if (!flag){
                         System.out.println("Número Inválido!");
-                        return;
+                        break;
                     }
                 }while (!flag);
             }
