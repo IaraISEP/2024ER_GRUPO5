@@ -1104,8 +1104,10 @@ public class TratamentoDados {
                             flag=true;
                         }
                     }
-                    if (!flag)
+                    if (!flag){
                         System.out.println("Número Inválido!");
+                        return;
+                    }
                 }while (!flag);
             }
             else {
