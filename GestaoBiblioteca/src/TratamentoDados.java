@@ -1047,9 +1047,18 @@ public class TratamentoDados {
                 gravarArrayReservaLinha();
                 break;
             case 2:
+                opcao=1;
+                do{
+                    if(opcao!=1)
+                        System.out.println("Número Inválido!");
+                    else if(!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)){
+                        System.out.println("Não existem mais itens para remover!");
+                        break;
+                    }
+                    opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                }while(opcao != 2);
                 RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                 gravarArrayReservaLinha();
-                //listarDetalhesReserva(idEditar);
                 break;
             default:
                 System.out.println("Escolha invalida! Tente novamente.");
@@ -1071,15 +1080,14 @@ public class TratamentoDados {
     }
 
 
-    public static void RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) throws IOException
+    public static Boolean RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico)
     {
-        Constantes.TipoItem tipoItem;
-        int idItem=0, opcao=0;
+        Constantes.TipoItem tipoItem = null;
+        int idItem, opcao, i=0;
         boolean flag=false;
         do {
-            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-
-            switch (tipoItemOpcao) {
+            opcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            switch (opcao) {
                 case 1:
                     tipoItem = Constantes.TipoItem.LIVRO;
                     break;
@@ -1091,56 +1099,58 @@ public class TratamentoDados {
                     break;
                 default:
                     System.out.println("Opção inválida! Tente novamente.");
-                    continue;
             }
+        }while (opcao < 1 || opcao > 3);
+        if(tipoServico == Constantes.TipoItem.RESERVA)
+            mostraDetalhesReservas(reservasLinha, id, tipoItem);
+        else
+            mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
+        do{
+            i=0;
+            idItem = lerInt("Escolha o ID do Item (0 para Retornar): ", false, null);
+            if(idItem == 0)
+                return false;
 
-            if(tipoServico == Constantes.TipoItem.RESERVA) {
-                for (ReservaLinha reservaLinha : reservasLinha) {
-                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
+            if(tipoServico == Constantes.TipoItem.RESERVA){
+                for (ReservaLinha reservaLinha : reservasLinha){
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem &&
+                            reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        reservaLinha.setEstado(Constantes.Estado.CANCELADO);
                         flag=true;
-                        break;
+                    }
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        i++;
                     }
                 }
-                if(!flag){
-                    System.out.println("Este reserva não tem este tipo de item");
-                    break;
-                }else{
-                    mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                if(i==0)
+                    for(Reserva reserva : reservas)
+                        if(reserva.getNumMovimento() == id) {
+                            reserva.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
+                        }
+            }
+            else{
+                for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getIdItem() == idItem &&
+                            emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                        flag=true;
+                    }
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        i++;
+                    }
                 }
-                do {
-                    idItem = lerInt("Escolha o ID do Item: ", false, null);
-                    // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
-                            reservaLinha.setEstado(Constantes.Estado.CANCELADO);
-                            flag=true;
+                if(i==0)
+                    for(Emprestimo emprestimo : emprestimos)
+                        if(emprestimo.getNumMovimento() == id) {
+                            emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
                         }
-                    }
-                    if (!flag){
-                        System.out.println("Número Inválido!");
-                        break;
-                    }
-                }while (!flag);
             }
-            else {
-                mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
-                do {
-                    idItem = lerInt("Escolha o ID do Item: ", false, null);
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                        if (emprestimoLinha.getIdItem() == id && emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
-                            emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
-                            flag=true;
-                        }
-                    }
-                    if (!flag)
-                        System.out.println("Número Inválido!");
-                }while (!flag);
-            }
-            opcao = lerInt("Deseja remover mais Items da Reserva? (1 - Sim, 2 - Não)", false, null);
-            if (opcao < 1 || opcao > 2) {
-                System.out.println("Valor inválido! Tente novamente.");
-            }
-        } while(opcao <1 || opcao > 2);
+            if (!flag)
+                System.out.println("Número Inválido!");
+        }while(!flag);
+        return true;
     }
 
     /**
@@ -1622,6 +1632,8 @@ public class TratamentoDados {
         listaTodosEmprestimos();
         do {
             int idEditar = lerInt("Escolha o ID do emprestimo que deseja " + etapa.toString().toLowerCase() + " (0 para Retornar): ", false, null);
+            if(idEditar == 0)
+                return;
             for (Emprestimo emprestimo : emprestimos) {
                 if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
                     if(etapa == Constantes.Etapa.CONCLUIR) {
@@ -1639,12 +1651,8 @@ public class TratamentoDados {
                                 emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
                         }
                     }
-
-
                 }
             }
-            if(idEditar == 0)
-                return;
             if(!flag){
                 System.out.println("Id Inválido!");
             }
@@ -1661,7 +1669,7 @@ public class TratamentoDados {
         boolean flag = false;
         int idEditar, opcao;
         LocalDate dataPrevFim;
-        // Verifica se a lista de clientes está vazia
+
         if(emprestimos.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
             return;
@@ -1669,7 +1677,9 @@ public class TratamentoDados {
 
         listaTodosEmprestimos();
         do {
-            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
+            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar (0 para Retornar): ", false, null);
+            if(idEditar == 0)
+                return;
             for (Emprestimo emprestimo : emprestimos) {
                 if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
                     flag = true;
@@ -1689,7 +1699,16 @@ public class TratamentoDados {
                         criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
                         break;
                     case 2:
-                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO);
+                        opcao=1;
+                        do{
+                            if(opcao!=1)
+                                System.out.println("Número Inválido!");
+                            else if(!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO)){
+                                System.out.println("Não existem mais itens para remover!");
+                                break;
+                            }
+                            opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                        }while(opcao != 2);
                         break;
                     case 3:
                         do {
@@ -1863,7 +1882,9 @@ public class TratamentoDados {
         Constantes.TipoItem tipoItem = null;
         boolean itemExists = false;
         do {
-            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal) (0 para Retornar): ", false, null);
+            if(tipoItemOpcao==0)
+                return false;
             switch (tipoItemOpcao) {
                 case 1:
                     if (livros.isEmpty()) {
