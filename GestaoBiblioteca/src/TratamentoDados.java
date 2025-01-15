@@ -7,13 +7,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
- * Representa Classe responsavel pelo tratamento de dados
+ * Classe responsável pelo tratamento de dados no sistema de gestão de bibliotecas.
+ * Esta classe gere a criação e manipulação de ficheiros e dados relacionados com bibliotecas, clientes, livros, jornais, revistas, empréstimos e reservas.
+ *
+ * As suas principais funcionalidades incluem:
+ * - Criação de novos objetos das classes relacionadas.
+ * - Criação e manutenção da estrutura de ficheiros para armazenamento de dados persistentes.
+ * - Edição e leitura de ficheiros para manter os dados atualizados.
+ *
  * @author ER_GRUPO_5
  * @since 2024
- * Criação de novos objectos das classes
- * Criação de toda a estrutura de ficheiros
- * Edição e Leitura de ficheiros
- * */
+ */
 public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
@@ -28,10 +32,27 @@ public class TratamentoDados {
     private static List<ReservaLinha> reservasLinha = new ArrayList<>();
 
     /**
-     * Metodo para criar a estrutura de ficheiros para
-     * guardar os dados permanentemente
-     * Cria 7 Directorios com um ficheiro cada
-     * */
+     * Método responsável por criar a estrutura de ficheiros necessária para o armazenamento de dados de forma persistente.
+     *
+     * O método cria uma série de diretórios e ficheiros para armazenar informações sobre bibliotecas, clientes, livros, jornais, revistas,
+     * empréstimos e reservas. Caso os diretórios ou ficheiros já existam, não são recriados.
+     *
+     * Diretórios criados:
+     * - Dados/Bibliotecas
+     * - Dados/Clientes
+     * - Dados/Livros
+     * - Dados/Jornais
+     * - Dados/Revistas
+     * - Dados/Emprestimos
+     * - Dados/Reservas
+     * - Dados/Reservas/Details
+     * - Dados/Historico
+     *
+     * Ficheiros criados:
+     * - Definidos pelos caminhos armazenados nas constantes em `Constantes.Path`
+     *
+     * @throws IOException Se ocorrer um erro ao criar os ficheiros ou diretórios.
+     */
     public static void criarSistemaFicheiros() throws IOException
     {
         File[] dirs = new File[]{
@@ -67,7 +88,7 @@ public class TratamentoDados {
         }
     }
 
-    /*
+/*
      * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
      * */
 
