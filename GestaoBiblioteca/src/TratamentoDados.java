@@ -553,202 +553,237 @@ public class TratamentoDados {
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - FIM #################################################
      * */
-    /*
-     * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
-     */
+/*
+ * ########################### TRATAMENTO DE DADOS LIVROS - INICIO #################################################
+ */
 
-    /**
-     * Adiciona um novo livro ao sistema.
-     */
-    public static void criarLivro() throws IOException {
-        livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO, -1)));
-        System.out.println("Livro criado com sucesso!");
-        gravarArrayLivros();
+/**
+ * Adiciona um novo livro ao sistema.
+ * Este método gera automaticamente um ID para o novo livro, solicita os dados do livro ao utilizador,
+ * adiciona o livro à lista de livros e grava a lista atualizada no ficheiro CSV.
+ *
+ * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+ */
+public static void criarLivro() throws IOException {
+    livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO, -1)));
+    System.out.println("Livro criado com sucesso!");
+    gravarArrayLivros();
+}
+
+/**
+ * Lista todos os livros cadastrados no sistema.
+ * Este método verifica se a lista de livros está vazia e, se não estiver, exibe os dados de todos os livros.
+ */
+public static void listaTodosLivros() {
+    if (livros.isEmpty()) {
+        System.out.println("Não existem livros para mostrar.");
+        return;
     }
 
-    /**
-     * Lista todos os livros cadastrados no sistema.
-     */
-    public static void listaTodosLivros() {
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros para mostrar.");
-            return;
-        }
+    mostraTabelaLivros(livros);
+}
 
-        mostraTabelaLivros(livros);
+/**
+ * Lista um livro pelo ISBN fornecido.
+ * Este método solicita ao utilizador que insira o ISBN do livro, realiza a pesquisa e exibe os detalhes do livro encontrado.
+ * Se não encontrar o livro, exibe uma mensagem informativa.
+ */
+public static void listaLivroPorIsbn() {
+    if (livros.isEmpty()) {
+        System.out.println("Nenhum livro registrado.");
+        return;
     }
 
-    /**
-     * Lista um livro pelo ISBN fornecido.
-     */
-    public static void listaLivroPorIsbn() {
-        if (livros.isEmpty()) {
-            System.out.println("Nenhum livro registrado.");
+    String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
+
+    for (Livro livro : livros) {
+        if (livro.getIsbn().equals(isbn)) {
+            mostraTabelaLivros(Collections.singletonList(livro));
             return;
         }
-
-        String isbn = lerString("Digite o ISBN do livro que deseja encontrar: ");
-
-        for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn)) {
-                mostraTabelaLivros(Collections.singletonList(livro));
-                return;
-            }
-        }
-
-        System.out.println("O ISBN que inseriu não existe.");
     }
 
-    /**
-     * Edita os dados de um livro existente.
-     */
-    public static void editarLivro() throws IOException {
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca.");
+    System.out.println("O ISBN que inseriu não existe.");
+}
+
+/**
+ * Edita os dados de um livro existente.
+ * Este método lista todos os livros, solicita ao utilizador que escolha o ID do livro a ser editado,
+ * solicita os novos dados do livro, atualiza a lista de livros e grava a lista atualizada no ficheiro CSV.
+ *
+ * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+ */
+public static void editarLivro() throws IOException {
+    if (livros.isEmpty()) {
+        System.out.println("Não existem livros nesta Biblioteca.");
+        return;
+    }
+    listaTodosLivros();
+    int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
+
+    for (Livro livro : livros) {
+        if (livro.getId() == idEditar) {
+            livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
+            System.out.println("Livro editado com sucesso!");
+            gravarArrayLivros();
             return;
         }
-        listaTodosLivros();
-        int idEditar = lerInt("Escolha o ID do livro que deseja editar: ", false, null);
+    }
 
-        for (Livro livro : livros) {
-            if (livro.getId() == idEditar) {
-                livros.set(livros.indexOf(livro), inserirDadosLivro(idEditar));
-                System.out.println("Livro editado com sucesso!");
-                gravarArrayLivros();
-                return;
-            }
+    System.out.println("ID do livro não encontrado.");
+}
+
+/**
+ * Apaga um livro pelo ID.
+ * Este método lista todos os livros, solicita ao utilizador que escolha o ID do livro a ser apagado,
+ * remove o livro da lista e grava a lista atualizada no ficheiro CSV.
+ *
+ * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+ */
+public static void apagarLivroPeloId() throws IOException {
+    if (livros.isEmpty()) {
+        System.out.println("Não existem livros nesta Biblioteca.");
+        return;
+    }
+
+    listaTodosLivros();
+    int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
+    Livro livroRemover = null;
+    for (Livro livro : livros) {
+        if (livro.getId() == idApagar) {
+            livroRemover = livro;
+            break;
         }
-
+    }
+    if (livroRemover == null) {
         System.out.println("ID do livro não encontrado.");
+        return;
     }
+    livros.remove(livroRemover);
+    System.out.println("Livro apagado com sucesso!");
+    gravarArrayLivros();
+}
 
-    /**
-     * Apaga um livro pelo ID.
-     */
-    public static void apagarLivroPeloId() throws IOException {
-        if (livros.isEmpty()) {
-            System.out.println("Não existem livros nesta Biblioteca.");
+/**
+ * Grava a lista de livros em um arquivo CSV.
+ * Este método itera pela lista de livros e grava os dados de cada livro no ficheiro CSV.
+ *
+ * @throws IOException Se ocorrer um erro de I/O durante as operações.
+ */
+public static void gravarArrayLivros() throws IOException {
+    for (int i = 0; i < livros.size(); i++)
+        criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
+}
+
+/**
+ * Cria um arquivo CSV para armazenar os dados dos livros.
+ * Este método grava os dados de um livro no ficheiro CSV.
+ *
+ * @param ficheiro O caminho do ficheiro CSV.
+ * @param livro O objeto Livro cujos dados serão gravados.
+ * @param append Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+ * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+ */
+public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
+    try (FileWriter fw = new FileWriter(ficheiro, append)) {
+        fw.write(String.join(";",
+                String.valueOf(livro.getId()),
+                livro.getTitulo(),
+                livro.getEditora(),
+                String.valueOf(livro.getCategoria()),
+                String.valueOf(livro.getAnoEdicao()),
+                livro.getIsbn(),
+                livro.getAutor(),
+                String.valueOf(livro.getCodBiblioteca()),
+                "\n"));
+    }
+}
+
+/**
+ * Lê os livros do arquivo CSV.
+ * Este método lê cada linha do ficheiro CSV, cria um objeto Livro com os dados lidos e adiciona-o à lista de livros.
+ *
+ * @param ficheiro O caminho para o ficheiro que contém os dados dos livros.
+ */
+public static void lerFicheiroCsvLivros(String ficheiro)
+{
+    try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+        String linha = readFile.readLine();
+        if (linha == null) {
+            System.out.println("O arquivo está vazio.");
             return;
         }
-
-        listaTodosLivros();
-        int idApagar = lerInt("Escolha o ID do livro que deseja apagar: ", false, null);
-        Livro livroRemover = null;
-        for (Livro livro : livros) {
-            if (livro.getId() == idApagar) {
-                livroRemover = livro;
-                break;
-            }
-        }
-        if (livroRemover == null) {
-            System.out.println("ID do livro não encontrado.");
-            return;
-        }
-        livros.remove(livroRemover);
-        System.out.println("Livro apagado com sucesso!");
-        gravarArrayLivros();
-    }
-
-    /**
-     * Grava a lista de livros em um arquivo CSV.
-     */
-    public static void gravarArrayLivros() throws IOException {
-        for (int i = 0; i < livros.size(); i++)
-            criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
-    }
-
-    /**
-     * Cria um arquivo CSV para armazenar os dados dos livros.
-     */
-    public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
-        try (FileWriter fw = new FileWriter(ficheiro, append)) {
-            fw.write(String.join(";",
-                    String.valueOf(livro.getId()),
-                    livro.getTitulo(),
-                    livro.getEditora(),
-                    String.valueOf(livro.getCategoria()),
-                    String.valueOf(livro.getAnoEdicao()),
-                    livro.getIsbn(),
-                    livro.getAutor(),
-                    String.valueOf(livro.getCodBiblioteca()),
-                    "\n"));
-        }
-    }
-
-    /**
-     * Lê os livros do arquivo CSV.
-     */
-    public static void lerFicheiroCsvLivros(String ficheiro)
-    {
-        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            String linha = readFile.readLine();
-            if (linha == null) {
-                System.out.println("O arquivo está vazio.");
-                return;
-            }
-            String csvDivisor = ";";
-            do {
-                String[] dados = linha.split(csvDivisor);
-                int id = Integer.parseInt(dados[0]);
-                String titulo = dados[1];
-                String editora = dados[2];
-                Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[3]);
-                int anoEdicao = Integer.parseInt(dados[4]);
-                String isbn = dados[5];
-                String autor = dados[6];
-                int codBiblioteca = Integer.parseInt(dados[7]);
-                Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
-                livros.add(livro);
-            }while ((linha = readFile.readLine()) != null);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Solicita os dados do usuário para criar ou editar um livro.
-     */
-    private static Livro inserirDadosLivro(int id) {
-        String titulo = lerString("Insira o Título do livro: ");
-        String editora = lerString("Insira a Editora do livro: ");
-        Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do livro: ");
-        int anoEdicao = lerInt("Insira o ano de Edição do livro: ", true, Constantes.TipoItem.LIVRO);
-        String isbn;
-        boolean flag;
+        String csvDivisor = ";";
         do {
-            isbn = lerString("Insira o ISBN do livro: ");
-            flag = isbn.matches("\\d{9}[\\dX]") || isbn.matches("\\d{13}");
-            if (!flag) {
-                System.out.println("ISBN Invalido! ( Ex: 0306406152 ou 9780306406157 )");
-                continue;
-            }
-            if (isbn.equals(pesquisarIsbn(isbn, id))) {
-                System.out.println("ISBN já existe! Tente novamente.");
-                flag = false;
-            }
-        }while(!flag);
-        String autor = lerString("Insira o Autor do livro: ");
-
-        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+            String[] dados = linha.split(csvDivisor);
+            int id = Integer.parseInt(dados[0]);
+            String titulo = dados[1];
+            String editora = dados[2];
+            Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[3]);
+            int anoEdicao = Integer.parseInt(dados[4]);
+            String isbn = dados[5];
+            String autor = dados[6];
+            int codBiblioteca = Integer.parseInt(dados[7]);
+            Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
+            livros.add(livro);
+        }while ((linha = readFile.readLine()) != null);
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
     }
+}
 
-    /**
-     * Pesquisa um ISBN na lista de livros.
-     */
-
-    private static String pesquisarIsbn(String isbn, int id) {
-        for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn) && livro.getId() != id) {
-                return isbn;
-            }
+/**
+ * Solicita os dados do usuário para criar ou editar um livro.
+ * Este método solicita ao utilizador que insira o título, editora, categoria, ano de edição, ISBN e autor do livro.
+ * Valida o ISBN para garantir que tem 10 ou 13 dígitos e que não está duplicado.
+ *
+ * @param id O ID do livro a ser inserido.
+ * @return Um objeto Livro com os dados inseridos.
+ */
+private static Livro inserirDadosLivro(int id) {
+    String titulo = lerString("Insira o Título do livro: ");
+    String editora = lerString("Insira a Editora do livro: ");
+    Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do livro: ");
+    int anoEdicao = lerInt("Insira o ano de Edição do livro: ", true, Constantes.TipoItem.LIVRO);
+    String isbn;
+    boolean flag;
+    do {
+        isbn = lerString("Insira o ISBN do livro: ");
+        flag = isbn.matches("\\d{9}[\\dX]") || isbn.matches("\\d{13}");
+        if (!flag) {
+            System.out.println("ISBN Invalido! ( Ex: 0306406152 ou 9780306406157 )");
+            continue;
         }
-        return null;
+        if (isbn.equals(pesquisarIsbn(isbn, id))) {
+            System.out.println("ISBN já existe! Tente novamente.");
+            flag = false;
+        }
+    }while(!flag);
+    String autor = lerString("Insira o Autor do livro: ");
+
+    return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+}
+
+/**
+ * Pesquisa um ISBN na lista de livros.
+ * Este método verifica se o ISBN fornecido já existe na lista de livros, excluindo o livro com o ID fornecido.
+ *
+ * @param isbn O ISBN a ser pesquisado.
+ * @param id O ID do livro a ser excluído da pesquisa.
+ * @return O ISBN se encontrado, ou null se não encontrado.
+ */
+private static String pesquisarIsbn(String isbn, int id) {
+    for (Livro livro : livros) {
+        if (livro.getIsbn().equals(isbn) && livro.getId() != id) {
+            return isbn;
+        }
     }
+    return null;
+}
 
-
-    /*
-     * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
-     */
+/*
+ * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
+ */
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
      */
