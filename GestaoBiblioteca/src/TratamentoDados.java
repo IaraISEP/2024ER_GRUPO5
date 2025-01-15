@@ -203,14 +203,20 @@ public class TratamentoDados {
     /*
      * ########################### TRATAMENTO DE DADOS BIBLIOTECA - FIM #################################################
      */
-
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
      * */
 
     /**
-     * Metodo para requisitar ao utilizador os dados do Cliente
-     * */
+     * Método para requisitar ao utilizador os dados do Cliente.
+     * Este método solicita ao utilizador que insira o contribuinte (NIF), nome, género e contacto do cliente.
+     * Valida o NIF para garantir que tem 9 dígitos e que não está duplicado.
+     * Valida o género para garantir que é 'M' ou 'F'.
+     * Valida o contacto para garantir que tem 9 dígitos e começa com 2 ou 9.
+     *
+     * @param id O ID do cliente a ser inserido.
+     * @return Um objeto Cliente com os dados inseridos.
+     */
     public static Cliente inserirDadosCliente(int id)
     {
         int contacto;
@@ -259,8 +265,12 @@ public class TratamentoDados {
     }
 
     /**
-     * Metodo para adicionar um novo Cliente à lista.
-     * */
+     * Método para adicionar um novo Cliente à lista.
+     * Este método gera automaticamente um ID para o novo cliente, solicita os dados do cliente ao utilizador,
+     * adiciona o cliente à lista de clientes e grava a lista atualizada no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+     */
     public static void criarCliente() throws IOException
     {
         clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1)));
@@ -269,6 +279,8 @@ public class TratamentoDados {
 
     /**
      * Edita um cliente pelo ID fornecido.
+     * Este método lista todos os clientes, solicita ao utilizador que escolha o ID do cliente a ser editado,
+     * solicita os novos dados do cliente, atualiza a lista de clientes e grava a lista atualizada no ficheiro CSV.
      *
      * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
@@ -295,9 +307,14 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo para criar o ficehiro clientes.csv
-     * e adicionar conteúdo ao mesmo.
-     * */
+     * Método para criar o ficheiro clientes.csv e adicionar conteúdo ao mesmo.
+     * Este método grava os dados de um cliente no ficheiro CSV.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param cliente O objeto Cliente cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever (true) ou adicionar (false) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void criarFicheiroCsvCliente(String ficheiro, Cliente cliente, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
@@ -306,8 +323,9 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo que lista todos os Clientes existentes na biblioteca
-     * */
+     * Método que lista todos os Clientes existentes na biblioteca.
+     * Este método verifica se a lista de clientes está vazia e, se não estiver, exibe os dados de todos os clientes.
+     */
     public static void listaTodosClientes()
     {
         if (clientes.isEmpty())
@@ -318,7 +336,9 @@ public class TratamentoDados {
 
     /**
      * Lista um cliente pelo Nome, NIF ou Contacto fornecido.
-     * Se o cliente for encontrado, exibe os detalhes do cliente.
+     * Este método solicita ao utilizador que escolha o parâmetro de pesquisa (Nome, NIF ou Contacto),
+     * realiza a pesquisa e exibe os detalhes do cliente encontrado.
+     * Se não encontrar o cliente, exibe uma mensagem informativa.
      */
     public static void listaClientePorParametro()
     {
@@ -326,7 +346,7 @@ public class TratamentoDados {
             System.out.println("Esta biblioteca não contém clientes.");
             return;
         }
-        
+
         do{
             boolean hasClient = false;
             System.out.println("Escolha o parâmetro que deseja pesquisar: ");
@@ -335,16 +355,16 @@ public class TratamentoDados {
             switch (escolha){
                 case 1:
                     String nome = lerString("\nDigite o Nome do Cliente que deseja encontrar: ");
-                    
+
                     List<Cliente> clienteComNome = new ArrayList<>();
                     for (Cliente cliente : clientes) {
                         if (cliente.getNome().toLowerCase().contains(nome.toLowerCase())) {
                             clienteComNome.add(cliente);
                         }
                     }
-                    
+
                     if(clienteComNome.isEmpty()) {
-                        System.out.println("Cliente não encontrado."); 
+                        System.out.println("Cliente não encontrado.");
                         keyPress();
                     }
                     else {
@@ -354,7 +374,7 @@ public class TratamentoDados {
                     break;
                 case 2:
                     String nif;
-                    
+
                     do {
                         nif = lerString("\nPor favor, insira o Contribuinte do Cliente:");
                         if ( !nif.matches("^\\d{9}$"))
@@ -362,7 +382,7 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
-                    
+
                     for (Cliente cliente : clientes) {
                         if (cliente.getNif() == Integer.parseInt(nif)) {
                             mostraTabelaClientes(Collections.singletonList(cliente));
@@ -371,7 +391,7 @@ public class TratamentoDados {
                             break;
                         }
                     }
-                    
+
                     if(!hasClient)
                     {
                         System.out.println("Cliente não encontrado.");
@@ -387,9 +407,9 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
-                    
+
                     List<Cliente> clienteComContacto = new ArrayList<>();
-                    
+
                     for (Cliente cliente : clientes) {
                         if (cliente.getContacto() == Integer.parseInt(contacto)) {
                             clienteComContacto.add(cliente);
@@ -417,6 +437,8 @@ public class TratamentoDados {
 
     /**
      * Apaga um cliente pelo ID fornecido.
+     * Este método lista todos os clientes, solicita ao utilizador que escolha o ID do cliente a ser apagado,
+     * verifica se o cliente possui reservas ou empréstimos ativos, e se não possuir, remove o cliente da lista e grava a lista atualizada no ficheiro CSV.
      *
      * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
@@ -451,7 +473,7 @@ public class TratamentoDados {
 
         // Verifica se o cliente possui reservas ativas, caso tenha, o programa salta fora e não apaga cliente
         for (Reserva reserva : reservas) {
-           if (reserva.getCliente().equals(clienteApagar)) {
+            if (reserva.getCliente().equals(clienteApagar)) {
                 System.out.println("Não pode apagar um cliente com reservas ativas.");
                 return;
             }
@@ -473,7 +495,8 @@ public class TratamentoDados {
 
     /**
      * Grava a lista de clientes em ficheiro.
-     * Se a lista estiver vazia, apaga o ficheiro e mostra uma mensagem a informar.
+     * Este método verifica se a lista de clientes está vazia e, se não estiver, grava os dados de cada cliente no ficheiro CSV.
+     * Se a lista estiver vazia, exibe uma mensagem informativa.
      *
      * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
@@ -492,6 +515,7 @@ public class TratamentoDados {
 
     /**
      * Lê os dados dos clientes a partir de um ficheiro e popula a lista de clientes.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto Cliente com os dados lidos e adiciona-o à lista de clientes.
      *
      * @param ficheiro O caminho para o ficheiro que contém os dados dos clientes.
      */
