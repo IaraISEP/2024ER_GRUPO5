@@ -1195,7 +1195,7 @@ public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOEx
         // Lê o ID do cliente a ser apagado
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
         for (Reserva reserva : reservas) {
-            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
+            if (reserva.getNumMovimento() == idEditar && (reserva.getEstado() == Constantes.Estado.CANCELADO || reserva.getEstado() == Constantes.Estado.CONCLUIDO)) {
                 System.out.println("Não é possivel editar a reserva.");
                 return;
             }
