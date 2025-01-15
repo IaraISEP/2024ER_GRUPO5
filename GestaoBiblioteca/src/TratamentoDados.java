@@ -1049,7 +1049,7 @@ public class TratamentoDados {
             case 2:
                 RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                 gravarArrayReservaLinha();
-                listarDetalhesReserva(idEditar);
+                //listarDetalhesReserva(idEditar);
                 break;
             default:
                 System.out.println("Escolha invalida! Tente novamente.");
@@ -1093,8 +1093,20 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
                     continue;
             }
+
             if(tipoServico == Constantes.TipoItem.RESERVA) {
-                mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                for (ReservaLinha reservaLinha : reservasLinha) {
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
+                        flag=true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    System.out.println("Este reserva não tem este tipo de item");
+                    break;
+                }else{
+                    mostraDetalhesReservas(reservasLinha, id, tipoItem);
+                }
                 do {
                     idItem = lerInt("Escolha o ID do Item: ", false, null);
                     // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
@@ -1104,8 +1116,10 @@ public class TratamentoDados {
                             flag=true;
                         }
                     }
-                    if (!flag)
+                    if (!flag){
                         System.out.println("Número Inválido!");
+                        break;
+                    }
                 }while (!flag);
             }
             else {
@@ -1601,9 +1615,47 @@ public class TratamentoDados {
     }
 
     /**
+     * Metodo para concluir empréstimo
+     */
+    public static void concluirCancelarEmprestimo(Constantes.Etapa etapa) throws IOException {
+        boolean flag = false;
+        listaTodosEmprestimos(etapa);
+        do {
+            int idEditar = lerInt("Escolha o ID do emprestimo que deseja " + etapa.toString().toLowerCase() + " (0 para Retornar): ", false, null);
+            for (Emprestimo emprestimo : emprestimos) {
+                if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
+                    if(etapa == Constantes.Etapa.CONCLUIR) {
+                        emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
+                        emprestimo.setDataFim(Constantes.getDatahoje());
+                    }
+                    else
+                        emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                    flag = true;
+                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                        if (emprestimoLinha.getIdEmprestimo() == idEditar) {
+                            if (etapa == Constantes.Etapa.CONCLUIR)
+                                emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
+                            else
+                                emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                        }
+                    }
+                }
+            }
+            if(idEditar == 0)
+                return;
+            if(!flag){
+                System.out.println("Id Inválido!");
+            }
+        } while (!flag);
+        System.out.println(etapa.toString().toLowerCase() + " Empréstimo com sucesso!");
+        gravarArrayEmprestimo();
+        gravarArrayEmprestimoLinha();
+    }
+
+    /**
      * Editar Emprestimo
      */
-    public static void EditarEmprestimo(Constantes.Etapa etapa) throws IOException {
+    public static void editarEmprestimo(Constantes.Etapa etapa) throws IOException {
         boolean flag = false;
         int idEditar, opcao;
         LocalDate dataPrevFim;
@@ -1617,32 +1669,9 @@ public class TratamentoDados {
         do {
             idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
             for (Emprestimo emprestimo : emprestimos) {
-                if (emprestimo.getNumMovimento() == idEditar) {
+                if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
                     flag = true;
-                    if (emprestimo.getEstado() == Constantes.Estado.CANCELADO || emprestimo.getEstado() == Constantes.Estado.CONCLUIDO) {
-                        System.out.println("Não é possivel " + etapa.toString().toLowerCase() + " o emprestimo, pois já se encontra " + emprestimo.getEstado().toString().toLowerCase() + ".");
-                        return;
-                    }
-                    
-                    if (etapa == Constantes.Etapa.CANCELAR) {
-                        emprestimo.setEstado(Constantes.Estado.CANCELADO);
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
-                                emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
-                            }
-                        }
-                        System.out.println("Emprestimo cancelado com sucesso!");
-                    }
-                    else if (etapa == Constantes.Etapa.CONCLUIR) {
-                        emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
-                        emprestimo.setDataFim(Constantes.getDatahoje());
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
-                                emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
-                            }
-                        }
-                        System.out.println("Emprestimo concluído com sucesso!");
-                    }
+                    break;
                 }
             }
             if(!flag){
