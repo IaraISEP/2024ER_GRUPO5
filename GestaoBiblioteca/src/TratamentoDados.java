@@ -1384,14 +1384,14 @@ public class TratamentoDados {
         }
     }
 
-    public static void listaTodosEmprestimos()
+    public static void listaTodosEmprestimos(Constantes.Etapa etapa)
     {
         if (emprestimos.isEmpty()) {
             System.out.println("Não existem empréstimos para mostrar.");
             return;
         }
 
-        mostraTabelaEmprestimos(emprestimos);
+        mostraTabelaEmprestimos(emprestimos, etapa);
     }
 
     public static void lerFicheiroCsvEmprestimosLinha(String ficheiro)
@@ -1613,12 +1613,17 @@ public class TratamentoDados {
             return;
         }
 
-        listaTodosEmprestimos();
+        listaTodosEmprestimos(etapa);
         do {
             idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
             for (Emprestimo emprestimo : emprestimos) {
                 if (emprestimo.getNumMovimento() == idEditar) {
                     flag = true;
+                    if (emprestimo.getEstado() == Constantes.Estado.CANCELADO || emprestimo.getEstado() == Constantes.Estado.CONCLUIDO) {
+                        System.out.println("Não é possivel " + etapa.toString().toLowerCase() + " o emprestimo, pois já se encontra " + emprestimo.getEstado().toString().toLowerCase() + ".");
+                        return;
+                    }
+                    
                     if (etapa == Constantes.Etapa.CANCELAR) {
                         emprestimo.setEstado(Constantes.Estado.CANCELADO);
                         for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
@@ -1626,6 +1631,7 @@ public class TratamentoDados {
                                 emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
                             }
                         }
+                        System.out.println("Emprestimo cancelado com sucesso!");
                     }
                     else if (etapa == Constantes.Etapa.CONCLUIR) {
                         emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
@@ -1635,6 +1641,7 @@ public class TratamentoDados {
                                 emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
                             }
                         }
+                        System.out.println("Emprestimo concluído com sucesso!");
                     }
                 }
             }
@@ -1727,7 +1734,7 @@ public class TratamentoDados {
         if (listagemEmprestimo.isEmpty()){
             System.out.println("Não existem Emprestimos desse cliente!");
         }else{
-            mostraTabelaEmprestimos(listagemEmprestimo);
+            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
 
     }
@@ -1771,7 +1778,7 @@ public class TratamentoDados {
         if (listagemEmprestimo.isEmpty()){
             System.out.println("Não existem Emprestimos desse cliente nessas datas!");
         }else{
-            mostraTabelaEmprestimos(listagemEmprestimo);
+            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
 
     }
@@ -2260,7 +2267,7 @@ public class TratamentoDados {
         System.out.println(separador);
     }
 
-    public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos)
+    public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos, Constantes.Etapa etapa)
     {
         //TODO : Implementar a função de mostrar a tabela de emprestimos, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id".length();
@@ -2294,9 +2301,15 @@ public class TratamentoDados {
 
         //Imprime os dados dos clientes
         for (Emprestimo emprestimo : listaEmprestimos) {
-            System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
+            //Valida se é edição, cancelamento ou conclusão de empréstimo e se está emprestado, para simplificar a sintaxe no if
+            boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
+            boolean notCanceladoConcluido = emprestimo.getEstado() != Constantes.Estado.CONCLUIDO && emprestimo.getEstado() != Constantes.Estado.CANCELADO;
+        
+            //Caso seja Edição/Cancelamento/Conclusão só mostra os emprestados, caso contrário mostra tudo 
+            if (!isEditCancelConclude || notCanceladoConcluido) 
+                System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
-
+        
         System.out.println(separador);
     }
 
@@ -2428,7 +2441,7 @@ public class TratamentoDados {
         System.out.println("Reservas");
         mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
         System.out.println("Emprestimos");
-        mostraTabelaEmprestimos(listagemEmprestimo);
+        mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
     }
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
