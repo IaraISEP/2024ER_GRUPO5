@@ -785,225 +785,286 @@ private static String pesquisarIsbn(String isbn, int id) {
  * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
  */
     /*
-     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
-     */
+ * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
+ */
 
-    /**
-     * Lê os jornais do arquivo CSV.
-     */
-    public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
-        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-            String linha = readFile.readLine();
-            if (linha == null) {
-                System.out.println("O arquivo está vazio.");
-                return;
-            }
-            do {
-                String[] dados = linha.split(Constantes.SplitChar);
-                int id = Integer.parseInt(dados[0]);
-                String titulo = dados[1];
-                String editora = dados[2];
-                Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[3]);
-                int anoPub = Integer.parseInt(dados[4]);
-                String issn = dados[5];
-                Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
-                int codBiblioteca = Integer.parseInt(dados[7]);
-                JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
-                if (tipoItem == Constantes.TipoItem.JORNAL)
-                    jornais.add(jornalRevista);
-                else
-                    revistas.add(jornalRevista);
-            } while ((linha = readFile.readLine()) != null);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+/**
+ * Lê os jornais ou revistas do arquivo CSV.
+ * Este método lê cada linha do ficheiro CSV, cria um objeto JornalRevista com os dados lidos e adiciona-o à lista correspondente (jornais ou revistas).
+ * Se o ficheiro estiver vazio, exibe uma mensagem informativa.
+ *
+ * @param ficheiro O caminho do ficheiro CSV.
+ * @param tipoItem O tipo de item a ser lido (JORNAL ou REVISTA).
+ */
+public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
+    try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+        String linha = readFile.readLine();
+        if (linha == null) {
+            System.out.println("O arquivo está vazio.");
+            return;
         }
+        do {
+            String[] dados = linha.split(Constantes.SplitChar);
+            int id = Integer.parseInt(dados[0]);
+            String titulo = dados[1];
+            String editora = dados[2];
+            Constantes.Categoria categoria = Constantes.Categoria.valueOf(dados[3]);
+            int anoPub = Integer.parseInt(dados[4]);
+            String issn = dados[5];
+            Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
+            int codBiblioteca = Integer.parseInt(dados[7]);
+            JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
+            if (tipoItem == Constantes.TipoItem.JORNAL)
+                jornais.add(jornalRevista);
+            else
+                revistas.add(jornalRevista);
+        } while ((linha = readFile.readLine()) != null);
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
+    }
+}
+
+/**
+ * Adiciona um novo jornal ao sistema.
+ * Este método gera automaticamente um ID para o novo jornal, solicita os dados do jornal ao utilizador,
+ * adiciona o jornal à lista de jornais e grava a lista atualizada no ficheiro CSV.
+ * Exibe uma mensagem de sucesso após a criação do jornal.
+ *
+ * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+ */
+public static void criarJornal() throws IOException {
+    jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL, Constantes.Etapa.CRIAR));
+    System.out.println("Jornal criado com sucesso!");
+    gravarArrayJornal();
+}
+
+/**
+ * Adiciona uma nova revista ao sistema.
+ * Este método gera automaticamente um ID para a nova revista, solicita os dados da revista ao utilizador,
+ * adiciona a revista à lista de revistas e grava a lista atualizada no ficheiro CSV.
+ * Exibe uma mensagem de sucesso após a criação da revista.
+ *
+ * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+ */
+public static void criarRevista() throws IOException {
+    revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA, Constantes.Etapa.CRIAR));
+    System.out.println("Revista criada com sucesso!");
+    gravarArrayRevista();
+}
+
+/**
+ * Solicita os dados do usuário para criar ou editar um jornal/revista.
+ * Este método solicita ao utilizador que insira o título, editora, categoria, ano de publicação e ISSN do jornal/revista.
+ * Valida o ISSN para garantir que tem o formato correto e que não está duplicado.
+ * Se o ISSN já existir, solicita ao utilizador que insira um novo ISSN.
+ *
+ * @param id O ID do jornal/revista a ser inserido.
+ * @param tipoItem O tipo de item a ser inserido (JORNAL ou REVISTA).
+ * @param etapa A etapa do processo (CRIAR ou EDITAR).
+ * @return Um objeto JornalRevista com os dados inseridos.
+ */
+private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem, Constantes.Etapa etapa) {
+    String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
+    String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
+    Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
+    int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
+    do {
+        String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+        if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
+            System.out.println("ISSN Invalido! ( Ex: 1111-111X )");
+            continue;
+        }
+        if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
+            System.out.println("ISSN já existe! Tente novamente.");
+        }
+        else
+            return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+    }while(true);
+}
+
+/**
+ * Lista todos os jornais ou revistas cadastrados no sistema.
+ * Este método verifica se a lista de jornais ou revistas está vazia e, se não estiver, exibe os dados de todos os itens.
+ * Se a lista estiver vazia, exibe uma mensagem informativa.
+ *
+ * @param tipoItem O tipo de item a ser listado (JORNAL ou REVISTA).
+ */
+public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
+    if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+        System.out.println("Não existem jornais para mostrar.");
+        return;
+    }
+    else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+        System.out.println("Não existem revistas para mostrar.");
+        return;
     }
 
-    /**
-     * Adiciona um novo jornal ao sistema.
-     */
-    public static void criarJornal() throws IOException {
-        jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL, Constantes.Etapa.CRIAR));
-        System.out.println("Jornal criado com sucesso!");
-        gravarArrayJornal();
+    if (tipoItem == Constantes.TipoItem.JORNAL)
+        mostraTabelaJornalRevista(jornais);
+    else
+        mostraTabelaJornalRevista(revistas);
+}
+
+/**
+ * Lista um jornal ou revista pelo ISSN fornecido.
+ * Este método solicita ao utilizador que insira o ISSN do jornal/revista, realiza a pesquisa e exibe os detalhes do item encontrado.
+ * Se não encontrar o item, exibe uma mensagem informativa.
+ * Permite ao utilizador voltar ao menu anterior digitando 0.
+ *
+ * @param tipoItem O tipo de item a ser listado (JORNAL ou REVISTA).
+ */
+public static void listaJornalRevistaPorIssn(Constantes.TipoItem tipoItem) {
+    if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+        System.out.println("Não existem jornais para mostrar.");
+        return;
+    }
+    else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
+        System.out.println("Não existem revistas para mostrar.");
+        return;
     }
 
-    /**
-     * Adiciona uma nova revista ao sistema.
-     */
-    public static void criarRevista() throws IOException {
-        revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA, Constantes.Etapa.CRIAR));
-        System.out.println("Revista criada com sucesso!");
+    boolean exists = false;
+
+    do{
+        String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar (0 para voltar ao menu anterior) :");
+
+        if(issn.equals("0"))
+            return;
+
+        exists = pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
+    }while (!exists);
+}
+
+/**
+ * Grava a lista de jornais em um arquivo CSV.
+ * Este método itera pela lista de jornais e grava os dados de cada jornal no ficheiro CSV.
+ * Utiliza o método criarFicheiroCsvJornalRevista para gravar os dados.
+ *
+ * @throws IOException Se ocorrer um erro de I/O durante as operações.
+ */
+public static void gravarArrayJornal() throws IOException {
+    for (int i = 0; i < jornais.size(); i++)
+        criarFicheiroCsvJornalRevista(Constantes.Path.JORNAL.getValue(), jornais.get(i), i != 0);
+}
+
+/**
+ * Grava a lista de revistas em um arquivo CSV.
+ * Este método itera pela lista de revistas e grava os dados de cada revista no ficheiro CSV.
+ * Utiliza o método criarFicheiroCsvJornalRevista para gravar os dados.
+ *
+ * @throws IOException Se ocorrer um erro de I/O durante as operações.
+ */
+public static void gravarArrayRevista() throws IOException {
+    for (int i = 0; i < revistas.size(); i++)
+        criarFicheiroCsvJornalRevista(Constantes.Path.REVISTA.getValue(), revistas.get(i), i != 0);
+}
+
+/**
+ * Cria um arquivo CSV para armazenar os dados dos jornais/revistas.
+ * Este método grava os dados de um jornal/revista no ficheiro CSV.
+ * Utiliza o FileWriter para escrever os dados no ficheiro.
+ *
+ * @param ficheiro O caminho do ficheiro CSV.
+ * @param jornalRevista O objeto JornalRevista cujos dados serão gravados.
+ * @param append Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+ * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+ */
+public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
+    try (FileWriter fw = new FileWriter(ficheiro, append)) {
+        fw.write(String.join(Constantes.SplitChar,
+                String.valueOf(jornalRevista.getId()),
+                jornalRevista.getTitulo(),
+                jornalRevista.getEditora(),
+                String.valueOf(jornalRevista.getCategoria()),
+                String.valueOf(jornalRevista.getDataPublicacao()),
+                jornalRevista.getIssn(),
+                String.valueOf(jornalRevista.getTipo()),
+                String.valueOf(jornalRevista.getCodBiblioteca()),
+                "\n"));
+    }
+}
+
+/**
+ * Edita os dados de uma revista ou jornal existente.
+ * Este método lista todos os jornais/revistas, solicita ao utilizador que escolha o ID do item a ser editado,
+ * solicita os novos dados do item, atualiza a lista de jornais/revistas e grava a lista atualizada no ficheiro CSV.
+ * Exibe uma mensagem de sucesso após a edição.
+ *
+ * @param tipoItem O tipo de item a ser editado (JORNAL ou REVISTA).
+ * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+ */
+public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+    if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+        System.out.println("Não existem jornais nesta Biblioteca.");
+        return;
+    }
+    else if(revistas.isEmpty()){
+        System.out.println("Não existem revistas nesta Biblioteca.");
+        return;
+    }
+    listaTodosJornalRevista(tipoItem);
+    do {
+        int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar (0 para voltar ao menu anterior) :", false, null);
+        if(idEditar == 0)
+            return;
+        if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
+            System.out.println("O(A) " + tipoItem.toString().toLowerCase() + " não existe.");
+            continue;
+        }
+        else
+            pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTEEDITAR);
+        break;
+    }while(true);
+    if (tipoItem == Constantes.TipoItem.REVISTA)
         gravarArrayRevista();
-    }
+    else
+        gravarArrayJornal();
+    System.out.println("ID do(a) " + tipoItem.toString().toLowerCase() + " editado(a) com sucesso.");
+}
 
-    /**
-     * Solicita os dados do usuário para criar ou editar um jornal/revista.
-     */
-    private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem, Constantes.Etapa etapa) {
-        String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
-        String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
-        Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
-        int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
-        do {
-            String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
-            if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
-                System.out.println("ISSN Invalido! ( Ex: 1111-111X )");
-                continue;
-            }
-            if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
-                System.out.println("ISSN já existe! Tente novamente.");
-            }
-            else
-                return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
-        }while(true);
+/**
+ * Apaga uma revista ou jornal pelo ID.
+ * Este método lista todos os jornais/revistas, solicita ao utilizador que escolha o ID do item a ser apagado,
+ * verifica se o item possui empréstimos ou reservas ativas, e se não possuir, remove o item da lista e grava a lista atualizada no ficheiro CSV.
+ * Exibe uma mensagem de sucesso após a remoção.
+ *
+ * @param tipoItem O tipo de item a ser apagado (JORNAL ou REVISTA).
+ * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
+ */
+public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+    if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+        System.out.println("Não existem jornais nesta Biblioteca.");
+        return;
     }
-
-    public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
-        if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem jornais para mostrar.");
+    else if(revistas.isEmpty()){
+        System.out.println("Não existem revistas nesta Biblioteca.");
+        return;
+    }
+    listaTodosJornalRevista(tipoItem);
+    do {
+        int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar (0 para voltar ao menu anterior) :", false, null);
+        if(idApagar == 0)
             return;
+        if (!pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.EXISTE)) {
+            System.out.println("O " + tipoItem.toString().toLowerCase() + " não existe.");
+            continue;
         }
-        else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
-            System.out.println("Não existem revistas para mostrar.");
-            return;
-        }
-
-        if (tipoItem == Constantes.TipoItem.JORNAL)
-            mostraTabelaJornalRevista(jornais);
-        else
-            mostraTabelaJornalRevista(revistas);
-    }
-
-    /**
-     * Lista um Jornal/Revista pelo ISSN fornecido.
-     */
-    public static void listaJornalRevistaPorIssn(Constantes.TipoItem tipoItem) {
-        if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem jornais para mostrar.");
-            return;
-        }
-        else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
-            System.out.println("Não existem revistas para mostrar.");
-            return;
+        if (pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR)) {
+            System.out.println("Não pode apagar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
         }
 
-        boolean exists = false;
+        break;
+    }while(true);
+    if(tipoItem == Constantes.TipoItem.REVISTA)
+        gravarArrayRevista();
+    else
+        gravarArrayJornal();
+    System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+}
 
-        do{
-            String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar (0 para voltar ao menu anterior) :");
-
-            if(issn.equals("0"))
-                return;
-
-            exists = pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
-        }while (!exists);
-    }
-
-    /**
-     * Grava a lista de jornais em um arquivo CSV.
-     */
-    public static void gravarArrayJornal() throws IOException {
-        for (int i = 0; i < jornais.size(); i++)
-            criarFicheiroCsvJornalRevista(Constantes.Path.JORNAL.getValue(), jornais.get(i), i != 0);
-    }
-
-    /**
-     * Grava a lista de revistas em um arquivo CSV.
-     */
-    public static void gravarArrayRevista() throws IOException {
-        for (int i = 0; i < revistas.size(); i++)
-            criarFicheiroCsvJornalRevista(Constantes.Path.REVISTA.getValue(), revistas.get(i), i != 0);
-    }
-
-    /**
-     * Cria um arquivo CSV para armazenar os dados dos jornais/revistas.
-     */
-    public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
-        try (FileWriter fw = new FileWriter(ficheiro, append)) {
-            fw.write(String.join(Constantes.SplitChar,
-                    String.valueOf(jornalRevista.getId()),
-                    jornalRevista.getTitulo(),
-                    jornalRevista.getEditora(),
-                    String.valueOf(jornalRevista.getCategoria()),
-                    String.valueOf(jornalRevista.getDataPublicacao()),
-                    jornalRevista.getIssn(),
-                    String.valueOf(jornalRevista.getTipo()),
-                    String.valueOf(jornalRevista.getCodBiblioteca()),
-                    "\n"));
-        }
-    }
-
-    /**
-     * Edita os dados de uma REVISTA ou JORNAL existente.
-     */
-    public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
-        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem jornais nesta Biblioteca.");
-            return;
-        }
-        else if(revistas.isEmpty()){
-            System.out.println("Não existem revistas nesta Biblioteca.");
-            return;
-        }
-        listaTodosJornalRevista(tipoItem);
-        do {
-            int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar (0 para voltar ao menu anterior) :", false, null);
-            if(idEditar == 0)
-                return;
-            if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
-                System.out.println("O(A) " + tipoItem.toString().toLowerCase() + " não existe.");
-                continue;
-            }
-            else
-                pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTEEDITAR);
-            break;
-        }while(true);
-        if (tipoItem == Constantes.TipoItem.REVISTA)
-            gravarArrayRevista();
-        else
-            gravarArrayJornal();
-        System.out.println("ID do(a) " + tipoItem.toString().toLowerCase() + " editado(a) com sucesso.");
-    }
-
-    /**
-     * Apaga uma REVISTA e JORNAL pelo ID.
-     */
-    public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
-        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
-            System.out.println("Não existem jornais nesta Biblioteca.");
-            return;
-        }
-        else if(revistas.isEmpty()){
-            System.out.println("Não existem revistas nesta Biblioteca.");
-            return;
-        }
-        listaTodosJornalRevista(tipoItem);
-        do {
-            int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar (0 para voltar ao menu anterior) :", false, null);
-            if(idApagar == 0)
-                return;
-            if (!pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.EXISTE)) {
-                System.out.println("O " + tipoItem.toString().toLowerCase() + " não existe.");
-                continue;
-            }
-            if (pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR)) {
-                System.out.println("Não pode apagar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
-            }
-
-            break;
-        }while(true);
-        if(tipoItem == Constantes.TipoItem.REVISTA)
-            gravarArrayRevista();
-        else
-            gravarArrayJornal();
-        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
-    }
-
-    /*
-     * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
-     * */
-
+/*
+ * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
+ */
     /*
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
      * */
