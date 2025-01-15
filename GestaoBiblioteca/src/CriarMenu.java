@@ -427,12 +427,12 @@ public class CriarMenu {
         Menu menuListarEmprestimos = new Menu("Listar Empréstimos");
 
         menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Simplificados",  () -> {
-            TratamentoDados.listaTodosEmprestimos();
+            TratamentoDados.listaTodosEmprestimos(Constantes.Etapa.LISTAR);
             keyPress();
         }));
         menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Detalhados", () -> {
             try {
-                TratamentoDados.listaTodosEmprestimos();
+                TratamentoDados.listaTodosEmprestimos(Constantes.Etapa.LISTAR);
                 TratamentoDados.listarDetalhesEmprestimo(TratamentoDados.lerInt("Insira o Id do empréstimo: ",false,null));
             } catch (IOException e) {
                 throw new RuntimeException(e);
