@@ -87,25 +87,38 @@ public class TratamentoDados {
             }
         }
     }
-
-/*
+    /*
      * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
-     * */
+     */
 
+    /**
+     * Método responsável por inserir os dados de uma nova biblioteca.
+     * Solicita ao utilizador o nome e a morada da biblioteca, e gera automaticamente o ID da mesma.
+     *
+     * @return Um objeto do tipo Biblioteca contendo as informações inseridas.
+     * @throws IOException Se ocorrer um erro ao ler a entrada do utilizador.
+     */
     public static Biblioteca inserirDadosBiblioteca() throws IOException
     {
-        String nome="";
+        String nome = "";
         int idBiblioteca = 0;
 
-        System.out.println("Insira o Nome da Biblioteca; ");
+        System.out.println("Insira o Nome da Biblioteca: ");
         nome = input.nextLine();
         Constantes.Morada morada = selecionaMorada("Insira a Morada da biblioteca: ");
 
-        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA,-1);
+        // Gera um ID único automaticamente para a nova biblioteca
+        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA, -1);
 
         return new Biblioteca(nome, morada, idBiblioteca);
     }
 
+    /**
+     * Método que cria uma nova biblioteca e adiciona-a à lista de bibliotecas.
+     * Após a criação, os dados são guardados no ficheiro CSV correspondente.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados.
+     */
     public static void criarBiblioteca() throws IOException
     {
         bibliotecas.add(inserirDadosBiblioteca());
@@ -113,9 +126,13 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo para criar o ficehiro bibliotecas.csv
-     * e adicionar conteúdo ao mesmo.
-     * */
+     * Método responsável por criar um ficheiro CSV e gravar os dados de uma biblioteca.
+     *
+     * @param ficheiro Nome do ficheiro a ser criado/atualizado.
+     * @param biblioteca Objeto Biblioteca cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever ou adicionar ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void criarFicheiroCsvBiblioteca(String ficheiro, Biblioteca biblioteca, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
@@ -123,38 +140,40 @@ public class TratamentoDados {
         }
     }
 
+    /**
+     * Método responsável por ler os dados de bibliotecas a partir de um ficheiro CSV.
+     *
+     * @param ficheiro Caminho do ficheiro CSV a ser lido.
+     * Lê cada linha e cria objetos Biblioteca que são adicionados à lista.
+     */
     public static void lerFicheiroCsvBiblioteca(String ficheiro)
     {
-        try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
+                System.out.println("O ficheiro está vazio.");
                 return;
             }
             do {
-                // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
+                // Divide a linha em diferentes atributos e cria o objeto Biblioteca
                 String[] dados = linha.split(Constantes.SplitChar);
                 String nome = dados[0];
                 Constantes.Morada morada = Constantes.Morada.valueOf(dados[1]);
                 int id = Integer.parseInt(dados[2]);
 
-                // Cria um novo objeto Cliente e adiciona à lista
+                // Cria um novo objeto Biblioteca e adiciona-o à lista
                 Biblioteca biblioteca = new Biblioteca(nome, morada, id);
                 bibliotecas.add(biblioteca);
-            }while ((linha = readFile.readLine()) != null);
-        } catch (IOException e){
-            System.out.println(e.getMessage());
+            } while ((linha = readFile.readLine()) != null);
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o ficheiro: " + e.getMessage());
         }
-
-        // Imprime todos as Bibliotecas
-/*        for (Biblioteca biblioteca : bibliotecas) {
-            System.out.println(biblioteca);
-        }*/
     }
 
     /**
-     * Metódo que lista todos os Clientes existentes na biblioteca
-     * */
+     * Método que lista todas as bibliotecas existentes.
+     * Se não existirem bibliotecas, uma mensagem informativa é apresentada.
+     */
     public static void listaTodasBibliotecas()
     {
         if (bibliotecas.isEmpty())
@@ -164,24 +183,26 @@ public class TratamentoDados {
     }
 
     /**
-     * Metodo para gravar a lista de bibliotecas em ficheiro
-     * */
+     * Método responsável por gravar a lista de bibliotecas num ficheiro CSV.
+     * Itera por todas as bibliotecas e grava cada uma individualmente no ficheiro.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void gravarArrayBibliotecas() throws IOException
     {
-        // Verifica se a lista de clientes está vazia
-        if(bibliotecas.isEmpty()){
-            System.out.println("Array vazio");
+        if (bibliotecas.isEmpty()) {
+            System.out.println("Array de bibliotecas vazio.");
         }
-        // Itera pela lista de clientes e grava cada um no ficheiro
-        for(int i = 0; i < bibliotecas.size(); i++) {
+        // Percorre todas as bibliotecas e grava cada uma no ficheiro CSV
+        for (int i = 0; i < bibliotecas.size(); i++) {
             Biblioteca biblioteca = bibliotecas.get(i);
             criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), biblioteca, i != 0);
         }
     }
 
     /*
-     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
-     * */
+     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - FIM #################################################
+     */
 
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
