@@ -2210,7 +2210,7 @@ public static void gravarArrayReservas() throws IOException {
                 }
                 break;
             default:
-                // TODO: Mensagem de erro/evitar que a app crashe quando se passa algo errado para aqui
+                System.out.println("Tipo de Item não existe.");
                 break;
         }
 
@@ -2526,7 +2526,6 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos, Constantes.Etapa etapa)
     {
-        //TODO : Implementar a função de mostrar a tabela de emprestimos, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id".length();
         int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
@@ -2703,7 +2702,6 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idReservaLinhaMaxLen = "Id Reserva Linha".length();
         int idReservaMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
@@ -2837,7 +2835,6 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
         int idMaxLen = "Id Emprestimo".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
