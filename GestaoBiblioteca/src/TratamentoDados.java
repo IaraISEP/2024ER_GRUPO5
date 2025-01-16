@@ -1232,10 +1232,10 @@ public class TratamentoDados {
         // É validado se a data fim introduzida é inferior à início e superior ao limite estipulado.
         do {
             dataInicio = lerData("Insira a data de início da reserva (dd/MM/yyyy): ");
-            if (dataInicio.isBefore(Constantes.getDatahoje())) {
-                System.out.println("A data de início não pode ser anterior ao dia de hoje.");
+            if (dataInicio.isBefore(Constantes.getDatahoje()) || dataInicio.isAfter(Constantes.getDatahoje().plusDays(30))) {
+                System.out.println("A data de início não pode ser anterior ao dia de hoje. (Com Max de 30 dias após)");
             }
-        } while (dataInicio.isBefore(Constantes.getDatahoje()));
+        } while (dataInicio.isBefore(Constantes.getDatahoje()) || dataInicio.isAfter(Constantes.getDatahoje().plusDays(30)));
 
         do {
             dataFim = lerData("Insira a data de fim da reserva (dd/MM/yyyy): ");
