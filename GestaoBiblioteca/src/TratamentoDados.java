@@ -1959,15 +1959,19 @@ public static void gravarArrayReservas() throws IOException {
      * */
 
     public static void listarTodasReservasEmprestimoCliente() {
-        if (clientes.isEmpty())
-        {
+        if (clientes.isEmpty()) {
             System.out.println("Não existem Clientes !");
-        }else
-        {
-            mostraTabelaClientes(clientes);
+            return;
         }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos: ",false,null);
+        
+        mostraTabelaClientes(clientes);
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas / Emprestimos: ",false,null);
 
+        if (getClienteById(idCliente) == null) {
+            System.out.println("Cliente não encontrado!");
+            return;
+        }
+        
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
@@ -1976,34 +1980,41 @@ public static void gravarArrayReservas() throws IOException {
                 listagemReserva.add(reserva);
             }
         }
+
+        if (listagemReserva.isEmpty())
+            System.out.println("Não existem reservas para mostrar.");
+        else {
+            System.out.println("\nReservas :");
+            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+        }
+        
         for (Emprestimo emprestimo : emprestimos){
             if (emprestimo.getCliente().getId() == idCliente) {
                 listagemEmprestimo.add(emprestimo);
             }
         }
-        if (listagemReserva.isEmpty()){
-            System.out.println("Não existem Reservas desse cliente!");
-        }else{
-            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
-        }
-        if (listagemEmprestimo.isEmpty()){
-            System.out.println("Não existem Emprestimos desse cliente!");
-        }else{
+        
+        if (listagemEmprestimo.isEmpty())
+            System.out.println("Não existem emprestimos para mostrar.");
+        else{
+            System.out.println("\nEmprestimos :");
             mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
-
     }
 
     public static void listarTodasReservasEmprestimoClienteData() {
-        if (clientes.isEmpty())
-        {
+        if (clientes.isEmpty()) {
             System.out.println("Não existem Clientes !");
-        }else
-        {
-            mostraTabelaClientes(clientes);
         }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Emprestimos",false,null);
+        
+        mostraTabelaClientes(clientes);
+        
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Emprestimos: ",false,null);
 
+        if (getClienteById(idCliente) == null) {
+            System.out.println("Cliente não encontrado!");
+            return;
+        }
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
@@ -2020,22 +2031,26 @@ public static void gravarArrayReservas() throws IOException {
                 listagemReserva.add(reserva);
             }
         }
+
+        if (listagemReserva.isEmpty())
+            System.out.println("Não existem Reservas desse cliente nessas datas!");
+        else {
+            System.out.println("\nReserva :");
+            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+        }
+        
         for (Emprestimo emprestimo : emprestimos){
             if (emprestimo.getCliente().getId() == idCliente && (emprestimo.getDataInicio().isAfter(dataInicio) || emprestimo.getDataInicio().isEqual(dataInicio) )&& (emprestimo.getDataFim().isBefore(dataFim) || emprestimo.getDataFim().isEqual(dataFim) )) {
                 listagemEmprestimo.add(emprestimo);
             }
         }
-        if (listagemReserva.isEmpty()){
-            System.out.println("Não existem Reservas desse cliente nessas datas!");
-        }else{
-            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
-        }
-        if (listagemEmprestimo.isEmpty()){
+        
+        if (listagemEmprestimo.isEmpty())
             System.out.println("Não existem Emprestimos desse cliente nessas datas!");
-        }else{
+        else {
+            System.out.println("\nEmprestimo :");
             mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
-
     }
 
     /*
@@ -3261,6 +3276,16 @@ public static void gravarArrayReservas() throws IOException {
         {
             if(emprestimo.getNumMovimento() == id)
                 return emprestimo;
+        }
+        return null;
+    }
+
+    private static Cliente getClienteById(int id)
+    {
+        for(Cliente cliente : clientes)
+        {
+            if(cliente.getId() == id)
+                return cliente;
         }
         return null;
     }
