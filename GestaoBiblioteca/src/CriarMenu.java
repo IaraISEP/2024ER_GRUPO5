@@ -431,12 +431,7 @@ public class CriarMenu {
             keyPress();
         }));
         menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Detalhados", () -> {
-            try {
-                TratamentoDados.listaTodosEmprestimos(Constantes.Etapa.LISTAR);
-                TratamentoDados.listarDetalhesEmprestimo(TratamentoDados.lerInt("Insira o Id do empréstimo: ",false,null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            TratamentoDados.listarDetalhesEmprestimo();
             keyPress();
         }));
 
