@@ -2,8 +2,11 @@ import java.io.IOException;
 import java.util.Scanner;
 
 /**
- * Representa a criação de menus.
- * @author ER_GRUPO_5
+ * Representa a criação de menus para a gestão da biblioteca.
+ * Esta classe contém métodos para criar e exibir diferentes menus relacionados à biblioteca,
+ * como menus para gestão de clientes, livros, jornais, revistas, reservas e empréstimos.
+ * Também inclui métodos para listar e exibir detalhes desses itens.
+ *
  * @since 2024
  */
 public class CriarMenu {
@@ -11,17 +14,11 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu principal da gestão da biblioteca.
+     * Este menu principal contém opções para acessar submenus de gestão de bibliotecas, clientes,
+     * livros, jornais, revistas, reservas, empréstimos e listagens.
      */
     public static void menuPrincipal(){
         Menu menuPrincipal = new Menu("Gestão Biblioteca");
-        //TODO : para passarmos a gerir a biblioteca, criar esta estrutura :
-        // Iniciar sessão na biblioteca
-        // Editar dados da biblioteca
-        // Criar nova biblioteca
-        // Fechar nova biblioteca
-        //o inicio de sessão na biblioteca é-nos levado a escolher qual a biblioteca, e mostra o demais menu (com cliente, livro, ...)
-        //após abrir a biblioteca, deve ser criada uma variável constante que guardará o id da biblioteca em "sessão"
-        //De forma a se utilizar em todos os métodos para separar a informação
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Bilioteca", CriarMenu::menuBiblioteca));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Cliente", CriarMenu::menuCliente));
         menuPrincipal.adicionarOpcao(new OpcaoMenu("Livro", CriarMenu::menuLivro));
@@ -35,6 +32,8 @@ public class CriarMenu {
 
     /**
      * Aguarda que o utilizador pressione a tecla Enter.
+     * Este método é utilizado para pausar a execução do programa até que o utilizador pressione Enter,
+     * permitindo que o utilizador leia mensagens ou resultados exibidos no console.
      */
     private static void keyPress() {
         System.out.println("\nPressione Enter para continuar...");
@@ -42,12 +41,22 @@ public class CriarMenu {
     }
 
     /**
-     * Cria e exibe o menu de gestão de Bibliotecas.
+     * Cria e exibe o menu de gestão de bibliotecas.
+     * Este menu contém opções para iniciar sessão, criar, listar, editar e apagar bibliotecas.
      */
-    private static void menuBiblioteca(){
+    public static void menuBiblioteca(){
         Menu menuBiblioteca = new Menu("Gestão Bibliotecas");
 
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Criar Bibliotecas", () -> {
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Iniciar Sessão", () -> {
+            try {
+                TratamentoDados.inicioSessao();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            keyPress();
+        }));
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Criar Biblioteca", () -> {
             try {
                 TratamentoDados.criarBiblioteca();
             } catch (IOException e) {
@@ -55,23 +64,36 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Listar Bibliotecas", () -> {
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Listar Biblioteca", () -> {
             TratamentoDados.listaTodasBibliotecas();
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Editar Bibliotecas", () -> {
-            System.out.println("Editar Biblioteca");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Editar Biblitoeca", () -> {
+            try {
+                TratamentoDados.editarBiblioteca();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Apagar Bibliotecas", () -> {
-            System.out.println("Apagar Biblioteca");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Apagar Biblitoeca", () -> {
+            try {
+                TratamentoDados.apagarBiblioteca();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
+
         menuBiblioteca.exibir();
     }
 
     /**
      * Cria e exibe o menu de gestão de clientes.
+     * Este menu contém opções para criar, listar, editar e apagar clientes.
      */
     private static void menuCliente(){
         Menu menuCliente = new Menu("Gestão Clientes");
@@ -106,6 +128,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de clientes.
+     * Este menu contém opções para listar todos os clientes ou listar clientes por parâmetro.
      */
     private static void menuListarClientes() {
         Menu menuListarClientes = new Menu("Listar Clientes");
@@ -124,6 +147,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de gestão de livros.
+     * Este menu contém opções para criar, listar, editar e apagar livros.
      */
     private static void menuLivro() {
         Menu menuLivro = new Menu("Gestão de Livros");
@@ -159,6 +183,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de livros.
+     * Este menu contém opções para listar todos os livros ou listar livros por ISBN.
      */
     private static void menuListarLivros() {
         Menu menuListarLivros = new Menu("Listar Livros");
@@ -177,6 +202,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de gestão de jornais.
+     * Este menu contém opções para criar, listar, editar e apagar jornais.
      */
     private static void menuJornal() {
         Menu menuJornal = new Menu("Gestão de Jornais");
@@ -212,6 +238,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de jornais.
+     * Este menu contém opções para listar todos os jornais ou listar jornais por ISSN.
      */
     private static void menuListarJornais() {
         Menu menuListarJornais = new Menu("Listar Jornais");
@@ -230,6 +257,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de gestão de revistas.
+     * Este menu contém opções para criar, listar, editar e apagar revistas.
      */
     private static void menuRevista() {
         Menu menuRevista = new Menu("Gestão de Revistas");
@@ -264,6 +292,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de revistas.
+     * Este menu contém opções para listar todas as revistas ou listar revistas por ISSN.
      */
     private static void menuListarRevistas() {
         Menu menuListarRevistas = new Menu("Listar Revistas");
@@ -282,6 +311,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de gestão de reservas.
+     * Este menu contém opções para criar, listar, editar, concluir e cancelar reservas.
      */
     private static void menuReservas() {
         Menu menuReservas = new Menu("Gestão de Reservas");
@@ -330,6 +360,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de gestão de empréstimos.
+     * Este menu contém opções para criar, listar, editar, cancelar e concluir empréstimos.
      */
     private static void menuEmprestimos() {
         Menu menuEmprestimos = new Menu("Gestão de Empréstimos");
@@ -370,6 +401,12 @@ public class CriarMenu {
 
         menuEmprestimos.exibir();
     }
+
+    /**
+     * Cria e exibe o menu de listagens de reservas e empréstimos.
+     * Este menu contém opções para listar reservas e empréstimos por cliente, por data,
+     * calcular o tempo médio de empréstimos e identificar o tipo de item mais requisitado.
+     */
     private static void menuListagens(){
         Menu menuListagens = new Menu("Listagens de Reservas / Emprestimos");
 
@@ -398,6 +435,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de reservas.
+     * Este menu contém opções para listar reservas de forma simplificada ou detalhada.
      */
     private static void menuListarReservas() {
         Menu menuListarReservas = new Menu("Listar Reservas");
@@ -425,6 +463,7 @@ public class CriarMenu {
 
     /**
      * Cria e exibe o menu de listagem de empréstimos.
+     * Este menu contém opções para listar empréstimos de forma simplificada ou detalhada.
      */
     private static void menuListarEmprestimos() {
         Menu menuListarEmprestimos = new Menu("Listar Empréstimos");

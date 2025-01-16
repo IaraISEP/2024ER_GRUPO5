@@ -16,6 +16,6 @@ public class Main {
         //int idBiblioteca = TratamentoDados.lerInt("Escolha o Id da biblioteca",false,null);
         //Biblioteca biblioteca = new Biblioteca("Biblioteca 1", "Morada 1", idBiblioteca);
         TratamentoDados.inicializador();
-        CriarMenu.menuPrincipal();
+        CriarMenu.menuBiblioteca();
     }
 }

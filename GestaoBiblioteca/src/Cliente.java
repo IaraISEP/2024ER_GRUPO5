@@ -30,6 +30,10 @@ public class Cliente {
         this.codBiblioteca = codBiblioteca;
     }
 
+    public int getCodBiblioteca() {
+        return codBiblioteca;
+    }
+
     /**
      * Obtém o ID do cliente.
      *
