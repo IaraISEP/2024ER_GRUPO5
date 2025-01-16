@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Classe responsável pelo tratamento de dados no sistema de gestão de bibliotecas.
  * Esta classe gere a criação e manipulação de ficheiros e dados relacionados com bibliotecas, clientes, livros, jornais, revistas, empréstimos e reservas.
- * <p>
+ *
  * As suas principais funcionalidades incluem:
  * - Criação de novos objetos das classes relacionadas.
  * - Criação e manutenção da estrutura de ficheiros para armazenamento de dados persistentes.
@@ -270,7 +270,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O ficheiro está vazio.");
                 return;
             }
             do {
@@ -630,7 +629,6 @@ public class TratamentoDados {
         try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             String csvDivisor = ";";
@@ -813,7 +811,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             String csvDivisor = ";";
@@ -903,7 +900,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             do {
@@ -1401,6 +1397,7 @@ public class TratamentoDados {
      * @throws IOException Se ocorrer um erro durante a gravação dos dados.
      */
     public static void editarReserva() throws IOException {
+
         // Verifica se a lista de reservas está vazia
         if (reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
@@ -1409,60 +1406,89 @@ public class TratamentoDados {
 
         // Lista todas as reservas
         listaTodasReservas(Constantes.Etapa.EDITAR);
-
-        // Lê o ID da reserva a ser editada
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        for (Reserva reserva : reservas) {
-            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
-                System.out.println("Não é possivel editar a reserva.");
+        boolean flag = false;
+        do{
+            // Lê o ID da reserva a ser editada
+            int idEditar = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
+            if (idEditar == 0)
                 return;
+            for (Reserva reserva : reservas) {
+                if (reserva.getNumMovimento() == idEditar ) {
+                    flag=true;
+                    break;
+                }
             }
-        }
-        listarDetalhesReserva(idEditar);
-
-        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
-        switch (opcao) {
-            case 1:
-                criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
-                gravarArrayReservaLinha();
-                break;
-            case 2:
-                opcao = 1;
-                do {
-                    if (opcao != 1)
-                        System.out.println("Número Inválido!");
-                    else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
-                        System.out.println("Não existem mais itens para remover!");
+            if (!flag){
+                System.out.println("Id Inválido!");
+            }else {
+                listarDetalhesReserva(idEditar, Constantes.Etapa.EDITAR);
+            }
+            if (flag){
+                int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n0 - Voltar\n", false, null);
+                switch (opcao) {
+                    case 0:
+                        return;
+                    case 1:
+                        criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
+                        gravarArrayReservaLinha();
                         break;
-                    }
-                    opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
-                } while (opcao != 2);
-                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
-                gravarArrayReservaLinha();
-                break;
-            default:
-                System.out.println("Escolha invalida! Tente novamente.");
-        }
+                    case 2:
+                        opcao = 1;
+                        do {
+                            if (opcao != 1)
+                                System.out.println("Número Inválido!");
+                            else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
+                                System.out.println("Não existem mais itens para remover!");
+                                break;
+                            }
+                            opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                        } while (opcao != 2);
+                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
+                        gravarArrayReservaLinha();
+                        break;
+                    default:
+                        System.out.println("Escolha invalida! Tente novamente.");
+
+                }
+            }
+        }while(!flag);
     }
 
     /**
      * Metodo para listar os detalhes de uma reserva.
      * Procura a reserva pelo ID e exibe os detalhes da reserva.
      *
-     * @param idReserva O ID da reserva.
      * @throws IOException Se ocorrer um erro durante a leitura dos dados.
      */
-    public static void listarDetalhesReserva(int idReserva) throws IOException {
+    public static void listarDetalhesReserva(int idReserva, Constantes.Etapa etapa) throws IOException {
         // Lista de apoio para editar os detalhes
         List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
+        boolean flag = false;
 
-        // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-        for (ReservaLinha reservaLinha : reservasLinha) {
-            if (reservaLinha.getIdReserva() == idReserva) {
-                reservaLinhaDetails.add(reservaLinha);
+        do {
+            boolean hasReservas = hasReservas();
+
+            if (!hasReservas) return;
+            if (etapa == Constantes.Etapa.LISTAR) {
+                idReserva = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
+
+                if (idReserva == 0) {
+                    return;
+                }
             }
-        }
-        mostraDetalhesReservas(reservaLinhaDetails, 0, null);
+            // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
+            for (ReservaLinha reservaLinha : reservasLinha) {
+                if (reservaLinha.getIdReserva() == idReserva) {
+                    reservaLinhaDetails.add(reservaLinha);
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                System.out.println("Id Inválido!");
+            } else {
+                mostraDetalhesReservas(reservaLinhaDetails, 0, null);
+            }
+        }while(!flag);
     }
 
     /**
@@ -1798,7 +1824,6 @@ public static void lerFicheiroCsvReservasLinha(String ficheiro) {
         String linha = readFile.readLine();
 
         if (linha == null) {
-            System.out.println("O ficheiro está vazio.");
             return;
         }
 
@@ -1846,7 +1871,6 @@ public static void lerFicheiroCsvEmprestimos(String ficheiro) {
     try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
         String linha = readFile.readLine();
         if (linha == null) {
-            System.out.println("O arquivo está vazio.");
             return;
         }
         do {
@@ -1900,7 +1924,6 @@ public static void lerFicheiroCsvEmprestimosLinha(String ficheiro) {
         String linha = readFile.readLine();
 
         if (linha == null) {
-            System.out.println("O ficheiro está vazio.");
             return;
         }
 
@@ -2517,8 +2540,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
             }
         }else{
             try{
-            reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
-            return true;
+                reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
+                return true;
             }catch (IllegalArgumentException e){
                 System.out.println(e.getMessage());
                 return false;
@@ -2610,8 +2633,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
         String campo;
         boolean flag;
         do {
-        System.out.print(mensagem);
-        campo = input.nextLine().trim();
+            System.out.print(mensagem);
+            campo = input.nextLine().trim();
             if (campo.isEmpty()) {
                 System.out.println("Campo não pode estar vazio");
                 flag = false;
@@ -2640,10 +2663,10 @@ public static void listarTodasReservasEmprestimoClienteData() {
                 valor = input.nextInt();
                 input.nextLine(); // necessário para limpar buffer
                 if (isDate) {
-                    if (valor > 0 && 
-                        ((valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO) || 
-                        (valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL) ||
-                        (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
+                    if (valor > 0 &&
+                            ((valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO) ||
+                                    (valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL) ||
+                                    (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
                         isInt = true;
                     else if(valor > 0 && valor <= 1455 && tipoItem == Constantes.TipoItem.LIVRO)
                         System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha... Por favor, insira um ano válido (>= 1455).\n");
@@ -2941,12 +2964,12 @@ public static void listarTodasReservasEmprestimoClienteData() {
             //Valida se é edição, cancelamento ou conclusão de empréstimo e se está emprestado, para simplificar a sintaxe no if
             boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
             boolean notCanceladoConcluido = emprestimo.getEstado() != Constantes.Estado.CONCLUIDO && emprestimo.getEstado() != Constantes.Estado.CANCELADO;
-        
+
             //Caso seja Edição/Cancelamento/Conclusão só mostra os emprestados, caso contrário mostra tudo 
             if (emprestimo.getCodBiblioteca() == codBibliotecaSessao && (!isEditCancelConclude || notCanceladoConcluido)) 
                 System.out.printf(formato, emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
-        
+
         System.out.println(separador);
     }
 
@@ -3499,7 +3522,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
                 throw new IllegalArgumentException("Campo desconhecido: " + validacaoCliente);
         }
     }
-    
+
     private static boolean hasReservas()
     {
         if(reservas.isEmpty())
@@ -3521,7 +3544,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
             System.out.println("Não existem reservas para mostrar.");
             return false;
         }
-        
+
         return true;
     }
 
@@ -3529,7 +3552,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
     }
-        
+
     /*
      * ########################################## HELPERS - FIM ########################################################
      * */
