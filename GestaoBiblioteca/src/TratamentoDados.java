@@ -1986,6 +1986,11 @@ public class TratamentoDados {
         }
     }
 
+    /**
+     * Metodo para listar os detalhes de um emprestimo
+     *
+     * @return O próximo ID disponível para o tipo de item especificado.
+     */
     public static void listarDetalhesEmprestimo()
     {
         if(emprestimosLinha.isEmpty())
