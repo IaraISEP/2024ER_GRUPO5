@@ -7,13 +7,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
- * Representa Classe responsavel pelo tratamento de dados
+ * Classe responsável pelo tratamento de dados no sistema de gestão de bibliotecas.
+ * Esta classe gere a criação e manipulação de ficheiros e dados relacionados com bibliotecas, clientes, livros, jornais, revistas, empréstimos e reservas.
+ *
+ * As suas principais funcionalidades incluem:
+ * - Criação de novos objetos das classes relacionadas.
+ * - Criação e manutenção da estrutura de ficheiros para armazenamento de dados persistentes.
+ * - Edição e leitura de ficheiros para manter os dados atualizados.
+ *
  * @author ER_GRUPO_5
  * @since 2024
- * Criação de novos objectos das classes
- * Criação de toda a estrutura de ficheiros
- * Edição e Leitura de ficheiros
- * */
+ */
 public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
@@ -29,10 +33,27 @@ public class TratamentoDados {
     private static int codBibliotecaLogin=0;
 
     /**
-     * Metodo para criar a estrutura de ficheiros para
-     * guardar os dados permanentemente
-     * Cria 7 Directorios com um ficheiro cada
-     * */
+     * Método responsável por criar a estrutura de ficheiros necessária para o armazenamento de dados de forma persistente.
+     *
+     * O método cria uma série de diretórios e ficheiros para armazenar informações sobre bibliotecas, clientes, livros, jornais, revistas,
+     * empréstimos e reservas. Caso os diretórios ou ficheiros já existam, não são recriados.
+     *
+     * Diretórios criados:
+     * - Dados/Bibliotecas
+     * - Dados/Clientes
+     * - Dados/Livros
+     * - Dados/Jornais
+     * - Dados/Revistas
+     * - Dados/Emprestimos
+     * - Dados/Reservas
+     * - Dados/Reservas/Details
+     * - Dados/Historico
+     *
+     * Ficheiros criados:
+     * - Definidos pelos caminhos armazenados nas constantes em `Constantes.Path`
+     *
+     * @throws IOException Se ocorrer um erro ao criar os ficheiros ou diretórios.
+     */
     public static void criarSistemaFicheiros() throws IOException
     {
         File[] dirs = new File[]{
@@ -67,7 +88,6 @@ public class TratamentoDados {
             }
         }
     }
-
     /*
      * ########################### TRATAMENTO DE DADOS LOGIN - INICIO #################################################
      * */
@@ -96,22 +116,36 @@ public class TratamentoDados {
 
     /*
      * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
-     * */
+     */
 
+    /**
+     * Método responsável por inserir os dados de uma nova biblioteca.
+     * Solicita ao utilizador o nome e a morada da biblioteca, e gera automaticamente o ID da mesma.
+     *
+     * @return Um objeto do tipo Biblioteca contendo as informações inseridas.
+     * @throws IOException Se ocorrer um erro ao ler a entrada do utilizador.
+     */
     public static Biblioteca inserirDadosBiblioteca() throws IOException
     {
-        String nome="";
+        String nome = "";
         int idBiblioteca = 0;
 
-        System.out.println("Insira o Nome da Biblioteca; ");
+        System.out.println("Insira o Nome da Biblioteca: ");
         nome = input.nextLine();
         Constantes.Morada morada = selecionaMorada("Insira a Morada da biblioteca: ");
 
-        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA,-1);
+        // Gera um ID único automaticamente para a nova biblioteca
+        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA, -1);
 
         return new Biblioteca(nome, morada, idBiblioteca);
     }
 
+    /**
+     * Método que cria uma nova biblioteca e adiciona-a à lista de bibliotecas.
+     * Após a criação, os dados são guardados no ficheiro CSV correspondente.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados.
+     */
     public static void criarBiblioteca() throws IOException
     {
         bibliotecas.add(inserirDadosBiblioteca());
@@ -119,9 +153,13 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo para criar o ficehiro bibliotecas.csv
-     * e adicionar conteúdo ao mesmo.
-     * */
+     * Método responsável por criar um ficheiro CSV e gravar os dados de uma biblioteca.
+     *
+     * @param ficheiro Nome do ficheiro a ser criado/atualizado.
+     * @param biblioteca Objeto Biblioteca cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever ou adicionar ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void criarFicheiroCsvBiblioteca(String ficheiro, Biblioteca biblioteca, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
@@ -129,39 +167,40 @@ public class TratamentoDados {
         }
     }
 
+    /**
+     * Método responsável por ler os dados de bibliotecas a partir de um ficheiro CSV.
+     *
+     * @param ficheiro Caminho do ficheiro CSV a ser lido.
+     * Lê cada linha e cria objetos Biblioteca que são adicionados à lista.
+     */
     public static void lerFicheiroCsvBiblioteca(String ficheiro)
     {
-        try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
+                System.out.println("O ficheiro está vazio.");
                 return;
             }
-            String csvDivisor = ";";
             do {
-                // Separa a linha num array para que sejam individualmente preenchidos e criados no objeto
-                String[] dados = linha.split(csvDivisor);
+                // Divide a linha em diferentes atributos e cria o objeto Biblioteca
+                String[] dados = linha.split(Constantes.SplitChar);
                 String nome = dados[0];
                 Constantes.Morada morada = Constantes.Morada.valueOf(dados[1]);
                 int id = Integer.parseInt(dados[2]);
 
-                // Cria um novo objeto Cliente e adiciona à lista
+                // Cria um novo objeto Biblioteca e adiciona-o à lista
                 Biblioteca biblioteca = new Biblioteca(nome, morada, id);
                 bibliotecas.add(biblioteca);
-            }while ((linha = readFile.readLine()) != null);
-        } catch (IOException e){
-            System.out.println(e.getMessage());
+            } while ((linha = readFile.readLine()) != null);
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o ficheiro: " + e.getMessage());
         }
-
-        // Imprime todos as Bibliotecas
-/*        for (Biblioteca biblioteca : bibliotecas) {
-            System.out.println(biblioteca);
-        }*/
     }
 
     /**
-     * Metódo que lista todos os Clientes existentes na biblioteca
-     * */
+     * Método que lista todas as bibliotecas existentes.
+     * Se não existirem bibliotecas, uma mensagem informativa é apresentada.
+     */
     public static void listaTodasBibliotecas()
     {
         if (bibliotecas.isEmpty())
@@ -171,32 +210,40 @@ public class TratamentoDados {
     }
 
     /**
-     * Metodo para gravar a lista de bibliotecas em ficheiro
-     * */
+     * Método responsável por gravar a lista de bibliotecas num ficheiro CSV.
+     * Itera por todas as bibliotecas e grava cada uma individualmente no ficheiro.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void gravarArrayBibliotecas() throws IOException
     {
-        // Verifica se a lista de clientes está vazia
-        if(bibliotecas.isEmpty()){
-            System.out.println("Array vazio");
+        if (bibliotecas.isEmpty()) {
+            System.out.println("Array de bibliotecas vazio.");
         }
-        // Itera pela lista de clientes e grava cada um no ficheiro
-        for(int i = 0; i < bibliotecas.size(); i++) {
+        // Percorre todas as bibliotecas e grava cada uma no ficheiro CSV
+        for (int i = 0; i < bibliotecas.size(); i++) {
             Biblioteca biblioteca = bibliotecas.get(i);
             criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), biblioteca, i != 0);
         }
     }
 
     /*
-     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - INICIO #################################################
-     * */
-
+     * ########################### TRATAMENTO DE DADOS BIBLIOTECA - FIM #################################################
+     */
     /*
      * ########################### TRATAMENTO DE DADOS CLIENTE - INICIO #################################################
      * */
 
     /**
-     * Metodo para requisitar ao utilizador os dados do Cliente
-     * */
+     * Método para requisitar ao utilizador os dados do Cliente.
+     * Este método solicita ao utilizador que insira o contribuinte (NIF), nome, género e contacto do cliente.
+     * Valida o NIF para garantir que tem 9 dígitos e que não está duplicado.
+     * Valida o género para garantir que é 'M' ou 'F'.
+     * Valida o contacto para garantir que tem 9 dígitos e começa com 2 ou 9.
+     *
+     * @param id O ID do cliente a ser inserido.
+     * @return Um objeto Cliente com os dados inseridos.
+     */
     public static Cliente inserirDadosCliente(int id)
     {
         int contacto;
@@ -230,24 +277,27 @@ public class TratamentoDados {
                 genero = Constantes.Genero.fromGenero(gen);
             else
                 System.out.print("O gênero introduzido não é válido!");
-
         } while (!flag);
 
         do {
             contacto = lerInt("\nPor favor, insira o Contacto do Cliente: ", false, null);
             if (!String.valueOf(contacto).matches("^[29]\\d{8}$")) {
                 System.out.print("Número de contacto com formato inválido! ex: 912345678");
-                flag = false;
+                continue;
             }
-            flag=true;
-        } while (!flag);
+            break;
+        } while (true);
 
-        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,codBibliotecaLogin);
+        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
-     * Metodo para adicionar um novo Cliente à lista.
-     * */
+     * Método para adicionar um novo Cliente à lista.
+     * Este método gera automaticamente um ID para o novo cliente, solicita os dados do cliente ao utilizador,
+     * adiciona o cliente à lista de clientes e grava a lista atualizada no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+     */
     public static void criarCliente() throws IOException
     {
         clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1)));
@@ -256,6 +306,8 @@ public class TratamentoDados {
 
     /**
      * Edita um cliente pelo ID fornecido.
+     * Este método lista todos os clientes, solicita ao utilizador que escolha o ID do cliente a ser editado,
+     * solicita os novos dados do cliente, atualiza a lista de clientes e grava a lista atualizada no ficheiro CSV.
      *
      * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
@@ -282,9 +334,14 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo para criar o ficehiro clientes.csv
-     * e adicionar conteúdo ao mesmo.
-     * */
+     * Método para criar o ficheiro clientes.csv e adicionar conteúdo ao mesmo.
+     * Este método grava os dados de um cliente no ficheiro CSV.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param cliente O objeto Cliente cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever (true) ou adicionar (false) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
     public static void criarFicheiroCsvCliente(String ficheiro, Cliente cliente, Boolean firstLine) throws IOException
     {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
@@ -293,8 +350,9 @@ public class TratamentoDados {
     }
 
     /**
-     * Metódo que lista todos os Clientes existentes na biblioteca
-     * */
+     * Método que lista todos os Clientes existentes na biblioteca.
+     * Este método verifica se a lista de clientes está vazia e, se não estiver, exibe os dados de todos os clientes.
+     */
     public static void listaTodosClientes()
     {
         if (clientes.isEmpty())
@@ -305,7 +363,9 @@ public class TratamentoDados {
 
     /**
      * Lista um cliente pelo Nome, NIF ou Contacto fornecido.
-     * Se o cliente for encontrado, exibe os detalhes do cliente.
+     * Este método solicita ao utilizador que escolha o parâmetro de pesquisa (Nome, NIF ou Contacto),
+     * realiza a pesquisa e exibe os detalhes do cliente encontrado.
+     * Se não encontrar o cliente, exibe uma mensagem informativa.
      */
     public static void listaClientePorParametro()
     {
@@ -313,7 +373,7 @@ public class TratamentoDados {
             System.out.println("Esta biblioteca não contém clientes.");
             return;
         }
-        
+
         do{
             boolean hasClient = false;
             System.out.println("Escolha o parâmetro que deseja pesquisar: ");
@@ -322,16 +382,16 @@ public class TratamentoDados {
             switch (escolha){
                 case 1:
                     String nome = lerString("\nDigite o Nome do Cliente que deseja encontrar: ");
-                    
+
                     List<Cliente> clienteComNome = new ArrayList<>();
                     for (Cliente cliente : clientes) {
                         if (cliente.getNome().toLowerCase().contains(nome.toLowerCase())) {
                             clienteComNome.add(cliente);
                         }
                     }
-                    
+
                     if(clienteComNome.isEmpty()) {
-                        System.out.println("Cliente não encontrado."); 
+                        System.out.println("Cliente não encontrado.");
                         keyPress();
                     }
                     else {
@@ -341,7 +401,7 @@ public class TratamentoDados {
                     break;
                 case 2:
                     String nif;
-                    
+
                     do {
                         nif = lerString("\nPor favor, insira o Contribuinte do Cliente:");
                         if ( !nif.matches("^\\d{9}$"))
@@ -349,7 +409,7 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
-                    
+
                     for (Cliente cliente : clientes) {
                         if (cliente.getNif() == Integer.parseInt(nif)) {
                             mostraTabelaClientes(Collections.singletonList(cliente));
@@ -358,7 +418,7 @@ public class TratamentoDados {
                             break;
                         }
                     }
-                    
+
                     if(!hasClient)
                     {
                         System.out.println("Cliente não encontrado.");
@@ -374,9 +434,9 @@ public class TratamentoDados {
                         else
                             break;
                     } while (true);
-                    
+
                     List<Cliente> clienteComContacto = new ArrayList<>();
-                    
+
                     for (Cliente cliente : clientes) {
                         if (cliente.getContacto() == Integer.parseInt(contacto)) {
                             clienteComContacto.add(cliente);
@@ -404,6 +464,8 @@ public class TratamentoDados {
 
     /**
      * Apaga um cliente pelo ID fornecido.
+     * Este método lista todos os clientes, solicita ao utilizador que escolha o ID do cliente a ser apagado,
+     * verifica se o cliente possui reservas ou empréstimos ativos, e se não possuir, remove o cliente da lista e grava a lista atualizada no ficheiro CSV.
      *
      * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
@@ -438,7 +500,7 @@ public class TratamentoDados {
 
         // Verifica se o cliente possui reservas ativas, caso tenha, o programa salta fora e não apaga cliente
         for (Reserva reserva : reservas) {
-           if (reserva.getCliente().equals(clienteApagar)) {
+            if (reserva.getCliente().equals(clienteApagar)) {
                 System.out.println("Não pode apagar um cliente com reservas ativas.");
                 return;
             }
@@ -460,7 +522,8 @@ public class TratamentoDados {
 
     /**
      * Grava a lista de clientes em ficheiro.
-     * Se a lista estiver vazia, apaga o ficheiro e mostra uma mensagem a informar.
+     * Este método verifica se a lista de clientes está vazia e, se não estiver, grava os dados de cada cliente no ficheiro CSV.
+     * Se a lista estiver vazia, exibe uma mensagem informativa.
      *
      * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
@@ -481,6 +544,7 @@ public class TratamentoDados {
 
     /**
      * Lê os dados dos clientes a partir de um ficheiro e popula a lista de clientes.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto Cliente com os dados lidos e adiciona-o à lista de clientes.
      *
      * @param ficheiro O caminho para o ficheiro que contém os dados dos clientes.
      */
@@ -525,6 +589,10 @@ public class TratamentoDados {
 
     /**
      * Adiciona um novo livro ao sistema.
+     * Este método gera automaticamente um ID para o novo livro, solicita os dados do livro ao utilizador,
+     * adiciona o livro à lista de livros e grava a lista atualizada no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
      */
     public static void criarLivro() throws IOException {
         livros.add(inserirDadosLivro(getIdAutomatico(Constantes.TipoItem.LIVRO, -1)));
@@ -534,6 +602,7 @@ public class TratamentoDados {
 
     /**
      * Lista todos os livros cadastrados no sistema.
+     * Este método verifica se a lista de livros está vazia e, se não estiver, exibe os dados de todos os livros.
      */
     public static void listaTodosLivros() {
         if (livros.isEmpty()) {
@@ -546,6 +615,8 @@ public class TratamentoDados {
 
     /**
      * Lista um livro pelo ISBN fornecido.
+     * Este método solicita ao utilizador que insira o ISBN do livro, realiza a pesquisa e exibe os detalhes do livro encontrado.
+     * Se não encontrar o livro, exibe uma mensagem informativa.
      */
     public static void listaLivroPorIsbn() {
         if (livros.isEmpty()) {
@@ -567,6 +638,10 @@ public class TratamentoDados {
 
     /**
      * Edita os dados de um livro existente.
+     * Este método lista todos os livros, solicita ao utilizador que escolha o ID do livro a ser editado,
+     * solicita os novos dados do livro, atualiza a lista de livros e grava a lista atualizada no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
     public static void editarLivro() throws IOException {
         if (livros.isEmpty()) {
@@ -590,6 +665,10 @@ public class TratamentoDados {
 
     /**
      * Apaga um livro pelo ID.
+     * Este método lista todos os livros, solicita ao utilizador que escolha o ID do livro a ser apagado,
+     * remove o livro da lista e grava a lista atualizada no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
     public static void apagarLivroPeloId() throws IOException {
         if (livros.isEmpty()) {
@@ -617,20 +696,23 @@ public class TratamentoDados {
 
     /**
      * Grava a lista de livros em um arquivo CSV.
+     * Este método itera pela lista de livros e grava os dados de cada livro no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
     public static void gravarArrayLivros() throws IOException {
-        if (livros.isEmpty()) {
-            new File(Constantes.Path.LIVRO.getValue()).delete();
-            System.out.println("Biblioteca não tem contem livros.");
-            return;
-        }
-        for (int i = 0; i < livros.size(); i++) {
+        for (int i = 0; i < livros.size(); i++)
             criarFicheiroCsvLivro(Constantes.Path.LIVRO.getValue(), livros.get(i), i != 0);
-        }
     }
 
     /**
      * Cria um arquivo CSV para armazenar os dados dos livros.
+     * Este método grava os dados de um livro no ficheiro CSV.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param livro O objeto Livro cujos dados serão gravados.
+     * @param append Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
      */
     public static void criarFicheiroCsvLivro(String ficheiro, Livro livro, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
@@ -649,6 +731,9 @@ public class TratamentoDados {
 
     /**
      * Lê os livros do arquivo CSV.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto Livro com os dados lidos e adiciona-o à lista de livros.
+     *
+     * @param ficheiro O caminho para o ficheiro que contém os dados dos livros.
      */
     public static void lerFicheiroCsvLivros(String ficheiro)
     {
@@ -669,7 +754,7 @@ public class TratamentoDados {
                 String isbn = dados[5];
                 String autor = dados[6];
                 int codBiblioteca = Integer.parseInt(dados[7]);
-                Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
+                Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);//TODO : codBiblioteca a ser desenvolvido posteriormente
                 livros.add(livro);
             }while ((linha = readFile.readLine()) != null);
         } catch (IOException e) {
@@ -679,6 +764,11 @@ public class TratamentoDados {
 
     /**
      * Solicita os dados do usuário para criar ou editar um livro.
+     * Este método solicita ao utilizador que insira o título, editora, categoria, ano de edição, ISBN e autor do livro.
+     * Valida o ISBN para garantir que tem 10 ou 13 dígitos e que não está duplicado.
+     *
+     * @param id O ID do livro a ser inserido.
+     * @return Um objeto Livro com os dados inseridos.
      */
     private static Livro inserirDadosLivro(int id) {
         String titulo = lerString("Insira o Título do livro: ");
@@ -701,13 +791,17 @@ public class TratamentoDados {
         }while(!flag);
         String autor = lerString("Insira o Autor do livro: ");
 
-        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);//TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
      * Pesquisa um ISBN na lista de livros.
+     * Este método verifica se o ISBN fornecido já existe na lista de livros, excluindo o livro com o ID fornecido.
+     *
+     * @param isbn O ISBN a ser pesquisado.
+     * @param id O ID do livro a ser excluído da pesquisa.
+     * @return O ISBN se encontrado, ou null se não encontrado.
      */
-
     private static String pesquisarIsbn(String isbn, int id) {
         for (Livro livro : livros) {
             if (livro.getIsbn().equals(isbn) && livro.getId() != id) {
@@ -717,16 +811,20 @@ public class TratamentoDados {
         return null;
     }
 
-
     /*
      * ########################### TRATAMENTO DE DADOS LIVROS - FIM #################################################
      */
-    /*
+        /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - INICIO #################################################
      */
 
     /**
-     * Lê os jornais do arquivo CSV.
+     * Lê os jornais ou revistas do arquivo CSV.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto JornalRevista com os dados lidos e adiciona-o à lista correspondente (jornais ou revistas).
+     * Se o ficheiro estiver vazio, exibe uma mensagem informativa.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param tipoItem O tipo de item a ser lido (JORNAL ou REVISTA).
      */
     public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.TipoItem tipoItem) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
@@ -745,7 +843,7 @@ public class TratamentoDados {
                 String issn = dados[5];
                 Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
                 int codBiblioteca = Integer.parseInt(dados[7]);
-                JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
+                JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);//TODO : codBiblioteca a ser desenvolvido posteriormente
                 if (tipoItem == Constantes.TipoItem.JORNAL)
                     jornais.add(jornalRevista);
                 else
@@ -758,6 +856,11 @@ public class TratamentoDados {
 
     /**
      * Adiciona um novo jornal ao sistema.
+     * Este método gera automaticamente um ID para o novo jornal, solicita os dados do jornal ao utilizador,
+     * adiciona o jornal à lista de jornais e grava a lista atualizada no ficheiro CSV.
+     * Exibe uma mensagem de sucesso após a criação do jornal.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
      */
     public static void criarJornal() throws IOException {
         jornais.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.JORNAL, -1), Constantes.TipoItem.JORNAL, Constantes.Etapa.CRIAR));
@@ -767,6 +870,11 @@ public class TratamentoDados {
 
     /**
      * Adiciona uma nova revista ao sistema.
+     * Este método gera automaticamente um ID para a nova revista, solicita os dados da revista ao utilizador,
+     * adiciona a revista à lista de revistas e grava a lista atualizada no ficheiro CSV.
+     * Exibe uma mensagem de sucesso após a criação da revista.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
      */
     public static void criarRevista() throws IOException {
         revistas.add(inserirDadosJornalRevista(getIdAutomatico(Constantes.TipoItem.REVISTA, -1), Constantes.TipoItem.REVISTA, Constantes.Etapa.CRIAR));
@@ -776,26 +884,65 @@ public class TratamentoDados {
 
     /**
      * Solicita os dados do usuário para criar ou editar um jornal/revista.
+     * Este método solicita ao utilizador que insira o título, editora, categoria, ano de publicação e ISSN do jornal/revista.
+     * Valida o ISSN para garantir que tem o formato correto e que não está duplicado.
+     * Se o ISSN já existir, solicita ao utilizador que insira um novo ISSN.
+     *
+     * @param id O ID do jornal/revista a ser inserido.
+     * @param tipoItem O tipo de item a ser inserido (JORNAL ou REVISTA).
+     * @param etapa A etapa do processo (CRIAR ou EDITAR).
+     * @return Um objeto JornalRevista com os dados inseridos.
      */
     private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoItem tipoItem, Constantes.Etapa etapa) {
         String titulo = lerString("Insira o Título do " + tipoItem.toString().toLowerCase() + ": ");
         String editora = lerString("Insira a Editora do " + tipoItem.toString().toLowerCase() + ": ");
+        String issn;
+        boolean flag;
         Constantes.Categoria categoria = selecionaCategoria("Insira a Categoria do " + tipoItem.toString().toLowerCase() + ": ");
         int anoPub = lerInt("Insira o ano de publicação do " + tipoItem.toString().toLowerCase() + ": ", true, tipoItem);
         do {
-            String issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
+            flag=true;
+            issn = lerString("Insira o ISSN do " + tipoItem.toString().toLowerCase() + ": ");
             if (!issn.matches("^\\d{4}-\\d{3}[X0-9]$")) {
                 System.out.println("ISSN Invalido! ( Ex: 1111-111X )");
+                flag=false;
                 continue;
             }
-            if (pesquisarJornalRevista(id, issn, tipoItem, etapa)) {
-                System.out.println("ISSN já existe! Tente novamente.");
+            for(JornalRevista jornal : jornais)
+            {
+                if(jornal.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR)
+                {
+                    flag=false;
+                }
+                else if(jornal.getIssn().equals(issn) && etapa == Constantes.Etapa.EDITAR && jornal.getId() != id)
+                {
+                    flag=false;
+                }
             }
-            else
-                return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
-        }while(true);
+            for(JornalRevista revista : revistas )
+            {
+                if(revista.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR)
+                {
+                    flag=false;
+                }
+                else if(revista.getIssn().equals(issn) && etapa == Constantes.Etapa.EDITAR && revista.getId() != id)
+                {
+                    flag=false;
+                }
+            }
+            if(!flag)
+                System.out.println("ISSN já existe! Tente novamente.");
+        }while(!flag);
+        return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);//TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
+    /**
+     * Lista todos os jornais ou revistas cadastrados no sistema.
+     * Este método verifica se a lista de jornais ou revistas está vazia e, se não estiver, exibe os dados de todos os itens.
+     * Se a lista estiver vazia, exibe uma mensagem informativa.
+     *
+     * @param tipoItem O tipo de item a ser listado (JORNAL ou REVISTA).
+     */
     public static void listaTodosJornalRevista(Constantes.TipoItem tipoItem) {
         if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
             System.out.println("Não existem jornais para mostrar.");
@@ -813,56 +960,83 @@ public class TratamentoDados {
     }
 
     /**
-     * Lista um Jornal/Revista pelo ISSN fornecido.
+     * Lista um jornal ou revista pelo ISSN fornecido.
+     * Este método solicita ao utilizador que insira o ISSN do jornal/revista, realiza a pesquisa e exibe os detalhes do item encontrado.
+     * Se não encontrar o item, exibe uma mensagem informativa.
+     * Permite ao utilizador voltar ao menu anterior digitando 0.
+     *
+     * @param tipoItem O tipo de item a ser listado (JORNAL ou REVISTA).
      */
     public static void listaJornalRevistaPorIssn(Constantes.TipoItem tipoItem) {
+        String issn;
+        boolean exists = false;
+
         if (tipoItem == Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
             System.out.println("Não existem jornais para mostrar.");
-            return;
         }
         else if (tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()) {
             System.out.println("Não existem revistas para mostrar.");
-            return;
         }
+        else{
+            do{
+                issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar (0 para voltar ao menu anterior) :");
 
-        do{
-            String issn = lerString("Digite o ISSN do " + tipoItem.toString().toLowerCase() + " que deseja encontrar\n0 - Sair\n");
-            if(issn.equals("0"))
-                return;
-            pesquisarJornalRevista(0, issn, tipoItem, Constantes.Etapa.LISTAR);
-        }while (true);
+                if(!issn.equals("0")) {
+                    if (tipoItem == Constantes.TipoItem.JORNAL) {
+                        for (JornalRevista jornal : jornais) {
+                            if (jornal.getIssn().equals(issn)) {
+                                mostraTabelaJornalRevista(Collections.singletonList(jornal));
+                                exists = true;
+                            }
+                        }
+                    } else {
+                        for (JornalRevista revista : revistas) {
+                            if (revista.getIssn().equals(issn)) {
+                                mostraTabelaJornalRevista(Collections.singletonList(revista));
+                                exists = true;
+                            }
+                        }
+                    }
+                    if (!exists)
+                        System.out.println("O item " + tipoItem.toString().toLowerCase() + " não foi encontrado.");
+                }
+            }while (!issn.equals("0"));
+        }
     }
 
     /**
      * Grava a lista de jornais em um arquivo CSV.
+     * Este método itera pela lista de jornais e grava os dados de cada jornal no ficheiro CSV.
+     * Utiliza o método criarFicheiroCsvJornalRevista para gravar os dados.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
     public static void gravarArrayJornal() throws IOException {
-        if (jornais.isEmpty()) {
-            new File(Constantes.Path.JORNAL.getValue()).delete();
-            System.out.println("Lista de jornais vazia. Arquivo excluído.");
-            return;
-        }
-        for (int i = 0; i < jornais.size(); i++) {
+        for (int i = 0; i < jornais.size(); i++)
             criarFicheiroCsvJornalRevista(Constantes.Path.JORNAL.getValue(), jornais.get(i), i != 0);
-        }
     }
 
     /**
      * Grava a lista de revistas em um arquivo CSV.
+     * Este método itera pela lista de revistas e grava os dados de cada revista no ficheiro CSV.
+     * Utiliza o método criarFicheiroCsvJornalRevista para gravar os dados.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
     public static void gravarArrayRevista() throws IOException {
-        if (revistas.isEmpty()) {
-            new File(Constantes.Path.REVISTA.getValue()).delete();
-            System.out.println("Lista de revistas vazia. Arquivo excluído.");
-            return;
-        }
-        for (int i = 0; i < revistas.size(); i++) {
+        for (int i = 0; i < revistas.size(); i++)
             criarFicheiroCsvJornalRevista(Constantes.Path.REVISTA.getValue(), revistas.get(i), i != 0);
-        }
     }
 
     /**
      * Cria um arquivo CSV para armazenar os dados dos jornais/revistas.
+     * Este método grava os dados de um jornal/revista no ficheiro CSV.
+     * Utiliza o FileWriter para escrever os dados no ficheiro.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param jornalRevista O objeto JornalRevista cujos dados serão gravados.
+     * @param append Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
      */
     public static void criarFicheiroCsvJornalRevista(String ficheiro, JornalRevista jornalRevista, boolean append) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, append)) {
@@ -880,79 +1054,170 @@ public class TratamentoDados {
     }
 
     /**
-     * Edita os dados de uma REVISTA ou JORNAL existente.
+     * Edita os dados de uma revista ou jornal existente.
+     * Este método lista todos os jornais/revistas, solicita ao utilizador que escolha o ID do item a ser editado,
+     * solicita os novos dados do item, atualiza a lista de jornais/revistas e grava a lista atualizada no ficheiro CSV.
+     * Exibe uma mensagem de sucesso após a edição.
+     *
+     * @param tipoItem O tipo de item a ser editado (JORNAL ou REVISTA).
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
     public static void editarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        int idEditar;
+        boolean flag;
+        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais nesta Biblioteca.");
+            return;
+        }
+        if(tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()){
+            System.out.println("Não existem revistas nesta Biblioteca.");
+            return;
+        }
         listaTodosJornalRevista(tipoItem);
         do {
-            int idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar\n0 - Sair\n", false, null);
-            if(idEditar == 0)
-                return;
-            if (!pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTE)) {
-                System.out.println("O(A) " + tipoItem.toString().toLowerCase() + " não existe.");
-                continue;
+            flag=true;
+            idEditar = lerInt("Escolha o ID do " + tipoItem.toString().toLowerCase() + " que deseja editar (0 para voltar ao menu anterior) :", false, null);
+            if(idEditar != 0) {
+                for(ReservaLinha reservaLinha : reservasLinha){
+                   if(reservaLinha.getIdItem()==idEditar && reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
+                       System.out.println("Não pode editar o item " + tipoItem.toString().toLowerCase() + " com reservas ativas.");
+                       flag=false;
+                       break;
+                   }
+                }
+                if(flag)
+                {
+                    for(EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                        if(emprestimoLinha.getIdItem()==idEditar && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO){
+                            System.out.println("Não pode editar o item " + tipoItem.toString().toLowerCase() + " com empréstimos ativos.");
+                            flag=false;
+                            break;
+                        }
+                    }
+                }
+                if (tipoItem == Constantes.TipoItem.JORNAL && flag) {
+                    for (JornalRevista jornal : jornais) {
+                        if (jornal.getId() == idEditar) {
+                            jornais.set(jornais.indexOf(jornal), inserirDadosJornalRevista(idEditar, tipoItem, Constantes.Etapa.EDITAR));
+                            gravarArrayJornal();
+                            idEditar = 0;
+                            System.out.println("O item " + tipoItem.toString().toLowerCase() + " foi editado com sucesso.");
+                            break;
+                        }
+                        else
+                            System.out.println("O item " + tipoItem.toString().toLowerCase() + " não existe.");
+                    }
+                } else if (tipoItem == Constantes.TipoItem.REVISTA && flag){
+                    for (JornalRevista revista : revistas) {
+                        if (revista.getId() == idEditar) {
+                            revistas.set(revistas.indexOf(revista), inserirDadosJornalRevista(idEditar, tipoItem, Constantes.Etapa.EDITAR));
+                            gravarArrayRevista();
+                            idEditar = 0;
+                            System.out.println("O item " + tipoItem.toString().toLowerCase() + " foi editado com sucesso.");
+                            break;
+                        }
+                        else
+                            System.out.println("O item " + tipoItem.toString().toLowerCase() + " não existe.");
+                    }
+                }
             }
-            if (pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.APAGAR)) {
-                System.out.println("Não pode editar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
-                continue;
-            }
-            else
-                pesquisarJornalRevista(idEditar, null, tipoItem, Constantes.Etapa.EXISTEEDITAR);
-            break;
-        }while(true);
-        if (tipoItem == Constantes.TipoItem.REVISTA)
-            gravarArrayRevista();
-        else
-            gravarArrayJornal();
-        System.out.println("ID do(a) " + tipoItem.toString().toLowerCase() + " editado(a) com sucesso.");
+        }while(idEditar != 0);
     }
 
     /**
-     * Apaga uma REVISTA e JORNAL pelo ID.
+     * Apaga uma revista ou jornal pelo ID.
+     * Este método lista todos os jornais/revistas, solicita ao utilizador que escolha o ID do item a ser apagado,
+     * verifica se o item possui empréstimos ou reservas ativas, e se não possuir, remove o item da lista e grava a lista atualizada no ficheiro CSV.
+     * Exibe uma mensagem de sucesso após a remoção.
+     *
+     * @param tipoItem O tipo de item a ser apagado (JORNAL ou REVISTA).
+     * @throws IOException Se ocorrer um erro de I/O durante a gravação dos dados.
      */
     public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOException {
+        boolean flag;
+        int idApagar;
+        if(tipoItem== Constantes.TipoItem.JORNAL && jornais.isEmpty()) {
+            System.out.println("Não existem jornais nesta Biblioteca.");
+            return;
+        }
+        if(tipoItem == Constantes.TipoItem.REVISTA && revistas.isEmpty()){
+            System.out.println("Não existem revistas nesta Biblioteca.");
+            return;
+        }
         listaTodosJornalRevista(tipoItem);
         do {
-            int idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar\n0 - Sair\n", false, null);
-            if(idApagar == 0)
-                return;
-            if (!pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.EXISTE)) {
-                System.out.println("O " + tipoItem.toString().toLowerCase() + " não existe.");
-                continue;
+            flag=true;
+            idApagar = lerInt("Escolha o ID do(a) " + tipoItem.toString().toLowerCase() + " que deseja apagar (0 para voltar ao menu anterior) :", false, null);
+            if(idApagar != 0) {
+                if (tipoItem == Constantes.TipoItem.JORNAL) {
+                    for (JornalRevista jornal : jornais) {
+                        if (jornal.getId() == idApagar) {
+                            for (ReservaLinha reservaLinha : reservasLinha)
+                                if (reservaLinha.getIdItem() == idApagar && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                                    flag = false;
+                                    break;
+                                }
+
+                            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                                if (emprestimoLinha.getIdItem() == idApagar && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                                    flag = false;
+                                    break;
+                                }
+                            if (flag) {
+                                idApagar=0;
+                                jornais.remove(jornal);
+                                gravarArrayJornal();
+                                System.out.println("O item " + tipoItem.toString().toLowerCase() + " foi apagado com sucesso!");
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    for (JornalRevista revista : revistas) {
+                        if (revista.getId() == idApagar) {
+                            for (ReservaLinha reservaLinha : reservasLinha)
+                                if (reservaLinha.getIdItem() == idApagar && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                                    flag = false;
+                                    break;
+                                }
+                            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                                if (emprestimoLinha.getIdItem() == idApagar && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                                    flag = false;
+                                    break;
+                                }
+                            if (flag) {
+                                idApagar=0;
+                                revistas.remove(revista);
+                                gravarArrayRevista();
+                                System.out.println("O item " + tipoItem.toString().toLowerCase() + " foi apagado com sucesso!");
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!flag)
+                    System.out.println("Não pode apagar o item " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
             }
-            if (pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR)) {
-                System.out.println("Não pode apagar " + tipoItem.toString().toLowerCase() + " com empréstimos ou reservas ativas.");
-                continue;
-            }
-            else
-                pesquisarJornalRevista(idApagar, null, tipoItem, Constantes.Etapa.APAGAR);
-            break;
-        }while(true);
-        if(tipoItem == Constantes.TipoItem.REVISTA)
-            gravarArrayRevista();
-        else
-            gravarArrayJornal();
-        System.out.println(tipoItem.toString().toLowerCase()+ " apagado(a) com sucesso!");
+        }while(!flag || idApagar != 0);
     }
 
     /*
      * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
-     * */
-
+     */
     /*
      * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
-     * */
+     */
 
     /**
      * Metodo para inserir os dados de uma reserva.
      * Este metodo solicita ao utilizador que selecione o cliente e insira as datas da reserva.
      * Garante que a data de início não é anterior a hoje e que a data de fim não é anterior à data de início.
+     * Valida o cliente com base em ID, NIF ou contacto.
      *
      * @param id O ID da reserva.
      * @return Um novo objeto Reserva com os detalhes fornecidos.
      */
-    public static Reserva inserirDadosReserva(int id)
-    {
+    public static Reserva inserirDadosReserva(int id) {
         Cliente cliente = null;
         LocalDate dataInicio;
         LocalDate dataFim;
@@ -997,77 +1262,89 @@ public class TratamentoDados {
             dataFim = lerData("Insira a data de fim da reserva (dd/MM/yyyy): ");
             if (dataFim.isBefore(dataInicio)) {
                 System.out.println("A data de fim não pode ser anterior à data de início.");
-            }
-            else if(dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
+            } else if (dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
                 System.out.println("A reserva não pode ser superior a " + Constantes.TempoMaxReservaDias + " dias.");
             }
         } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
 
         estado = Constantes.Estado.RESERVADO;
-        return new Reserva(1, id, dataInicio, dataFim, cliente,null, estado);
+        return new Reserva(1, id, dataInicio, dataFim, cliente, null, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
-     * Metodo para criar a nova Reserva
-     * Verifica se existem clientes na Biblioteca
-     * */
-    public static void criarReserva() throws IOException
-    {
-        //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
-        if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
+     * Metodo para criar uma nova reserva.
+     * Verifica se existem clientes e itens (livros, jornais, revistas) na biblioteca.
+     * Solicita ao utilizador que insira os dados da reserva e adiciona itens à reserva.
+     * Grava a reserva e seus detalhes em arquivos CSV.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
+     */
+    public static void criarReserva() throws IOException {
+        int opcao = 1;
+        // Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
+        if (livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()) {
             System.out.println("Não existem Items nesta Biblioteca");
             return;
         }
-        //Mostra mensagem a informar que não tem cliente.
-        //TODO : Ao invés de não deixar prosseguir, pode perguntar se deseja criar um novo cliente e prosseguir para a sua criação.
-        if (clientes.isEmpty()){
+        // Mostra mensagem a informar que não tem cliente.
+        if (clientes.isEmpty()) {
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
-        }else {
-            mostraTabelaClientes(clientes);
         }
+        mostraTabelaClientes(clientes);
 
-        //Atribui automaticamente o Id com base no último Id existente.
+        // Atribui automaticamente o Id com base no último Id existente.
         int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA, -1);
 
-        //Cria a reserva
+        // Cria a reserva
         reservas.add(inserirDadosReserva(idReserva));
         Reserva reserva = reservas.getLast();
 
-        criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA);
-
-        boolean reservaLinhaValida = false;
-        for (ReservaLinha reservalinha : reservasLinha){
-            if (reservalinha.getIdReserva() == reserva.getNumMovimento() && reservalinha.getEstado() != null){
-                reservaLinhaValida = true;
+        boolean firstEntry = true;
+        do {
+            if (opcao < 1 || opcao > 2) {
+                System.out.println("Opção inválida! Tente novamente.");
+            } else {
+                if (!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry) {
+                    reservas.remove(reservas.getLast());
+                    return;
+                }
+                firstEntry = false;
             }
-        }
-        if (!reservaLinhaValida) {
-            System.out.println("Sem detalhes da reserva.");
-            reservas.remove(reservas.getLast());
-            reservasLinha.remove(reservasLinha.getLast());
-        }else{
-            System.out.println("Reserva criada com sucesso!");
-            gravarArrayReservaLinha();
-            gravarArrayReservas();
-        }
+            opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
+        } while (opcao != 2);
 
+        System.out.println("Reserva criada com sucesso!");
 
+        gravarArrayReservas();
+        gravarArrayReservaLinha();
     }
 
-    public static void editarReserva() throws IOException
-    {
-        // Verifica se a lista de clientes está vazia
-        if(reservas.isEmpty()) {
+    /**
+     * Metodo para editar uma reserva existente.
+     * Lista todas as reservas e permite ao utilizador adicionar ou remover itens da reserva.
+     * Grava as alterações nos arquivos CSV.
+     *
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados.
+     */
+    public static void editarReserva() throws IOException {
+        // Verifica se a lista de reservas está vazia
+        if (reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
             return;
         }
 
-        // Lista todos os clientes
+        // Lista todas as reservas
         listaTodasReservas(Constantes.Etapa.EDITAR);
 
-        // Lê o ID do cliente a ser apagado
+        // Lê o ID da reserva a ser editada
         int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        for (Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
+                System.out.println("Não é possivel editar a reserva.");
+                return;
+            }
+        }
         listarDetalhesReserva(idEditar);
 
         int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
@@ -1077,39 +1354,60 @@ public class TratamentoDados {
                 gravarArrayReservaLinha();
                 break;
             case 2:
+                opcao = 1;
+                do {
+                    if (opcao != 1)
+                        System.out.println("Número Inválido!");
+                    else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
+                        System.out.println("Não existem mais itens para remover!");
+                        break;
+                    }
+                    opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                } while (opcao != 2);
                 RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                 gravarArrayReservaLinha();
-                listarDetalhesReserva(idEditar);
                 break;
             default:
                 System.out.println("Escolha invalida! Tente novamente.");
         }
     }
 
-    public static void listarDetalhesReserva(int idReserva) throws IOException
-    {
+    /**
+     * Metodo para listar os detalhes de uma reserva.
+     * Procura a reserva pelo ID e exibe os detalhes da reserva.
+     *
+     * @param idReserva O ID da reserva.
+     * @throws IOException Se ocorrer um erro durante a leitura dos dados.
+     */
+    public static void listarDetalhesReserva(int idReserva) throws IOException {
         // Lista de apoio para editar os detalhes
         List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
 
         // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-        for(ReservaLinha reservaLinha : reservasLinha) {
+        for (ReservaLinha reservaLinha : reservasLinha) {
             if (reservaLinha.getIdReserva() == idReserva) {
                 reservaLinhaDetails.add(reservaLinha);
             }
         }
-        mostraDetalhesReservas(reservaLinhaDetails, 0,null);
+        mostraDetalhesReservas(reservaLinhaDetails, 0, null);
     }
 
-
-    public static void RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) throws IOException
-    {
-        Constantes.TipoItem tipoItem;
-        int idItem=0, opcao=0;
-        boolean flag=false;
+    /**
+     * Metodo para remover um item de uma reserva ou empréstimo.
+     * Solicita ao utilizador que escolha o tipo de item e o ID do item a ser removido.
+     * Atualiza o estado do item para CANCELADO.
+     *
+     * @param id O ID da reserva ou empréstimo.
+     * @param tipoServico O tipo de serviço (RESERVA ou EMPRESTIMO).
+     * @return true se o item foi removido com sucesso, false caso contrário.
+     */
+    public static Boolean RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) {
+        Constantes.TipoItem tipoItem = null;
+        int idItem, opcao, i = 0;
+        boolean flag = false;
         do {
-            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-
-            switch (tipoItemOpcao) {
+            opcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            switch (opcao) {
                 case 1:
                     tipoItem = Constantes.TipoItem.LIVRO;
                     break;
@@ -1121,54 +1419,71 @@ public class TratamentoDados {
                     break;
                 default:
                     System.out.println("Opção inválida! Tente novamente.");
-                    continue;
             }
-            if(tipoServico == Constantes.TipoItem.RESERVA) {
-                mostraDetalhesReservas(reservasLinha, id, tipoItem);
-                do {
-                    idItem = lerInt("Escolha o ID do Item: ", false, null);
-                    // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
-                            reservaLinha.setEstado(Constantes.Estado.CANCELADO);
-                            flag=true;
-                        }
+        } while (opcao < 1 || opcao > 3);
+        if (tipoServico == Constantes.TipoItem.RESERVA)
+            mostraDetalhesReservas(reservasLinha, id, tipoItem);
+        else
+            mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
+        do {
+            i = 0;
+            idItem = lerInt("Escolha o ID do Item (0 para Retornar): ", false, null);
+            if (idItem == 0)
+                return false;
+
+            if (tipoServico == Constantes.TipoItem.RESERVA) {
+                for (ReservaLinha reservaLinha : reservasLinha) {
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem &&
+                            reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        reservaLinha.setEstado(Constantes.Estado.CANCELADO);
+                        flag = true;
                     }
-                    if (!flag)
-                        System.out.println("Número Inválido!");
-                }while (!flag);
-            }
-            else {
-                mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
-                do {
-                    idItem = lerInt("Escolha o ID do Item: ", false, null);
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
-                        if (emprestimoLinha.getIdItem() == id && emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
-                            emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
-                            flag=true;
-                        }
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        i++;
                     }
-                    if (!flag)
-                        System.out.println("Número Inválido!");
-                }while (!flag);
+                }
+                if (i == 0)
+                    for (Reserva reserva : reservas)
+                        if (reserva.getNumMovimento() == id) {
+                            reserva.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
+                        }
+            } else {
+                for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getIdItem() == idItem &&
+                            emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                        flag = true;
+                    }
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        i++;
+                    }
+                }
+                if (i == 0)
+                    for (Emprestimo emprestimo : emprestimos)
+                        if (emprestimo.getNumMovimento() == id) {
+                            emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
+                        }
             }
-            opcao = lerInt("Deseja remover mais Items da Reserva? (1 - Sim, 2 - Não)", false, null);
-            if (opcao < 1 || opcao > 2) {
-                System.out.println("Valor inválido! Tente novamente.");
-            }
-        } while(opcao!=2);
+            if (!flag)
+                System.out.println("Número Inválido!");
+        } while (!flag);
+        return true;
     }
 
     /**
-     * Metodo para cancelar a reserva na totalidade ou apenas algunm
-     * dos itens que lhe pertence
+     * Metodo para cancelar uma reserva na totalidade ou apenas alguns dos itens que lhe pertencem.
+     * Atualiza o estado da reserva e dos itens para CANCELADO.
      *
-     * */
-    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException
-    {
-        boolean hasReservas = hasReservas();        
-        if(!hasReservas) return;
-        
+     * @param idCancelar O ID da reserva a ser cancelada.
+     * @param estado O estado da reserva (CANCELADO).
+     * @throws IOException Se ocorrer um erro durante a gravação dos dados.
+     */
+    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException {
+        boolean hasReservas = hasReservas();
+        if (!hasReservas) return;
+
         for (Reserva reserva : reservas) {
             if (reserva.getNumMovimento() == idCancelar) {
                 reserva.setEstado(estado);
@@ -1184,9 +1499,17 @@ public class TratamentoDados {
         gravarArrayReservaLinha();
     }
 
-
-    public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException
-    {
+    /**
+     * Cria um arquivo CSV para armazenar os dados das reservas.
+     * Este método grava os dados de uma reserva no ficheiro CSV.
+     * Utiliza o FileWriter para escrever os dados no ficheiro.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param reserva O objeto Reserva cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
+    public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(";",
                     Integer.toString(reserva.getCodBiblioteca()),
@@ -1198,8 +1521,14 @@ public class TratamentoDados {
         }
     }
 
-    public static void lerFicheiroCsvReservas(String ficheiro)
-    {
+    /**
+     * Lê os dados das reservas a partir de um ficheiro CSV.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto Reserva com os dados lidos e adiciona-o à lista de reservas.
+     * Se o cliente associado à reserva não for encontrado, cria um cliente com dados padrão.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     */
+    public static void lerFicheiroCsvReservas(String ficheiro) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha;
             while ((linha = readFile.readLine()) != null) {
@@ -1210,37 +1539,40 @@ public class TratamentoDados {
                 LocalDate dataInicio = LocalDate.parse(dados[2]);
                 LocalDate dataFim = LocalDate.parse(dados[3]);
                 int id = Integer.parseInt(dados[4]);
-                for(Cliente clienteReserva : clientes) {
+                for (Cliente clienteReserva : clientes) {
                     if (clienteReserva.getId() == id) {
                         cliente = clienteReserva;
                         break;
                     }
                 }
                 Constantes.Estado estado = Constantes.Estado.valueOf(dados[5]);
-                
+
                 List<ReservaLinha> reservaLinha = new ArrayList<>();
-                
-                for(ReservaLinha resLinha : reservasLinha) {
+
+                for (ReservaLinha resLinha : reservasLinha) {
                     if (resLinha.getIdReserva() == codMovimento) {
                         reservaLinha.add(resLinha);
                     }
                 }
-                if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBibliotecaLogin);
-                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
+                if (cliente == null)
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
+                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
                 reservas.add(reserva);
             }
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-/*        for (Reserva reserva : reservas) {
-            System.out.println(reserva);
-        }*/
     }
 
-    public static boolean listaTodasReservas(Constantes.Etapa etapa)
-    {
+    /**
+     * Lista todas as reservas existentes.
+     * Exibe uma mensagem se não houver reservas para mostrar.
+     * Utiliza o método mostraTabelaReservas para exibir os dados das reservas.
+     *
+     * @param etapa A etapa do processo (LISTAR, EDITAR, etc.).
+     * @return true se houver reservas para mostrar, false caso contrário.
+     */
+    public static boolean listaTodasReservas(Constantes.Etapa etapa) {
         if (reservas.isEmpty()) {
             System.out.println("Não existem reservas para mostrar.");
             return false;
@@ -1250,22 +1582,22 @@ public class TratamentoDados {
         return true;
     }
 
-    public static void gravarArrayReservas() throws IOException
-    {
-        if(reservas.isEmpty()) {
-            new File(Constantes.Path.RESERVA.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
-
-        for(int i = 0; i < reservas.size(); i++){
+    /**
+     * Grava a lista de reservas em um ficheiro CSV.
+     * Este método itera pela lista de reservas e grava os dados de cada reserva no ficheiro CSV.
+     * Utiliza o método criarFicheiroCsvReservas para gravar os dados.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
+     */
+    public static void gravarArrayReservas() throws IOException {
+        for (int i = 0; i < reservas.size(); i++) {
             criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
         }
     }
 
     /*
      * ############################### TRATAMENTO DE DADOS RESERVAS - FIM ##############################################
-     * */
+     */
 
     /*
      * ############################### TRATAMENTO DE DADOS DETALHES RESERVAS - INICIO ##############################################
@@ -1276,201 +1608,68 @@ public class TratamentoDados {
      * @param reservaId Recebe o Id da Reserva
      * @param tipoItem Recebe o Tipo de Item a ser inserido
      * */
-    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem)
+    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem, LocalDate dataInicio, LocalDate dataFim)
     {
-        int idItem;
-        boolean idValido;
+        int idItem=0;
         int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
-        Constantes.Estado estado = null;
-        boolean isReservado = false;
-        boolean isEmprestado = false;        
-        do {
-            switch (tipoItem) {
+        boolean flag;
+        switch (tipoItem){
+            case LIVRO:
+                listaTodosLivros();
+                break;
+            case JORNAL:
+                listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                break;
+            case REVISTA:
+                listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                break;
+        }
+        do{
+            flag = false;
+            idItem = lerInt("Insira o ID do Item: ", false, null);
+            switch (tipoItem){
                 case LIVRO:
-                    listaTodosLivros();
-                    idItem = lerInt("Insira o ID do Livro: ", false, null);
-                    idValido = validarIdLivro(idItem);
-                    //Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
+                    for (Livro livro : livros)
+                        if (livro.getId() == idItem) {
+                            flag = true;
+                            break;
                         }
-                    }
-
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else 
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
-                    break;
-                case REVISTA:
-                    listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
-                    idItem = lerInt("Insira o ID da Revista: ", false, null);
-                    idValido = validarIdRevista(idItem);
-
-                    //Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
                     break;
                 case JORNAL:
-                    listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
-                    idItem = lerInt("Insira o ID do Jornal: ", false, null);
-                    idValido = validarIdJornal(idItem);
-//Percorre a lista das reservas linha
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        //valida se o item e o id são os mesmos e se está reservado
-                        if (reservaLinha.getIdReserva() != reservaId && reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                            //Instancia o objeto da reserva atual (que estamos a criar) e da antiga (que estamos a comparar), com base no id da reserva, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reservaAtual = getReservaById(reservaId);
-                            Reserva reservaAntiga = getReservaById(reservaLinha.getIdReserva());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataInicio()) || reservaAtual.getDataInicio().isEqual(reservaAntiga.getDataInicio())) &&
-                                    (reservaAtual.getDataFim().isBefore(reservaAntiga.getDataFim()) || reservaAtual.getDataFim().isEqual(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
-
-                            // Verifica sobreposição de datas (fora dos intervalos permitidos)
-                            if (!(reservaAtual.getDataFim().isBefore(reservaAntiga.getDataInicio()) ||
-                                    reservaAtual.getDataInicio().isAfter(reservaAntiga.getDataFim()))) {
-                                isReservado = true;
-                                break;
-                            }
+                    for (JornalRevista jornal : jornais)
+                        if (jornal.getId() == idItem) {
+                            flag = true;
+                            break;
                         }
-                    }
-
-                    //Percorre a lista dos emprestimos linha
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        //valida se o item e o id são os mesmos e se está em empréstimo
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                            //Instancia o objeto da reserva e do emprestimo, com base nos id, para se comparar as datas e validar se é possível ou não reservar nesta altura
-                            Reserva reserva = getReservaById(reservaId);
-                            Emprestimo emprestimo = getEmprestimoById(emprestimoLinha.getIdEmprestimo());
-                            //Valida se há alguma reserva que esteja a decorrer nas mesmas datas
-                            if ((reserva.getDataInicio().isAfter(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isEqual(emprestimo.getDataInicio())) &&
-                                    (reserva.getDataFim().isBefore(emprestimo.getDataFim()) ||
-                                            reserva.getDataFim().isEqual(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-
-                            // Verifica se a reserva se sobrepõe ao empréstimo
-                            if (!(reserva.getDataFim().isBefore(emprestimo.getDataInicio()) ||
-                                    reserva.getDataInicio().isAfter(emprestimo.getDataFim()))) {
-                                isEmprestado = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    //se não encontrar na lista de cima, em cima tem que reservar
-                    if(!isReservado && !isEmprestado)
-                        estado = Constantes.Estado.RESERVADO;
-                    else
-                        System.out.println("Já se encontra numa Reserva ou Emprestimo!");
                     break;
-                default:
-                    throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
+                case REVISTA:
+                    for (JornalRevista revista : revistas)
+                        if (revista.getId() == idItem) {
+                            flag = true;
+                            break;
+                        }
+                    break;
             }
+            if (!flag)
+                System.out.println("Número Inválido!");
+        }while(!flag);
+        for (Reserva reserva : reservas)
+            for (ReservaLinha reservaLinha : reservasLinha)
+                if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem)
+                    if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO && reservaLinha.getIdReserva() == reserva.getNumMovimento())
+                        if ((reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataFim)) &&
+                                (reserva.getDataFim().isAfter(dataInicio) || reserva.getDataFim().isEqual(dataInicio)))
+                            throw new IllegalArgumentException("Item já reservado!");
 
-            if (!idValido) {
-                System.out.println("ID inválido. Tente novamente.");
-            }
-        } while (!idValido);
+        for (Emprestimo emprestimo : emprestimos)
+            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem &&
+                        emprestimo.getEstado() == Constantes.Estado.EMPRESTADO && emprestimoLinha.getIdEmprestimo() == emprestimo.getNumMovimento() &&
+                        (emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataFim)) &&
+                        (emprestimo.getDataFim().isAfter(dataInicio) || emprestimo.getDataFim().isEqual(dataInicio)))
+                    throw new IllegalArgumentException("Item já emprestado!");
 
-        return new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, estado);
+        return new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, Constantes.Estado.RESERVADO);
     }
 
     /**
@@ -1531,11 +1730,6 @@ public class TratamentoDados {
      * */
     public static void gravarArrayReservaLinha() throws IOException
     {
-        if (reservasLinha.isEmpty()) {
-            new File(Constantes.Path.RESERVALINHA.getValue()).delete();
-            System.out.println("Array vazio");
-        }
-
         for (int i = 0; i < reservasLinha.size(); i++) {
             criarFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
         }
@@ -1574,9 +1768,9 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 000000000, 000000000, codBibliotecaLogin);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
 
-                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
+                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
                 emprestimos.add(emprestimo);
             }while ((linha = readFile.readLine()) != null);
         }
@@ -1585,14 +1779,12 @@ public class TratamentoDados {
         }
     }
 
-    public static void listaTodosEmprestimos()
+    public static void listaTodosEmprestimos(Constantes.Etapa etapa)
     {
-        if (emprestimos.isEmpty()) {
+        if (emprestimos.isEmpty())
             System.out.println("Não existem empréstimos para mostrar.");
-            return;
-        }
-
-        mostraTabelaEmprestimos(emprestimos);
+        else
+            mostraTabelaEmprestimos(emprestimos, etapa);
     }
 
     public static void lerFicheiroCsvEmprestimosLinha(String ficheiro)
@@ -1628,13 +1820,12 @@ public class TratamentoDados {
      * */
     public static void criarEmprestimo() throws IOException
     {
-        //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
+        //opcao a 1 para que na condição abaixo entre na primeira vez, e só teste posteriormente, após o valor da opcao ser lido
+        int opcao=1;
         if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
             System.out.println("Não existem Items nesta Biblioteca");
             return;
         }
-        //Mostra mensagem a informar que não tem cliente.
-        //TODO : Ao invés de não deixar prosseguir, pode perguntar se deseja criar um novo cliente e prosseguir para a sua criação.
         if (clientes.isEmpty()){
             System.out.println("Não existem clientes nesta Biblioteca");
             return;
@@ -1647,7 +1838,21 @@ public class TratamentoDados {
         emprestimos.add(inserirDadosEmprestimo(idEmprestimo, null));
         Emprestimo emprestimo = emprestimos.getLast();
 
-        criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO);
+        boolean firstEntry = true;
+        do{
+            if(opcao < 1 || opcao > 2){
+                System.out.println("Opção inválida! Tente novamente.");
+            }
+            else {
+                if(!criarDetalheEmprestimoReserva(emprestimo.getNumMovimento(), Constantes.TipoItem.EMPRESTIMO) && firstEntry){
+                    emprestimos.remove(emprestimos.getLast());
+                    return;
+                }
+                firstEntry = false;
+            }
+            
+            opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
+        }while(opcao!=2);
 
         System.out.println("Emprestimo criada com sucesso!");
 
@@ -1685,9 +1890,6 @@ public class TratamentoDados {
                     System.out.println("Cliente não encontrado. Tente novamente.");
                 }
             } while (cliente == null);
-
-            // Introdução das datas.
-            // É validado se a data final prevista introduzida é inferior à início e superior ao limite estipulado.
             do {
                 dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
                 if (dataPrevFim.isBefore(Constantes.getDatahoje())) {
@@ -1696,7 +1898,7 @@ public class TratamentoDados {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);
+            return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
         }
         else{
             do {
@@ -1707,137 +1909,85 @@ public class TratamentoDados {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);
+            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
         }
     }
 
-    public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem)
+    public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem, LocalDate dataFim)
     {
         int idItem=0;
         int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
-        boolean idValido, avaiable;
-        
-        do {
-            switch (tipoItem) {
-                case LIVRO:
-                    listaTodosLivros();
-                    idItem = lerInt("Insira o ID do Livro: ", false, null);
-                    idValido = validarIdLivro(idItem);
-                    avaiable = true;
-                    for (ReservaLinha reservaLinha : reservasLinha) {
-                        if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem) {
-                            if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                avaiable = false;
-                                break;
-                            }
-                        }
-                    }
-                    for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                        if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
-                            if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                            }else{
-                                System.out.println("Já se encontra num Emprestimo!");
-                                break;
-                            }
-                        }else {
-                            System.out.println("Jś se encontra numa Reserva");
-                        }
-                    }
+        boolean flag;
 
-                    break;
-                case REVISTA:
-                        listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
-                        idItem = lerInt("Insira o ID da Revista: ", false, null);
-                        idValido = validarIdRevista(idItem);
-                        avaiable = true;
-                        for (ReservaLinha reservaLinha : reservasLinha) {
-                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem ) {
-                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                    avaiable = false;
-                                    break;
-                                }
-                            }
-                        }
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && avaiable) {
-                                if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                    emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                                }else{
-                                    System.out.println("Já se encontra num Emprestimo!");
-                                    break;
-                                }
-                            }else {
-                                System.out.println("Jś se encontra numa Reserva");
-                            }
+        switch (tipoItem){
+            case LIVRO:
+                listaTodosLivros();
+                break;
+            case JORNAL:
+                listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
+                break;
+            case REVISTA:
+                listaTodosJornalRevista(Constantes.TipoItem.REVISTA);
+                break;
+        }
+        do{
+            flag = false;
+            idItem = lerInt("Insira o ID do Item: ", false, null);
+            switch (tipoItem){
+                case LIVRO:
+                    for (Livro livro : livros)
+                        if (livro.getId() == idItem) {
+                            flag = true;
+                            break;
                         }
                     break;
                 case JORNAL:
-                        listaTodosJornalRevista(Constantes.TipoItem.JORNAL);
-                        idItem = lerInt("Insira o ID do Jornal: ", false, null);
-                        idValido = validarIdJornal(idItem);
-                        avaiable = true;
-                        for (ReservaLinha reservaLinha : reservasLinha) {
-                            if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem && avaiable) {
-                                if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO){
-                                    avaiable = false;
-                                    break;
-                                }
-                            }
-                        }
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem) {
-                                if (emprestimoLinha.getEstado() != Constantes.Estado.EMPRESTADO){
-                                    emprestimoLinha.setEstado(Constantes.Estado.EMPRESTADO);
-                                }else{
-                                    System.out.println("Já se encontra num Emprestimo!");
-                                    break;
-                                }
-                            }else {
-                                System.out.println("Jś se encontra numa Reserva");
-                            }
+                    for (JornalRevista jornal : jornais)
+                        if (jornal.getId() == idItem) {
+                            flag = true;
+                            break;
                         }
                     break;
-                default:
-                    throw new IllegalArgumentException("Tipo de item inválido: " + tipoItem);
+                case REVISTA:
+                    for (JornalRevista revista : revistas)
+                        if (revista.getId() == idItem) {
+                            flag = true;
+                            break;
+                        }
+                    break;
             }
-            if (!idValido) {
-                System.out.println("ID inválido. Tente novamente.");
-            }
-            for(EmprestimoLinha emprestimoLinha: emprestimosLinha){
-                if(emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO || emprestimoLinha.getEstado() == Constantes.Estado.RESERVADO){
-                    throw new IllegalArgumentException("Item já " + emprestimoLinha.getEstado().toString().toLowerCase());
-                }
-            }
-        } while (!idValido);
+            if (!flag)
+                System.out.println("Número Inválido!");
+        }while(!flag);
+        for (Reserva reserva : reservas)
+            for (ReservaLinha reservaLinha : reservasLinha)
+                if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem)
+                    if (reservaLinha.getEstado() == Constantes.Estado.RESERVADO && reservaLinha.getIdReserva() == reserva.getNumMovimento())
+                        if ((reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataFim)) &&
+                                (reserva.getDataFim().isAfter(Constantes.getDatahoje()) || reserva.getDataFim().isEqual(Constantes.getDatahoje())))
+                            throw new IllegalArgumentException("Item já reservado!");
+
+        for (Emprestimo emprestimo : emprestimos)
+            for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
+                if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem &&
+                    emprestimo.getEstado() == Constantes.Estado.EMPRESTADO && emprestimoLinha.getIdEmprestimo() == emprestimo.getNumMovimento() &&
+                        (emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataFim)) &&
+                        (emprestimo.getDataFim().isAfter(Constantes.getDatahoje()) || emprestimo.getDataFim().isEqual(Constantes.getDatahoje())))
+                            throw new IllegalArgumentException("Item já emprestado!");
 
         return new EmprestimoLinha(emprestimoId, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
     }
 
     public static void gravarArrayEmprestimo() throws IOException
     {
-        if(emprestimos.isEmpty()) {
-            new File(Constantes.Path.EMPRESTIMO.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
-
-        for(int i = 0; i < emprestimos.size(); i++){
+        for(int i = 0; i < emprestimos.size(); i++)
             criarFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue(), emprestimos.get(i), i != 0);
-        }
     }
 
     public static void gravarArrayEmprestimoLinha() throws IOException
     {
-        if(emprestimosLinha.isEmpty()) {
-            new File(Constantes.Path.EMPRESTIMOLINHA.getValue()).delete();
-            System.out.println("Array vazio");
-            return;
-        }
-
-        for(int i = 0; i < emprestimosLinha.size(); i++){
+        for(int i = 0; i < emprestimosLinha.size(); i++)
             criarFicheiroCsvEmprestimosLinha(Constantes.Path.EMPRESTIMOLINHA.getValue(), emprestimosLinha.get(i), i != 0);
-        }
     }
 
     public static void criarFicheiroCsvEmprestimosLinha(String ficheiro, EmprestimoLinha emprestimoLinha, Boolean firstLine) throws IOException
@@ -1866,47 +2016,93 @@ public class TratamentoDados {
         }
     }
 
-    public static void listarDetalhesEmprestimo(int idEmprestimo) throws IOException
+    /**
+     * Metodo para listar os detalhes de um emprestimo
+     *
+     * @return O próximo ID disponível para o tipo de item especificado.
+     */
+    public static void listarDetalhesEmprestimo()
     {
-        mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, null);
+        if(emprestimosLinha.isEmpty())
+            System.out.println("Não há empréstimos nesta biblioteca.");
+        else{
+            mostraTabelaEmprestimos(emprestimos, Constantes.Etapa.LISTAR);
+            int idEmprestimo = lerInt("Escolha o ID do empréstimo que deseja ver os detalhes (0 para Retornar): ", false, null);
+            if(idEmprestimo != 0) {
+                for (Emprestimo emprestimo : emprestimos) {
+                    if (emprestimo.getNumMovimento() == idEmprestimo) {
+                        mostraDetalhesEmprestimos(emprestimosLinha, idEmprestimo, null);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Metodo para concluir empréstimo
+     */
+    public static void concluirCancelarEmprestimo(Constantes.Etapa etapa) throws IOException {
+        boolean flag = false;
+        if(emprestimos.isEmpty()) {
+            System.out.println("Não há empréstimos nesta biblioteca.");
+        }
+        else {
+            listaTodosEmprestimos(etapa);
+            do {
+                int idEditar = lerInt("Escolha o ID do emprestimo que deseja " + etapa.toString().toLowerCase() + " (0 para Retornar): ", false, null);
+                if (idEditar == 0)
+                    return;
+                for (Emprestimo emprestimo : emprestimos) {
+                    if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        if (etapa == Constantes.Etapa.CONCLUIR) {
+                            emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
+                            emprestimo.setDataFim(Constantes.getDatahoje());
+                        } else
+                            emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                        flag = true;
+                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
+                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
+                                if (etapa == Constantes.Etapa.CONCLUIR)
+                                    emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
+                                else
+                                    emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                            }
+                        }
+                    }
+                }
+                if (!flag) {
+                    System.out.println("Id Inválido!");
+                }
+            } while (!flag);
+            System.out.println(etapa.toString().toLowerCase() + " Empréstimo com sucesso!");
+            gravarArrayEmprestimo();
+            gravarArrayEmprestimoLinha();
+        }
     }
 
     /**
      * Editar Emprestimo
      */
-    public static void EditarEmprestimo(Constantes.Etapa etapa) throws IOException {
+    public static void editarEmprestimo(Constantes.Etapa etapa) throws IOException {
         boolean flag = false;
         int idEditar, opcao;
         LocalDate dataPrevFim;
-        // Verifica se a lista de clientes está vazia
+
         if(emprestimos.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
             return;
         }
 
-        listaTodosEmprestimos();
+        listaTodosEmprestimos(etapa);
         do {
-            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar: ", false, null);
+            idEditar = lerInt("Escolha o ID do emprestimo que deseja editar (0 para Retornar): ", false, null);
+            if(idEditar == 0)
+                return;
             for (Emprestimo emprestimo : emprestimos) {
-                if (emprestimo.getNumMovimento() == idEditar) {
+                if (emprestimo.getNumMovimento() == idEditar && emprestimo.getEstado() == Constantes.Estado.EMPRESTADO) {
                     flag = true;
-                    if (etapa == Constantes.Etapa.CANCELAR) {
-                        emprestimo.setEstado(Constantes.Estado.CANCELADO);
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
-                                emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
-                            }
-                        }
-                    }
-                    else if (etapa == Constantes.Etapa.CONCLUIR) {
-                        emprestimo.setEstado(Constantes.Estado.CONCLUIDO);
-                        emprestimo.setDataFim(Constantes.getDatahoje());
-                        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                            if (emprestimoLinha.getIdEmprestimo() == idEditar) {
-                                emprestimoLinha.setEstado(Constantes.Estado.CONCLUIDO);
-                            }
-                        }
-                    }
+                    break;
                 }
             }
             if(!flag){
@@ -1914,7 +2110,7 @@ public class TratamentoDados {
             }
         } while (!flag);
         if(etapa== Constantes.Etapa.EDITAR) {
-            listarDetalhesEmprestimo(idEditar);
+            mostraDetalhesEmprestimos(emprestimosLinha, idEditar, null);
             do{
                 opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n3 - Editar Data Final Prevista\n", false, null);
                 switch (opcao) {
@@ -1922,7 +2118,16 @@ public class TratamentoDados {
                         criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.EMPRESTIMO);
                         break;
                     case 2:
-                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO);
+                        opcao=1;
+                        do{
+                            if(opcao!=1)
+                                System.out.println("Número Inválido!");
+                            else if(!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.EMPRESTIMO)){
+                                System.out.println("Não existem mais itens para remover!");
+                                break;
+                            }
+                            opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                        }while(opcao != 2);
                         break;
                     case 3:
                         do {
@@ -1998,7 +2203,7 @@ public class TratamentoDados {
         if (listagemEmprestimo.isEmpty()){
             System.out.println("Não existem Emprestimos desse cliente!");
         }else{
-            mostraTabelaEmprestimos(listagemEmprestimo);
+            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
 
     }
@@ -2011,13 +2216,18 @@ public class TratamentoDados {
         {
             mostraTabelaClientes(clientes);
         }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos",false,null);
+        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Emprestimos",false,null);
 
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
         LocalDate dataInicio = lerData("Insira a data inicio do intervalo: ");
         LocalDate dataFim = lerData("Insira a data fim do intervalo: ");
+
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         for (Reserva reserva : reservas){
             if (reserva.getCliente().getId() == idCliente && (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio) )&& (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim) )) {
@@ -2037,7 +2247,7 @@ public class TratamentoDados {
         if (listagemEmprestimo.isEmpty()){
             System.out.println("Não existem Emprestimos desse cliente nessas datas!");
         }else{
-            mostraTabelaEmprestimos(listagemEmprestimo);
+            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
         }
 
     }
@@ -2086,80 +2296,66 @@ public class TratamentoDados {
         gravarArrayEmprestimoLinha();
     }
 
-    public static Constantes.TipoItem criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva) throws IOException
+    public static Boolean criarDetalheEmprestimoReserva(int id, Constantes.TipoItem emprestimoReserva)
     {
         Constantes.TipoItem tipoItem = null;
-        boolean flag=false, itemExists = true;
+        boolean itemExists = false;
         do {
-            do {
-                int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-
-                switch (tipoItemOpcao) {
-                    case 1:
-                        if (livros.isEmpty()) {
-                            System.out.println("Não existem Livros para mostrar.");
-                            itemExists = false;
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.LIVRO;
-                            itemExists = true;
-                        }
-                        break;
-                    case 2:
-                        if (revistas.isEmpty()) {
-                            System.out.println("Não existem Revistas para mostrar.");
-                            itemExists = false;
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.REVISTA;
-                            itemExists = true;
-                        }
+            int tipoItemOpcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal) (0 para Retornar): ", false, null);
+            if(tipoItemOpcao==0)
+                return false;
+            switch (tipoItemOpcao) {
+                case 1:
+                    if (livros.isEmpty()) {
+                        System.out.println("Não existem Livros para mostrar.");
+                        continue;
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.LIVRO;
+                        itemExists = true;
+                    }
                     break;
-                    case 3:
-                        if (jornais.isEmpty()) {
-                            System.out.println("Não existem Jornais para mostrar.");
-                            itemExists = false;
-                        }
-                        else {
-                            tipoItem = Constantes.TipoItem.JORNAL;
-                            itemExists = true;
-                        }           
-                        break;
-                    default:
-                        System.out.println("Opção inválida! Tente novamente.");
-                        itemExists = false;
-                        break;
-                }
-            } while (!itemExists);
-            
-            if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO)
-                try
-                {
-                    emprestimosLinha.add(inserirDetalhesEmprestimo(id,tipoItem));
-                    flag=true;
-                }catch (IllegalArgumentException e){
-                    System.out.println("Item já emprestado/reservado.");
-                    flag=false;
-                }
-            else{
-                try{
-                reservasLinha.add(inserirDetalhesReserva(id, tipoItem));
-                flag=true;
-                }catch (IllegalArgumentException e){
-                    System.out.println("Item já emprestado/reservado.");
-                    flag=false;
-                }
+                case 2:
+                    if (revistas.isEmpty()) {
+                        System.out.println("Não existem Revistas para mostrar.");
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.REVISTA;
+                        itemExists = true;
+                    }
+                    break;
+                case 3:
+                    if (jornais.isEmpty()) {
+                        System.out.println("Não existem Jornais para mostrar.");
+                    }
+                    else {
+                        tipoItem = Constantes.TipoItem.JORNAL;
+                        itemExists = true;
+                    }
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    break;
             }
-            if(flag) {
-                int opcao = lerInt("Deseja acrescentar mais Items a(o) " + emprestimoReserva.toString().toLowerCase() + "? (1 - Sim, 2 - Não): ", false, null);
+        } while (!itemExists);
 
-                if (opcao == 2)
-                    flag=true;
-                else
-                    flag=false;
+        if (emprestimoReserva == Constantes.TipoItem.EMPRESTIMO) {
+            try {
+                emprestimosLinha.add(inserirDetalhesEmprestimo(id, tipoItem, emprestimos.getLast().getDataFim()));
+                return true;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+                return false;
             }
-        } while(!flag);
-        return tipoItem;
+        }else{
+            try{
+            reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
+            return true;
+            }catch (IllegalArgumentException e){
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
     }
 
     /**
@@ -2228,7 +2424,7 @@ public class TratamentoDados {
                 }
                 break;
             default:
-                // TODO: Mensagem de erro/evitar que a app crashe quando se passa algo errado para aqui
+                System.out.println("Erro ao gerar o ID automático");
                 break;
         }
 
@@ -2282,11 +2478,15 @@ public class TratamentoDados {
                         (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
                         isInt = true;
                     else if(valor > 0 && valor <= 1455 && tipoItem == Constantes.TipoItem.LIVRO)
-                        System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha.\nPor favor, insira um ano válido (>= 1455): ");
+                        System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha... Por favor, insira um ano válido (>= 1455).\n");
                     else if(valor > 0 && valor <= 1605 && tipoItem == Constantes.TipoItem.JORNAL)
-                        System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França.\nPor favor, insira um ano válido (>= 1605): ");
+                        System.out.print("O primeiro jornal impresso, assim como os conhecemos, foi o Relation aller Fürnemmen und gedenckwürdigen Historien, impresso em 1605, Strasbourg, França... Por favor, insira um ano válido (>= 1605).\n");
                     else if(valor > 0 && valor <= 1731 && tipoItem == Constantes.TipoItem.REVISTA)
-                        System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra.\nPor favor, insira um ano válido (>= 1731): ");
+                        System.out.print("A primeira revista impressa, assim como as conhecemos, foi The Gentleman’s Magazine impressa, impressa em 1731, Londres, Inglaterra... Por favor, insira um ano válido (>= 1731).\n");
+                    else if(valor < 0)
+                        System.out.print("O ano não pode ser um número negativo... Por favor, insira um ano válido (>= 0 e < " + LocalDateTime.now().getYear() + ").\n");
+                    else if(valor > LocalDateTime.now().getYear())
+                        System.out.print("O ano não pode ser superior ao atual...Por favor, insira um ano válido (>= 0 e < " + LocalDateTime.now().getYear() + ").\n");
                 } else {
                     isInt = true;
                 }
@@ -2313,7 +2513,6 @@ public class TratamentoDados {
 
     /**
      * Lê uma data e hora preenchida pelo utilizador.
-     *
      * Este método solicita ao utilizador que insira uma data no formato "yyyy-MM-dd".
      * Continua a solicitar ao utilizador até que uma data válida seja introduzida.
      *
@@ -2531,17 +2730,18 @@ public class TratamentoDados {
 
         //Imprime os dados das Reservas
         for (Reserva reserva : listaReservas) {
-            if ((etapa != Constantes.Etapa.CONCLUIR && etapa != Constantes.Etapa.CANCELAR) || 
-                ((etapa == Constantes.Etapa.CONCLUIR || etapa == Constantes.Etapa.CANCELAR) && reserva.getEstado() == Constantes.Estado.RESERVADO))
+            boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
+            boolean notCanceladoConcluido = reserva.getEstado() != Constantes.Estado.CONCLUIDO && reserva.getEstado() != Constantes.Estado.CANCELADO;
+            if (!isEditCancelConclude || notCanceladoConcluido)
                 System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
         }
 
         System.out.println(separador);
     }
 
-    public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos)
+    public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos, Constantes.Etapa etapa)
     {
-        //TODO : Implementar a função de mostrar a tabela de emprestimos, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idMaxLen = "Id".length();
         int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
@@ -2573,9 +2773,15 @@ public class TratamentoDados {
 
         //Imprime os dados dos clientes
         for (Emprestimo emprestimo : listaEmprestimos) {
-            System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
+            //Valida se é edição, cancelamento ou conclusão de empréstimo e se está emprestado, para simplificar a sintaxe no if
+            boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
+            boolean notCanceladoConcluido = emprestimo.getEstado() != Constantes.Estado.CONCLUIDO && emprestimo.getEstado() != Constantes.Estado.CANCELADO;
+        
+            //Caso seja Edição/Cancelamento/Conclusão só mostra os emprestados, caso contrário mostra tudo 
+            if (!isEditCancelConclude || notCanceladoConcluido) 
+                System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
-
+        
         System.out.println(separador);
     }
 
@@ -2587,16 +2793,22 @@ public class TratamentoDados {
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
 
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         int diasMax=0, diasTemp=0, idItem=0;
         Constantes.TipoItem tipoItem=null;
         for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
             for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
-                if(emprestimoLinha.getIdItem()==emprestimoLinha1.getIdItem()&&emprestimoLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                if(emprestimoLinha.getIdItem()==emprestimoLinha1.getIdItem()&&emprestimoLinha.getTipoItem()==emprestimoLinha1.getTipoItem()
+                        &&emprestimoLinha1.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             for (ReservaLinha reservaLinha : reservasLinha){
-                if(emprestimoLinha.getIdItem()==reservaLinha.getIdItem()&&emprestimoLinha.getTipoItem()==reservaLinha.getTipoItem())
+                if(emprestimoLinha.getIdItem()==reservaLinha.getIdItem()&&emprestimoLinha.getTipoItem()==reservaLinha.getTipoItem()
+                        &&emprestimoLinha.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             if(diasTemp>diasMax) {
@@ -2608,11 +2820,13 @@ public class TratamentoDados {
         }
         for (ReservaLinha reservaLinha : reservasLinha){
             for (EmprestimoLinha emprestimoLinha1 : emprestimosLinha){
-                if(reservaLinha.getIdItem()==emprestimoLinha1.getIdItem()&&reservaLinha.getTipoItem()==emprestimoLinha1.getTipoItem())
+                if(reservaLinha.getIdItem()==emprestimoLinha1.getIdItem()&&reservaLinha.getTipoItem()==emprestimoLinha1.getTipoItem()
+                        &&emprestimoLinha1.getEstado()!= Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             for (ReservaLinha reservaLinha1 : reservasLinha){
-                if(reservaLinha1.getIdItem()==reservaLinha.getIdItem()&&reservaLinha1.getTipoItem()==reservaLinha.getTipoItem())
+                if(reservaLinha1.getIdItem()==reservaLinha.getIdItem()&&reservaLinha1.getTipoItem()==reservaLinha.getTipoItem()
+                        &&reservaLinha.getEstado()!=Constantes.Estado.CANCELADO)
                     diasTemp++;
             }
             if(diasTemp>diasMax) {
@@ -2630,10 +2844,17 @@ public class TratamentoDados {
                     break;
                 }
             }
-        } else {
+        } else if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
                 if (jornal.getId() == idItem) {
                     mostraTabelaJornalRevista(Collections.singletonList(jornal));
+                    break;
+                }
+            }
+        } else{
+            for (JornalRevista revista : revistas) {
+                if (revista.getId() == idItem) {
+                    mostraTabelaJornalRevista(Collections.singletonList(revista));
                     break;
                 }
             }
@@ -2649,6 +2870,11 @@ public class TratamentoDados {
         }
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
+
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
 
         int dias=0, i=0;
         for(Emprestimo emprestimo : emprestimos)
@@ -2670,6 +2896,11 @@ public class TratamentoDados {
         LocalDate dataInicio = lerData("Insira a data inicial (dd/MM/yyyy): ");
         LocalDate dataFim = lerData("Insira a data final (dd/MM/yyyy): ");
 
+        if(dataFim.isBefore(dataInicio)){
+            System.out.println("Data fim não pode ser inferior à data inicio!");
+            return;
+        }
+
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
         for(Reserva reserva : reservas)
@@ -2682,12 +2913,12 @@ public class TratamentoDados {
         System.out.println("Reservas");
         mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
         System.out.println("Emprestimos");
-        mostraTabelaEmprestimos(listagemEmprestimo);
+        mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
     }
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idReservaLinhaMaxLen = "Id Reserva Linha".length();
         int idReservaMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
@@ -2821,7 +3052,7 @@ public class TratamentoDados {
 
     public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idMaxLen = "Id Emprestimo".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
@@ -3055,59 +3286,6 @@ public class TratamentoDados {
         return moradaInserida;
     }
 
-    /**
-     * Efetua algum tipo de pesquisa nos jornais ou revistas.
-     */
-    public static Boolean pesquisarJornalRevista(int id, String issn, Constantes.TipoItem tipoItem, Constantes.Etapa etapa)
-    {
-        if(tipoItem==Constantes.TipoItem.JORNAL) {
-            for (JornalRevista jornalRevista : jornais) {
-                if (etapa == Constantes.Etapa.EXISTE && jornalRevista.getId() == id)
-                    return true;
-                if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
-                    return true;
-                if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
-                    mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
-                if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
-                    jornais.set(jornais.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
-                if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
-                    return jornalRevista.getId() != id;
-                if(etapa == Constantes.Etapa.APAGAR) {
-                    for(ReservaLinha reservaLinha : reservasLinha)
-                        if(reservaLinha.getIdItem()==id && reservaLinha.getTipoItem()==tipoItem && reservaLinha.getEstado()==Constantes.Estado.RESERVADO)
-                            return true;
-                    for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
-                        if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
-                            return true;
-                    jornais.remove(jornalRevista);
-                }
-            }
-        }
-        else {
-            for (JornalRevista jornalRevista : revistas) {
-                if (etapa == Constantes.Etapa.EXISTE && jornalRevista.getId() == id)
-                    return true;
-                if (etapa == Constantes.Etapa.CRIAR && jornalRevista.getIssn().equals(issn))
-                    return true;
-                if (etapa == Constantes.Etapa.LISTAR && jornalRevista.getIssn().equals(issn))
-                    mostraTabelaJornalRevista(Collections.singletonList(jornalRevista));
-                if(etapa == Constantes.Etapa.EXISTEEDITAR && jornalRevista.getId()==id)
-                    revistas.set(revistas.indexOf(jornalRevista), inserirDadosJornalRevista(id, tipoItem, Constantes.Etapa.EDITAR));
-                if (etapa == Constantes.Etapa.EDITAR && jornalRevista.getIssn().equals(issn))
-                    return jornalRevista.getId() != id;
-                if(etapa == Constantes.Etapa.APAGAR) {
-                    for(ReservaLinha reservaLinha : reservasLinha)
-                        if(reservaLinha.getIdItem()==id && reservaLinha.getTipoItem()==tipoItem && reservaLinha.getEstado()==Constantes.Estado.RESERVADO)
-                            return true;
-                    for(EmprestimoLinha emprestimoLinha : emprestimosLinha)
-                        if(emprestimoLinha.getIdItem()==id && emprestimoLinha.getTipoItem()==tipoItem && emprestimoLinha.getEstado()==Constantes.Estado.EMPRESTADO)
-                            return true;
-                    revistas.remove(jornalRevista);
-                }
-            }
-        }
-        return false;
-    }
 
     public static Cliente validarCliente(Constantes.ValidacaoCliente validacaoCliente, int valor)
     {

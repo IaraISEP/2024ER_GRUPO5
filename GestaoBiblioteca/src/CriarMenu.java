@@ -361,7 +361,7 @@ public class CriarMenu {
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Listar Empréstimo", CriarMenu::menuListarEmprestimos));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Editar Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.EDITAR);
+                TratamentoDados.editarEmprestimo(Constantes.Etapa.EDITAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -369,7 +369,7 @@ public class CriarMenu {
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Cancelar Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CANCELAR);
+                TratamentoDados.concluirCancelarEmprestimo(Constantes.Etapa.CANCELAR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -377,7 +377,7 @@ public class CriarMenu {
         }));
         menuEmprestimos.adicionarOpcao(new OpcaoMenu("Concluir Empréstimo", () -> {
             try {
-                TratamentoDados.EditarEmprestimo(Constantes.Etapa.CONCLUIR);
+                TratamentoDados.concluirCancelarEmprestimo(Constantes.Etapa.CONCLUIR);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -444,16 +444,11 @@ public class CriarMenu {
         Menu menuListarEmprestimos = new Menu("Listar Empréstimos");
 
         menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Simplificados",  () -> {
-            TratamentoDados.listaTodosEmprestimos();
+            TratamentoDados.listaTodosEmprestimos(Constantes.Etapa.LISTAR);
             keyPress();
         }));
         menuListarEmprestimos.adicionarOpcao(new OpcaoMenu("Empréstimos Detalhados", () -> {
-            try {
-                TratamentoDados.listaTodosEmprestimos();
-                TratamentoDados.listarDetalhesEmprestimo(TratamentoDados.lerInt("Insira o Id do empréstimo: ",false,null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            TratamentoDados.listarDetalhesEmprestimo();
             keyPress();
         }));
 
