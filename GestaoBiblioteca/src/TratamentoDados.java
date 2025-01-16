@@ -861,7 +861,7 @@ public class TratamentoDados {
         }while(!flag);
         String autor = lerString("Insira o Autor do livro: ");
 
-        return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);//TODO : codBiblioteca a ser desenvolvido posteriormente
+        return new Livro(id, codBibliotecaSessao, titulo, editora, categoria, anoEdicao, isbn, autor);
     }
 
     /**
@@ -1002,7 +1002,7 @@ public class TratamentoDados {
             if(!flag)
                 System.out.println("ISSN já existe! Tente novamente.");
         }while(!flag);
-        return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);//TODO : codBiblioteca a ser desenvolvido posteriormente
+        return new JornalRevista(id, titulo, editora, issn, anoPub, codBibliotecaSessao, tipoItem, categoria);
     }
 
     /**
@@ -2031,7 +2031,7 @@ public static Emprestimo inserirDadosEmprestimo(int idEmprestimo, Reserva reserv
                 System.out.println("A empréstimo não pode ser superior a 30 dias.");
             }
         } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-        return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO); // TODO: codBiblioteca a ser desenvolvido posteriormente
+        return new Emprestimo(codBibliotecaSessao, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO); 
     } else {
         do {
             dataPrevFim = lerData("Insira a data de fim do empréstimo prevista (dd/MM/yyyy): ");
@@ -2041,7 +2041,7 @@ public static Emprestimo inserirDadosEmprestimo(int idEmprestimo, Reserva reserv
                 System.out.println("A empréstimo não pode ser superior a 30 dias.");
             }
         } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-        return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO); // TODO: codBiblioteca a ser desenvolvido posteriormente
+        return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO); 
     }
 }
 
