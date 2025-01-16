@@ -1307,23 +1307,27 @@ public class TratamentoDados {
      * @throws IOException Se ocorrer um erro durante a gravação dos dados.
      */
     public static void editarReserva() throws IOException {
-
+        boolean flag = false;
+        int i=0;
+        for (Reserva reserva : reservas){
+            if(reserva.getEstado() == Constantes.Estado.CANCELADO || reserva.getEstado() == Constantes.Estado.CONCLUIDO)
+                i++;
+        }
         // Verifica se a lista de reservas está vazia
-        if (reservas.isEmpty()) {
+        if (reservas.isEmpty() || i==reservas.size()) {
             System.out.println("Não há reservas nesta biblioteca.");
             return;
         }
 
         // Lista todas as reservas
         listaTodasReservas(Constantes.Etapa.EDITAR);
-        boolean flag = false;
         do{
             // Lê o ID da reserva a ser editada
             int idEditar = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
             if (idEditar == 0)
                 return;
             for (Reserva reserva : reservas) {
-                if (reserva.getNumMovimento() == idEditar ) {
+                if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.RESERVADO) {
                     flag=true;
                     break;
                 }
@@ -1353,6 +1357,7 @@ public class TratamentoDados {
                             }
                             opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
                         } while (opcao != 2);
+                        gravarArrayReservas();
                         gravarArrayReservaLinha();
                         break;
                     default:
@@ -1429,10 +1434,6 @@ public class TratamentoDados {
                     System.out.println("Opção inválida! Tente novamente.");
             }
         } while (opcao < 1 || opcao > 3);
-        if (tipoServico == Constantes.TipoItem.RESERVA)
-            mostraDetalhesReservas(reservasLinha, id, tipoItem);
-        else
-            mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
         do {
             i = 0;
             idItem = lerInt("Escolha o ID do Item (0 para Retornar): ", false, null);
