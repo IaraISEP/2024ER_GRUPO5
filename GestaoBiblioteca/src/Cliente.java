@@ -10,8 +10,6 @@ public class Cliente {
     private int nif;
     private int contacto;
     private int codBiblioteca;
-    private int opcao;
-    private boolean status = true;
 
     /**
      * Construtor para criar um cliente.

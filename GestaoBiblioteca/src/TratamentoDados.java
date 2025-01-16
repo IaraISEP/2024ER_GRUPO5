@@ -100,8 +100,8 @@ public class TratamentoDados {
      */
     public static Biblioteca inserirDadosBiblioteca() throws IOException
     {
-        String nome = "";
-        int idBiblioteca = 0;
+        String nome;
+        int idBiblioteca;
 
         System.out.println("Insira o Nome da Biblioteca: ");
         nome = input.nextLine();
@@ -543,11 +543,6 @@ public class TratamentoDados {
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-
-        // Imprime todos os clientes
-/*        for (Cliente cliente : clientes) {
-            System.out.println(cliente);
-        }*/
     }
 
     /*
@@ -1373,7 +1368,7 @@ public class TratamentoDados {
      */
     public static Boolean RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) {
         Constantes.TipoItem tipoItem = null;
-        int idItem, opcao, i = 0;
+        int idItem, opcao, i;
         boolean flag = false;
         do {
             opcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
@@ -1689,9 +1684,6 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-/*        for (Reserva reserva : reservas) {
-            System.out.println(reserva);
-        }*/
     }
 
     /**
@@ -1780,9 +1772,6 @@ public class TratamentoDados {
         catch (IOException e){
             System.out.println(e.getMessage());
         }
-/*        for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-            System.out.println(emprestimoLinha);
-        }*/
     }
 
     /**
@@ -1885,7 +1874,7 @@ public class TratamentoDados {
 
     public static EmprestimoLinha inserirDetalhesEmprestimo(int emprestimoId, Constantes.TipoItem tipoItem, LocalDate dataFim)
     {
-        int idItem=0;
+        int idItem;
         int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, emprestimoId);
         boolean flag;
 
@@ -2409,8 +2398,8 @@ public class TratamentoDados {
      */
     public static String lerString(String mensagem)
     {
-        String campo=null;
-        boolean flag=true;
+        String campo;
+        boolean flag;
         do {
         System.out.print(mensagem);
         campo = input.nextLine().trim();
@@ -3306,36 +3295,6 @@ public class TratamentoDados {
                 throw new IllegalArgumentException("Campo desconhecido: " + validacaoCliente);
         }
     }
-
-    private static boolean validarIdLivro(int id)
-    {
-        for (Livro livro : livros) {
-            if (livro.getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean validarIdRevista(int id)
-    {
-        for (JornalRevista revista : revistas) {
-            if (revista.getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean validarIdJornal(int id)
-    {
-        for (JornalRevista jornal : jornais) {
-            if (jornal.getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     private static boolean hasReservas()
     {
@@ -3365,26 +3324,6 @@ public class TratamentoDados {
     private static void keyPress() {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
-    }
-    
-    private static Reserva getReservaById(int id)
-    {
-        for(Reserva reserva : reservas)
-        {
-            if(reserva.getNumMovimento() == id)
-                return reserva;
-        }
-        return null;
-    }
-    
-    private static Emprestimo getEmprestimoById(int id)
-    {
-        for(Emprestimo emprestimo : emprestimos)
-        {
-            if(emprestimo.getNumMovimento() == id)
-                return emprestimo;
-        }
-        return null;
     }
         
     /*

@@ -4,7 +4,7 @@ public class Constantes {
     public static String SplitChar = ";";
     public static int TempoMaxReservaDias = 7;
     private static final LocalDate datahoje = LocalDate.now();
-    public static final int QtdTotalCharMenu = 70; // Quantidade de MenuChar que vai mostrar, para criar o título do menu
+    public static final int QtdTotalCharMenu = 50; // Quantidade de MenuChar que vai mostrar, para criar o título do menu
     public static final String MenuChar = "#";
     public static final int qtdPad = 10; // Quantidade de espaços que vai ter entre o MenuChar e o titulo
     public enum Categoria {
@@ -136,15 +136,6 @@ public class Constantes {
         CRIAR,
         EDITAR,
         LISTAR,
-        EXISTE,
-        EXISTEEDITAR,
-        APAGAR,
-        NOME,
-        CONTRIBUINTE,
-        CONTACTO,
-        JORNAL,
-        REVISTA,
-        CLIENTE,
         CONCLUIR,
         CANCELAR
     }
