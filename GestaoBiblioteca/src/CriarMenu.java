@@ -316,7 +316,7 @@ public class CriarMenu {
             try {
                 boolean flag = TratamentoDados.listaTodasReservas(Constantes.Etapa.CANCELAR);
                 if (flag) {
-                    TratamentoDados.cancelarReserva(TratamentoDados.lerInt("Escolha o ID da reserva que deseja editar: ", false, null), Constantes.Estado.CANCELADO);
+                    TratamentoDados.cancelarReserva( Constantes.Estado.CANCELADO);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

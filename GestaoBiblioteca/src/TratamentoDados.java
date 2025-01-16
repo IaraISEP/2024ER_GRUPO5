@@ -1446,27 +1446,37 @@ public class TratamentoDados {
      * Metodo para cancelar uma reserva na totalidade ou apenas alguns dos itens que lhe pertencem.
      * Atualiza o estado da reserva e dos itens para CANCELADO.
      *
-     * @param idCancelar O ID da reserva a ser cancelada.
      * @param estado O estado da reserva (CANCELADO).
      * @throws IOException Se ocorrer um erro durante a gravação dos dados.
      */
-    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException {
+    public static void cancelarReserva( Constantes.Estado estado) throws IOException {
+
         boolean hasReservas = hasReservas();
+        boolean flag=false;
         if (!hasReservas) return;
 
-        for (Reserva reserva : reservas) {
-            if (reserva.getNumMovimento() == idCancelar) {
-                reserva.setEstado(estado);
-                for (ReservaLinha reservaLinha : reservasLinha) {
-                    if (reservaLinha.getIdReserva() == idCancelar) {
-                        reservaLinha.setEstado(estado);
+        do {
+            int idCancelar = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
+            if (idCancelar == 0)
+                return;
+
+            for (Reserva reserva : reservas) {
+                if (reserva.getNumMovimento() == idCancelar) {
+                    reserva.setEstado(estado);
+                    for (ReservaLinha reservaLinha : reservasLinha) {
+                        if (reservaLinha.getIdReserva() == idCancelar) {
+                            reservaLinha.setEstado(estado);
+                            flag = true;
+                        }
                     }
                 }
             }
-        }
-
-        gravarArrayReservas();
-        gravarArrayReservaLinha();
+            if (!flag) {
+                System.out.println("Id inválido");
+            }
+        }while (!flag);
+            gravarArrayReservas();
+            gravarArrayReservaLinha();
     }
 
     /**
@@ -2235,32 +2245,42 @@ public class TratamentoDados {
     public static void concluirReserva() throws IOException
     {
         boolean hasReservas = hasReservas();
+        boolean flag=false;
         if(!hasReservas) return;
 
         // ******** MOSTRAR TODAS AS RESERVAS E ESCOLHER 1 *******
         mostraTabelaReservas(reservas, Constantes.Etapa.CONCLUIR);
-        int idReserva = lerInt("Escolha o id da reserva: ", false, null);
+        do {
+            int idReserva = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
 
-        //Atribui automaticamente o Id com base no último Id existente.
-        int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO, -1);
+            if (idReserva == 0){
+                return;
+            }
+            //Atribui automaticamente o Id com base no último Id existente.
+            int idEmprestimo = getIdAutomatico(Constantes.TipoItem.EMPRESTIMO, -1);
 
-        // Faz a procura da reserva pelo id e retorna se encontrar
-        for (Reserva reserva : reservas) {
-            if (reserva.getNumMovimento() == idReserva) {
-                emprestimos.add(inserirDadosEmprestimo(idEmprestimo, reserva));
-                for (ReservaLinha reservalinha : reservasLinha) {
-                    if (reservalinha.getIdReserva() == idReserva) {
-                        int idItem = reservalinha.getIdItem();
-                        Constantes.TipoItem tipoItem = reservalinha.getTipoItem();
-                        int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, idEmprestimo);
-                        EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
-                        emprestimosLinha.add(emprestimoLinha);
+            // Faz a procura da reserva pelo id e retorna se encontrar
+            for (Reserva reserva : reservas) {
+                if (reserva.getNumMovimento() == idReserva) {
+                    emprestimos.add(inserirDadosEmprestimo(idEmprestimo, reserva));
+                    flag = true;
+                    for (ReservaLinha reservalinha : reservasLinha) {
+                        if (reservalinha.getIdReserva() == idReserva) {
+                            int idItem = reservalinha.getIdItem();
+                            Constantes.TipoItem tipoItem = reservalinha.getTipoItem();
+                            int emprestimoLinhaId = getIdAutomatico(Constantes.TipoItem.EMPRESTIMOLINHA, idEmprestimo);
+                            EmprestimoLinha emprestimoLinha = new EmprestimoLinha(idEmprestimo, emprestimoLinhaId, tipoItem, idItem, Constantes.Estado.EMPRESTADO);
+                            emprestimosLinha.add(emprestimoLinha);
 
-                        cancelarReserva(idReserva, Constantes.Estado.CONCLUIDO);
+                            cancelarReserva(Constantes.Estado.CONCLUIDO);
+                        }
                     }
                 }
             }
-        }
+            if (!flag) {
+                System.out.println("Id inválido");
+            }
+        }while(!flag);
 
         gravarArrayEmprestimo();
         gravarArrayEmprestimoLinha();
