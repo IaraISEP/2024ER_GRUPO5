@@ -1065,416 +1065,380 @@ public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOEx
 /*
  * ########################### TRATAMENTO DE DADOS JORNAIS/REVISTAS - FIM #################################################
  */
-/*
- * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
- */
-
-/**
- * Metodo para inserir os dados de uma reserva.
- * Este metodo solicita ao utilizador que selecione o cliente e insira as datas da reserva.
- * Garante que a data de início não é anterior a hoje e que a data de fim não é anterior à data de início.
- * Valida o cliente com base em ID, NIF ou contacto.
- *
- * @param id O ID da reserva.
- * @return Um novo objeto Reserva com os detalhes fornecidos.
- */
-public static Reserva inserirDadosReserva(int id) {
-    Cliente cliente = null;
-    LocalDate dataInicio;
-    LocalDate dataFim;
-    Constantes.Estado estado;
-
-    // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
-    do {
-        int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - Contribuinte, 3 - Contacto): ", false, null);
-        Constantes.ValidacaoCliente validacaoCliente;
-        switch (opcao) {
-            case 1:
-                validacaoCliente = Constantes.ValidacaoCliente.ID;
-                break;
-            case 2:
-                validacaoCliente = Constantes.ValidacaoCliente.NIF;
-                break;
-            case 3:
-                validacaoCliente = Constantes.ValidacaoCliente.CONTACTO;
-                break;
-            default:
-                System.out.println("Opção inválida! Tente novamente.");
-                continue;
-        }
-        int valor = lerInt("Insira o " + validacaoCliente.toString().toLowerCase() + " : ", false, null);
-        cliente = validarCliente(validacaoCliente, valor);
-        if (cliente == null) {
-            System.out.println("Cliente não encontrado. Tente novamente.");
-        }
-    } while (cliente == null);
-
-    // Introdução das datas.
-    // É validado se a data início introduzida é inferior a hoje.
-    // É validado se a data fim introduzida é inferior à início e superior ao limite estipulado.
-    do {
-        dataInicio = lerData("Insira a data de início da reserva (dd/MM/yyyy): ");
-        if (dataInicio.isBefore(Constantes.getDatahoje())) {
-            System.out.println("A data de início não pode ser anterior ao dia de hoje.");
-        }
-    } while (dataInicio.isBefore(Constantes.getDatahoje()));
-
-    do {
-        dataFim = lerData("Insira a data de fim da reserva (dd/MM/yyyy): ");
-        if (dataFim.isBefore(dataInicio)) {
-            System.out.println("A data de fim não pode ser anterior à data de início.");
-        } else if (dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
-            System.out.println("A reserva não pode ser superior a " + Constantes.TempoMaxReservaDias + " dias.");
-        }
-    } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
-
-    estado = Constantes.Estado.RESERVADO;
-    return new Reserva(1, id, dataInicio, dataFim, cliente, null, estado);
-}
-
-/**
- * Metodo para criar uma nova reserva.
- * Verifica se existem clientes e itens (livros, jornais, revistas) na biblioteca.
- * Solicita ao utilizador que insira os dados da reserva e adiciona itens à reserva.
- * Grava a reserva e seus detalhes em arquivos CSV.
- *
- * @throws IOException Se ocorrer um erro durante a gravação dos dados no ficheiro.
- */
-public static void criarReserva() throws IOException {
-    int opcao = 1;
-    // Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
-    if (livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()) {
-        System.out.println("Não existem Items nesta Biblioteca");
-        return;
-    }
-    // Mostra mensagem a informar que não tem cliente.
-    if (clientes.isEmpty()) {
-        System.out.println("Não existem clientes nesta Biblioteca");
-        return;
-    }
-    mostraTabelaClientes(clientes);
-
-    // Atribui automaticamente o Id com base no último Id existente.
-    int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA, -1);
-
-    // Cria a reserva
-    reservas.add(inserirDadosReserva(idReserva));
-    Reserva reserva = reservas.getLast();
-
-    boolean firstEntry = true;
-    do {
-        if (opcao < 1 || opcao > 2) {
-            System.out.println("Opção inválida! Tente novamente.");
-        } else {
-            if (!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry) {
-                reservas.remove(reservas.getLast());
-                return;
-            }
-            firstEntry = false;
-        }
-        opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
-    } while (opcao != 2);
-
-    System.out.println("Reserva criada com sucesso!");
-
-    gravarArrayReservas();
-    gravarArrayReservaLinha();
-}
-
-/**
- * Metodo para editar uma reserva existente.
- * Lista todas as reservas e permite ao utilizador adicionar ou remover itens da reserva.
- * Grava as alterações nos arquivos CSV.
- *
- * @throws IOException Se ocorrer um erro durante a gravação dos dados.
- */
-public static void editarReserva() throws IOException {
-    // Verifica se a lista de reservas está vazia
-    if (reservas.isEmpty()) {
-        System.out.println("Não há reservas nesta biblioteca.");
-        return;
-    }
-
-    // Lista todas as reservas
-    listaTodasReservas(Constantes.Etapa.EDITAR);
-
-    // Lê o ID da reserva a ser editada
-    int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-    for (Reserva reserva : reservas) {
-        if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
-            System.out.println("Não é possivel editar a reserva.");
-            return;
-        }
-    }
-    listarDetalhesReserva(idEditar);
-
-    int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
-    switch (opcao) {
-        case 1:
-            criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
-            gravarArrayReservaLinha();
-            break;
-        case 2:
-            opcao = 1;
-            do {
-                if (opcao != 1)
-                    System.out.println("Número Inválido!");
-                else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
-                    System.out.println("Não existem mais itens para remover!");
-                    break;
-                }
-                opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
-            } while (opcao != 2);
-            RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
-            gravarArrayReservaLinha();
-            break;
-        default:
-            System.out.println("Escolha invalida! Tente novamente.");
-    }
-}
-
-/**
- * Metodo para listar os detalhes de uma reserva.
- * Procura a reserva pelo ID e exibe os detalhes da reserva.
- *
- * @param idReserva O ID da reserva.
- * @throws IOException Se ocorrer um erro durante a leitura dos dados.
- */
-public static void listarDetalhesReserva(int idReserva) throws IOException {
-    // Lista de apoio para editar os detalhes
-    List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
-
-    // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-    for (ReservaLinha reservaLinha : reservasLinha) {
-        if (reservaLinha.getIdReserva() == idReserva) {
-            reservaLinhaDetails.add(reservaLinha);
-        }
-    }
-    mostraDetalhesReservas(reservaLinhaDetails, 0, null);
-}
-
-/**
- * Metodo para remover um item de uma reserva ou empréstimo.
- * Solicita ao utilizador que escolha o tipo de item e o ID do item a ser removido.
- * Atualiza o estado do item para CANCELADO.
- *
- * @param id O ID da reserva ou empréstimo.
- * @param tipoServico O tipo de serviço (RESERVA ou EMPRESTIMO).
- * @return true se o item foi removido com sucesso, false caso contrário.
- */
-public static Boolean RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico) {
-    Constantes.TipoItem tipoItem = null;
-    int idItem, opcao, i = 0;
-    boolean flag = false;
-    do {
-        opcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
-        switch (opcao) {
-            case 1:
-                tipoItem = Constantes.TipoItem.LIVRO;
-                break;
-            case 2:
-                tipoItem = Constantes.TipoItem.REVISTA;
-                break;
-            case 3:
-                tipoItem = Constantes.TipoItem.JORNAL;
-                break;
-            default:
-                System.out.println("Opção inválida! Tente novamente.");
-        }
-    } while (opcao < 1 || opcao > 3);
-    if (tipoServico == Constantes.TipoItem.RESERVA)
-        mostraDetalhesReservas(reservasLinha, id, tipoItem);
-    else
-        mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
-    do {
-        i = 0;
-        idItem = lerInt("Escolha o ID do Item (0 para Retornar): ", false, null);
-        if (idItem == 0)
-            return false;
-
-        if (tipoServico == Constantes.TipoItem.RESERVA) {
-            for (ReservaLinha reservaLinha : reservasLinha) {
-                if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem &&
-                        reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                    reservaLinha.setEstado(Constantes.Estado.CANCELADO);
-                    flag = true;
-                }
-                if (reservaLinha.getIdReserva() == id && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
-                    i++;
-                }
-            }
-            if (i == 0)
-                for (Reserva reserva : reservas)
-                    if (reserva.getNumMovimento() == id) {
-                        reserva.setEstado(Constantes.Estado.CANCELADO);
-                        return false;
-                    }
-        } else {
-            for (EmprestimoLinha emprestimoLinha : emprestimosLinha) {
-                if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getIdItem() == idItem &&
-                        emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                    emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
-                    flag = true;
-                }
-                if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
-                    i++;
-                }
-            }
-            if (i == 0)
-                for (Emprestimo emprestimo : emprestimos)
-                    if (emprestimo.getNumMovimento() == id) {
-                        emprestimo.setEstado(Constantes.Estado.CANCELADO);
-                        return false;
-                    }
-        }
-        if (!flag)
-            System.out.println("Número Inválido!");
-    } while (!flag);
-    return true;
-}
-
-/**
- * Metodo para cancelar uma reserva na totalidade ou apenas alguns dos itens que lhe pertencem.
- * Atualiza o estado da reserva e dos itens para CANCELADO.
- *
- * @param idCancelar O ID da reserva a ser cancelada.
- * @param estado O estado da reserva (CANCELADO).
- * @throws IOException Se ocorrer um erro durante a gravação dos dados.
- */
-public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException {
-    boolean hasReservas = hasReservas();
-    if (!hasReservas) return;
-
-    for (Reserva reserva : reservas) {
-        if (reserva.getNumMovimento() == idCancelar) {
-            reserva.setEstado(estado);
-            for (ReservaLinha reservaLinha : reservasLinha) {
-                if (reservaLinha.getIdReserva() == idCancelar) {
-                    reservaLinha.setEstado(estado);
-                }
-            }
-        }
-    }
-
-    gravarArrayReservas();
-    gravarArrayReservaLinha();
-}
-
-/**
- * Cria um arquivo CSV para armazenar os dados das reservas.
- * Este método grava os dados de uma reserva no ficheiro CSV.
- * Utiliza o FileWriter para escrever os dados no ficheiro.
- *
- * @param ficheiro O caminho do ficheiro CSV.
- * @param reserva O objeto Reserva cujos dados serão gravados.
- * @param firstLine Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
- * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
- */
-public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException {
-    try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
-        fw.write(String.join(";",
-                Integer.toString(reserva.getCodBiblioteca()),
-                Integer.toString(reserva.getNumMovimento()),
-                reserva.getDataInicio().toString(),
-                reserva.getDataFim().toString(),
-                Integer.toString(reserva.getClienteId()),
-                reserva.getEstado() + "\n"));
-    }
-}
-
-/**
- * Lê os dados das reservas a partir de um ficheiro CSV.
- * Este método lê cada linha do ficheiro CSV, cria um objeto Reserva com os dados lidos e adiciona-o à lista de reservas.
- * Se o cliente associado à reserva não for encontrado, cria um cliente com dados padrão.
- *
- * @param ficheiro O caminho do ficheiro CSV.
- */
-public static void lerFicheiroCsvReservas(String ficheiro) {
-    try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
-        String linha;
-        while ((linha = readFile.readLine()) != null) {
-            Cliente cliente = null;
-            String[] dados = linha.split(Constantes.SplitChar);
-            int codBiblioteca = Integer.parseInt(dados[0]);
-            int codMovimento = Integer.parseInt(dados[1]);
-            LocalDate dataInicio = LocalDate.parse(dados[2]);
-            LocalDate dataFim = LocalDate.parse(dados[3]);
-            int id = Integer.parseInt(dados[4]);
-            for (Cliente clienteReserva : clientes) {
-                if (clienteReserva.getId() == id) {
-                    cliente = clienteReserva;
-                    break;
-                }
-            }
-            Constantes.Estado estado = Constantes.Estado.valueOf(dados[5]);
-
-            List<ReservaLinha> reservaLinha = new ArrayList<>();
-
-            for (ReservaLinha resLinha : reservasLinha) {
-                if (resLinha.getIdReserva() == codMovimento) {
-                    reservaLinha.add(resLinha);
-                }
-            }
-            if (cliente == null)
-                cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
-            Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
-            reservas.add(reserva);
-        }
-    } catch (IOException e) {
-        System.out.println(e.getMessage());
-    }
-}
-
-/**
- * Lista todas as reservas existentes.
- * Exibe uma mensagem se não houver reservas para mostrar.
- * Utiliza o método mostraTabelaReservas para exibir os dados das reservas.
- *
- * @param etapa A etapa do processo (LISTAR, EDITAR, etc.).
- * @return true se houver reservas para mostrar, false caso contrário.
- */
-public static boolean listaTodasReservas(Constantes.Etapa etapa) {
-    if (reservas.isEmpty()) {
-        System.out.println("Não existem reservas para mostrar.");
-        return false;
-    }
-
-    mostraTabelaReservas(reservas, etapa);
-    return true;
-}
-
-/**
- * Grava a lista de reservas em um ficheiro CSV.
- * Este método itera pela lista de reservas e grava os dados de cada reserva no ficheiro CSV.
- * Utiliza o método criarFicheiroCsvReservas para gravar os dados.
- *
- * @throws IOException Se ocorrer um erro de I/O durante as operações.
- */
-public static void gravarArrayReservas() throws IOException {
-    for (int i = 0; i < reservas.size(); i++) {
-        criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
-    }
-}
-
-/*
- * ############################### TRATAMENTO DE DADOS RESERVAS - FIM ##############################################
- */
-
     /*
-     * ############################### TRATAMENTO DE DADOS DETALHES RESERVAS - INICIO ##############################################
+     * ########################### TRATAMENTO DE DADOS RESERVAS - INICIO #################################################
      * */
 
     /**
-     * Metodo para inserir os detalhes de uma reserva atribuido a algum Cliente
-     * @param reservaId Recebe o Id da Reserva
-     * @param tipoItem Recebe o Tipo de Item a ser inserido
-     * */
-    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem, LocalDate dataInicio, LocalDate dataFim)
+     * Metodo para inserir os dados de uma reserva.
+     * Este metodo solicita ao utilizador que selecione o cliente e insira as datas da reserva.
+     * Garante que a data de início não é anterior a hoje e que a data de fim não é anterior à data de início.
+     *
+     * @param id O ID da reserva.
+     * @return Um novo objeto Reserva com os detalhes fornecidos.
+     */
+    public static Reserva inserirDadosReserva(int id)
     {
-        int idItem=0;
+        Cliente cliente = null;
+        LocalDate dataInicio;
+        LocalDate dataFim;
+        Constantes.Estado estado;
+
+        // Verifica qual é a maneira como queremos procurar pelo cliente, para ser mais flexível
+        do {
+            int opcao = lerInt("Escolha a opção de validação do cliente (1 - ID, 2 - Contribuinte, 3 - Contacto): ", false, null);
+            Constantes.ValidacaoCliente validacaoCliente;
+            switch (opcao) {
+                case 1:
+                    validacaoCliente = Constantes.ValidacaoCliente.ID;
+                    break;
+                case 2:
+                    validacaoCliente = Constantes.ValidacaoCliente.NIF;
+                    break;
+                case 3:
+                    validacaoCliente = Constantes.ValidacaoCliente.CONTACTO;
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+                    continue;
+            }
+            int valor = lerInt("Insira o " + validacaoCliente.toString().toLowerCase() + " : ", false, null);
+            cliente = validarCliente(validacaoCliente, valor);
+            if (cliente == null) {
+                System.out.println("Cliente não encontrado. Tente novamente.");
+            }
+        } while (cliente == null);
+
+        // Introdução das datas.
+        // É validado se a data início introduzida é inferior a hoje.
+        // É validado se a data fim introduzida é inferior à início e superior ao limite estipulado.
+        do {
+            dataInicio = lerData("Insira a data de início da reserva (dd/MM/yyyy): ");
+            if (dataInicio.isBefore(Constantes.getDatahoje())) {
+                System.out.println("A data de início não pode ser anterior ao dia de hoje.");
+            }
+        } while (dataInicio.isBefore(Constantes.getDatahoje()));
+
+        do {
+            dataFim = lerData("Insira a data de fim da reserva (dd/MM/yyyy): ");
+            if (dataFim.isBefore(dataInicio)) {
+                System.out.println("A data de fim não pode ser anterior à data de início.");
+            }
+            else if(dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias))) {
+                System.out.println("A reserva não pode ser superior a " + Constantes.TempoMaxReservaDias + " dias.");
+            }
+        } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
+
+        estado = Constantes.Estado.RESERVADO;
+        return new Reserva(1, id, dataInicio, dataFim, cliente,null, estado);
+    }
+
+    /**
+     * Metodo para criar a nova Reserva
+     * Verifica se existem clientes na Biblioteca
+     * */
+    public static void criarReserva() throws IOException
+    {
+        int opcao = 1;
+        //Mostra mensagem a informar que a Biblioteca não tem nada que seja possível reserva, e sai fora.
+        if(livros.isEmpty() && jornais.isEmpty() && revistas.isEmpty()){
+            System.out.println("Não existem Items nesta Biblioteca");
+            return;
+        }
+        //Mostra mensagem a informar que não tem cliente.
+        //TODO : Ao invés de não deixar prosseguir, pode perguntar se deseja criar um novo cliente e prosseguir para a sua criação.
+        if (clientes.isEmpty()){
+            System.out.println("Não existem clientes nesta Biblioteca");
+            return;
+        }
+        mostraTabelaClientes(clientes);
+
+        //Atribui automaticamente o Id com base no último Id existente.
+        int idReserva = getIdAutomatico(Constantes.TipoItem.RESERVA, -1);
+
+        //Cria a reserva
+        reservas.add(inserirDadosReserva(idReserva));
+        Reserva reserva = reservas.getLast();
+
+        boolean firstEntry = true;
+        do{
+            if(opcao < 1 || opcao > 2){
+                System.out.println("Opção inválida! Tente novamente.");
+            }
+            else {
+                if(!criarDetalheEmprestimoReserva(reserva.getNumMovimento(), Constantes.TipoItem.RESERVA) && firstEntry){
+                    reservas.remove(reservas.getLast());
+                    return;
+                }
+                firstEntry = false;
+            }
+            opcao = lerInt("Deseja adicionar mais Items à Reserva? (1 - Sim, 2 - Não)", false, null);
+        }while(opcao!=2);
+
+        System.out.println("Reserva criada com sucesso!");
+
+        gravarArrayReservas();
+        gravarArrayReservaLinha();
+    }
+
+    public static void editarReserva() throws IOException
+    {
+        // Verifica se a lista de clientes está vazia
+        if(reservas.isEmpty()) {
+            System.out.println("Não há reservas nesta biblioteca.");
+            return;
+        }
+
+        // Lista todos os clientes
+        listaTodasReservas(Constantes.Etapa.EDITAR);
+
+        // Lê o ID do cliente a ser apagado
+        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
+        for (Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
+                System.out.println("Não é possivel editar a reserva.");
+                return;
+            }
+        }
+        listarDetalhesReserva(idEditar);
+
+        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
+        switch (opcao) {
+            case 1:
+                criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
+                gravarArrayReservaLinha();
+                break;
+            case 2:
+                opcao=1;
+                do{
+                    if(opcao!=1)
+                        System.out.println("Número Inválido!");
+                    else if(!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)){
+                        System.out.println("Não existem mais itens para remover!");
+                        break;
+                    }
+                    opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                }while(opcao != 2);
+                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
+                gravarArrayReservaLinha();
+                break;
+            default:
+                System.out.println("Escolha invalida! Tente novamente.");
+        }
+    }
+
+    public static void listarDetalhesReserva(int idReserva) throws IOException
+    {
+        // Lista de apoio para editar os detalhes
+        List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
+
+        // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
+        for(ReservaLinha reservaLinha : reservasLinha) {
+            if (reservaLinha.getIdReserva() == idReserva) {
+                reservaLinhaDetails.add(reservaLinha);
+            }
+        }
+        mostraDetalhesReservas(reservaLinhaDetails, 0,null);
+    }
+
+
+    public static Boolean RemoverItemReservaEmprestimo(int id, Constantes.TipoItem tipoServico)
+    {
+        Constantes.TipoItem tipoItem = null;
+        int idItem, opcao, i=0;
+        boolean flag=false;
+        do {
+            opcao = lerInt("Escolha o tipo de item (1 - Livro, 2 - Revista, 3 - Jornal): ", false, null);
+            switch (opcao) {
+                case 1:
+                    tipoItem = Constantes.TipoItem.LIVRO;
+                    break;
+                case 2:
+                    tipoItem = Constantes.TipoItem.REVISTA;
+                    break;
+                case 3:
+                    tipoItem = Constantes.TipoItem.JORNAL;
+                    break;
+                default:
+                    System.out.println("Opção inválida! Tente novamente.");
+            }
+        }while (opcao < 1 || opcao > 3);
+        if(tipoServico == Constantes.TipoItem.RESERVA)
+            mostraDetalhesReservas(reservasLinha, id, tipoItem);
+        else
+            mostraDetalhesEmprestimos(emprestimosLinha, id, tipoItem);
+        do{
+            i=0;
+            idItem = lerInt("Escolha o ID do Item (0 para Retornar): ", false, null);
+            if(idItem == 0)
+                return false;
+
+            if(tipoServico == Constantes.TipoItem.RESERVA){
+                for (ReservaLinha reservaLinha : reservasLinha){
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getIdItem() == idItem &&
+                            reservaLinha.getTipoItem() == tipoItem && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        reservaLinha.setEstado(Constantes.Estado.CANCELADO);
+                        flag=true;
+                    }
+                    if (reservaLinha.getIdReserva() == id && reservaLinha.getEstado() == Constantes.Estado.RESERVADO) {
+                        i++;
+                    }
+                }
+                if(i==0)
+                    for(Reserva reserva : reservas)
+                        if(reserva.getNumMovimento() == id) {
+                            reserva.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
+                        }
+            }
+            else{
+                for (EmprestimoLinha emprestimoLinha : emprestimosLinha){
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getIdItem() == idItem &&
+                            emprestimoLinha.getTipoItem() == tipoItem && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        emprestimoLinha.setEstado(Constantes.Estado.CANCELADO);
+                        flag=true;
+                    }
+                    if (emprestimoLinha.getIdEmprestimo() == id && emprestimoLinha.getEstado() == Constantes.Estado.EMPRESTADO) {
+                        i++;
+                    }
+                }
+                if(i==0)
+                    for(Emprestimo emprestimo : emprestimos)
+                        if(emprestimo.getNumMovimento() == id) {
+                            emprestimo.setEstado(Constantes.Estado.CANCELADO);
+                            return false;
+                        }
+            }
+            if (!flag)
+                System.out.println("Número Inválido!");
+        }while(!flag);
+        return true;
+    }
+
+    /**
+     * Metodo para cancelar a reserva na totalidade ou apenas algunm
+     * dos itens que lhe pertencem.
+     * */
+    public static void cancelarReserva(int idCancelar, Constantes.Estado estado) throws IOException
+    {
+        boolean hasReservas = hasReservas();
+        if(!hasReservas) return;
+
+        for (Reserva reserva : reservas) {
+            if (reserva.getNumMovimento() == idCancelar) {
+                reserva.setEstado(estado);
+                for (ReservaLinha reservaLinha : reservasLinha) {
+                    if (reservaLinha.getIdReserva() == idCancelar) {
+                        reservaLinha.setEstado(estado);
+                    }
+                }
+            }
+        }
+
+        gravarArrayReservas();
+        gravarArrayReservaLinha();
+    }
+
+
+    public static void criarFicheiroCsvReservas(String ficheiro, Reserva reserva, Boolean firstLine) throws IOException
+    {
+        try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
+            fw.write(String.join(";",
+                    Integer.toString(reserva.getCodBiblioteca()),
+                    Integer.toString(reserva.getNumMovimento()),
+                    reserva.getDataInicio().toString(),
+                    reserva.getDataFim().toString(),
+                    Integer.toString(reserva.getClienteId()),
+                    reserva.getEstado() + "\n"));
+        }
+    }
+
+    public static void lerFicheiroCsvReservas(String ficheiro)
+    {
+        try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
+            String linha;
+            while ((linha = readFile.readLine()) != null) {
+                Cliente cliente = null;
+                String[] dados = linha.split(Constantes.SplitChar);
+                int codBiblioteca = Integer.parseInt(dados[0]);
+                int codMovimento = Integer.parseInt(dados[1]);
+                LocalDate dataInicio = LocalDate.parse(dados[2]);
+                LocalDate dataFim = LocalDate.parse(dados[3]);
+                int id = Integer.parseInt(dados[4]);
+                for(Cliente clienteReserva : clientes) {
+                    if (clienteReserva.getId() == id) {
+                        cliente = clienteReserva;
+                        break;
+                    }
+                }
+                Constantes.Estado estado = Constantes.Estado.valueOf(dados[5]);
+
+                List<ReservaLinha> reservaLinha = new ArrayList<>();
+
+                for(ReservaLinha resLinha : reservasLinha) {
+                    if (resLinha.getIdReserva() == codMovimento) {
+                        reservaLinha.add(resLinha);
+                    }
+                }
+                if(cliente == null)
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
+                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
+                reservas.add(reserva);
+            }
+        }
+        catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+/*        for (Reserva reserva : reservas) {
+            System.out.println(reserva);
+        }*/
+    }
+
+    public static boolean listaTodasReservas(Constantes.Etapa etapa)
+    {
+        if (reservas.isEmpty()) {
+            System.out.println("Não existem reservas para mostrar.");
+            return false;
+        }
+
+        mostraTabelaReservas(reservas, etapa);
+        return true;
+    }
+
+    public static void gravarArrayReservas() throws IOException
+    {
+
+        for(int i = 0; i < reservas.size(); i++){
+            criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
+        }
+    }
+
+    /*
+     * ############################### TRATAMENTO DE DADOS RESERVAS - FIM ##############################################
+     * */
+
+/*
+ * ############################### TRATAMENTO DE DADOS DETALHES RESERVAS - INICIO ##############################################
+ * */
+
+    /**
+     * Método para inserir os detalhes de uma reserva atribuída a um cliente.
+     * Este método solicita ao utilizador que insira o ID do item a ser reservado e verifica se o item já está reservado ou emprestado.
+     * Se o item estiver disponível, cria um novo objeto ReservaLinha com os detalhes fornecidos.
+     *
+     * @param reservaId O ID da reserva.
+     * @param tipoItem O tipo de item a ser inserido (LIVRO, JORNAL ou REVISTA).
+     * @param dataInicio A data de início da reserva.
+     * @param dataFim A data de fim da reserva.
+     * @return Um novo objeto ReservaLinha com os detalhes fornecidos.
+     * @throws IllegalArgumentException Se o item já estiver reservado ou emprestado.
+     */
+    public static ReservaLinha inserirDetalhesReserva(int reservaId, Constantes.TipoItem tipoItem, LocalDate dataInicio, LocalDate dataFim) {
+        int idItem = 0;
         int reservaLinhaId = getIdAutomatico(Constantes.TipoItem.RESERVALINHA, reservaId);
 
-        switch (tipoItem){
+        // Lista todos os itens do tipo especificado
+        switch (tipoItem) {
             case LIVRO:
                 listaTodosLivros();
                 break;
@@ -1487,6 +1451,7 @@ public static void gravarArrayReservas() throws IOException {
         }
         idItem = lerInt("Insira o ID do Item: ", false, null);
 
+        // Verifica se o item já está reservado
         for (Reserva reserva : reservas)
             for (ReservaLinha reservaLinha : reservasLinha)
                 if (reservaLinha.getIdItem() == idItem && reservaLinha.getTipoItem() == tipoItem)
@@ -1495,6 +1460,7 @@ public static void gravarArrayReservas() throws IOException {
                                 (reserva.getDataFim().isAfter(dataInicio) || reserva.getDataFim().isEqual(dataInicio)))
                             throw new IllegalArgumentException("Item já reservado!");
 
+        // Verifica se o item já está emprestado
         for (Emprestimo emprestimo : emprestimos)
             for (EmprestimoLinha emprestimoLinha : emprestimosLinha)
                 if (emprestimoLinha.getIdItem() == idItem && emprestimoLinha.getTipoItem() == tipoItem &&
@@ -1507,14 +1473,15 @@ public static void gravarArrayReservas() throws IOException {
     }
 
     /**
-     * Metodo para criar o ficheiro de detalhes de uma reserva
-     * atribuido a algum Cliente
-     * @param ficheiro Recebe o valor do Path do ficheiro a tratar
-     * @param reservaLinha Recebe o valor de uma ReservaLinha do Array
-     * @param firstLine reescrever o ficheiro só e só se for a primeira linha a ser inserida
-     * */
-    public static void criarFicheiroCsvReservasLinha(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException
-    {
+     * Método para criar o ficheiro de detalhes de uma reserva atribuída a um cliente.
+     * Este método grava os dados de uma ReservaLinha no ficheiro CSV.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     * @param reservaLinha O objeto ReservaLinha cujos dados serão gravados.
+     * @param firstLine Define se a gravação deve sobrescrever (false) ou adicionar (true) ao ficheiro.
+     * @throws IOException Se ocorrer um erro ao gravar os dados no ficheiro.
+     */
+    public static void criarFicheiroCsvReservasLinha(String ficheiro, ReservaLinha reservaLinha, Boolean firstLine) throws IOException {
         try (FileWriter fw = new FileWriter(ficheiro, firstLine)) {
             fw.write(String.join(Constantes.SplitChar,
                     Integer.toString(reservaLinha.getIdReserva()),
@@ -1526,12 +1493,12 @@ public static void gravarArrayReservas() throws IOException {
     }
 
     /**
-     * Metodo para ler o Ficheiro de Detalhes de Reserva e carregar a
-     * informação no Array ReservasDtl
-     * @param ficheiro Recebe o valor do Path do ficheiro a tratar
-     * */
-    public static void lerFicheiroCsvReservasLinha(String ficheiro)
-    {
+     * Método para ler o ficheiro de detalhes de reserva e carregar a informação no array reservasLinha.
+     * Este método lê cada linha do ficheiro CSV, cria um objeto ReservaLinha com os dados lidos e adiciona-o à lista reservasLinha.
+     *
+     * @param ficheiro O caminho do ficheiro CSV.
+     */
+    public static void lerFicheiroCsvReservasLinha(String ficheiro) {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
 
@@ -1549,21 +1516,18 @@ public static void gravarArrayReservas() throws IOException {
                 Constantes.Estado estado = Constantes.Estado.valueOf(dados[4]);
                 reservasLinha.add(new ReservaLinha(reservaId, reservaLinhaId, tipoItem, idItem, estado));
             } while ((linha = readFile.readLine()) != null);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-/*        for (Reserva reserva : reservas) {
-            System.out.println(reserva);
-        }*/
     }
 
     /**
-     * Metodo para gravar as alterações efetuadas no Array ReservasDtl
-     * no Ficheiro reservasdtl.csv
-     * */
-    public static void gravarArrayReservaLinha() throws IOException
-    {
+     * Método para gravar as alterações efetuadas no array reservasLinha no ficheiro reservasdtl.csv.
+     * Este método itera pela lista reservasLinha e grava os dados de cada ReservaLinha no ficheiro CSV.
+     *
+     * @throws IOException Se ocorrer um erro de I/O durante as operações.
+     */
+    public static void gravarArrayReservaLinha() throws IOException {
         for (int i = 0; i < reservasLinha.size(); i++) {
             criarFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
         }
@@ -1572,7 +1536,6 @@ public static void gravarArrayReservas() throws IOException {
     /*
      * ############################### TRATAMENTO DE DADOS DETALHES RESERVAS - FIM ##############################################
      * */
-
     /*
      * ############################### TRATAMENTO DE DADOS EMPRESTIMO - INICIO ##############################################
      * */
