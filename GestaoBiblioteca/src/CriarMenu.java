@@ -41,30 +41,19 @@ public class CriarMenu {
         input.nextLine();
     }
 
-    public static void menuLogin(){
-        Menu menuLogin = new Menu("Login");
-        menuLogin.adicionarOpcao(new OpcaoMenu("Listar Bibliotecas", () -> {
-            TratamentoDados.listaTodasBibliotecas();
+    public static void menuBiblioteca(){
+        Menu menuBiblioteca = new Menu("Gestão Bibliotecas");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Iniciar Sessão", () -> {
             try {
-                TratamentoDados.fazerLogin();
+                TratamentoDados.inicioSessao();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            //menuPrincipal();
             keyPress();
         }));
-        menuLogin.exibir();
 
-
-    }
-
-    /**
-     * Cria e exibe o menu de gestão de Bibliotecas.
-     */
-    private static void menuBiblioteca(){
-        Menu menuBiblioteca = new Menu("Gestão Bibliotecas");
-
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Criar Bibliotecas", () -> {
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Criar Biblioteca", () -> {
             try {
                 TratamentoDados.criarBiblioteca();
             } catch (IOException e) {
@@ -72,18 +61,30 @@ public class CriarMenu {
             }
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Listar Bibliotecas", () -> {
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Listar Biblioteca", () -> {
             TratamentoDados.listaTodasBibliotecas();
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Editar Bibliotecas", () -> {
-            System.out.println("Editar Biblioteca");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Editar Biblitoeca", () -> {
+            try {
+                TratamentoDados.editarBiblioteca();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
-        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Apagar Bibliotecas", () -> {
-            System.out.println("Apagar Biblioteca");
+
+        menuBiblioteca.adicionarOpcao(new OpcaoMenu("Apagar Biblitoeca", () -> {
+            try {
+                TratamentoDados.apagarBiblioteca();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             keyPress();
         }));
+
         menuBiblioteca.exibir();
     }
 

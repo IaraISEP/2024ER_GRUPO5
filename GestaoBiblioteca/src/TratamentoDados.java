@@ -30,7 +30,7 @@ public class TratamentoDados {
     private static List<JornalRevista> revistas = new ArrayList<>();
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<ReservaLinha> reservasLinha = new ArrayList<>();
-    private static int codBibliotecaLogin=0;
+    private static int codBibliotecaSessao = -1;
 
     /**
      * Método responsável por criar a estrutura de ficheiros necessária para o armazenamento de dados de forma persistente.
@@ -92,22 +92,21 @@ public class TratamentoDados {
      * ########################### TRATAMENTO DE DADOS LOGIN - INICIO #################################################
      * */
 
-    public static void fazerLogin() throws IOException {
-
-
-        if (!bibliotecas.isEmpty()){
-            int opcao = lerInt("Escolha a Biblioteca: ", false, null);
-            for (Biblioteca biblioteca : bibliotecas) {
-                if (biblioteca.getCodBiblioteca() == opcao){
-                    biblioteca.setCodBiblioteca(opcao);
-                    codBibliotecaLogin = biblioteca.getCodBiblioteca();
-                    CriarMenu.menuPrincipal();
-                }
-            }
-        }else {
+    public static void inicioSessao() throws IOException {
+        if(bibliotecas.isEmpty()) {
             criarBiblioteca();
         }
-
+        
+        listaTodasBibliotecas();
+        
+        int opcao = lerInt("Escolha a Biblioteca: ", false, null);
+        for (Biblioteca biblioteca : bibliotecas) {
+            if (biblioteca.getCodBiblioteca() == opcao){
+                biblioteca.setCodBiblioteca(opcao);
+                codBibliotecaSessao = biblioteca.getCodBiblioteca();
+                CriarMenu.menuPrincipal();
+            }
+        }
     }
 
     /*
@@ -125,19 +124,11 @@ public class TratamentoDados {
      * @return Um objeto do tipo Biblioteca contendo as informações inseridas.
      * @throws IOException Se ocorrer um erro ao ler a entrada do utilizador.
      */
-    public static Biblioteca inserirDadosBiblioteca() throws IOException
+    public static Biblioteca inserirDadosBiblioteca(int id) throws IOException
     {
-        String nome = "";
-        int idBiblioteca = 0;
-
-        System.out.println("Insira o Nome da Biblioteca: ");
-        nome = input.nextLine();
+        String nome = lerString("Insira o Nome da Biblioteca: ");
         Constantes.Morada morada = selecionaMorada("Insira a Morada da biblioteca: ");
-
-        // Gera um ID único automaticamente para a nova biblioteca
-        idBiblioteca = getIdAutomatico(Constantes.TipoItem.BIBLIOTECA, -1);
-
-        return new Biblioteca(nome, morada, idBiblioteca);
+        return new Biblioteca(nome, morada, id);
     }
 
     /**
@@ -148,10 +139,76 @@ public class TratamentoDados {
      */
     public static void criarBiblioteca() throws IOException
     {
-        bibliotecas.add(inserirDadosBiblioteca());
+        bibliotecas.add(inserirDadosBiblioteca(getIdAutomatico(Constantes.TipoItem.BIBLIOTECA, -1)));
         gravarArrayBibliotecas();
     }
 
+    /**
+     * Método que edita biblioteca consoante o input do utilizador.
+     * Após a edição, os dados são guardados no ficheiro CSV correspondente.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados.
+     */
+    public static void editarBiblioteca() throws IOException
+    {
+        if(bibliotecas.isEmpty()) {
+            System.out.println("Não existem bibliotecas configuradas.");
+            return;
+        }
+        
+        listaTodasBibliotecas();
+
+        int idEditar = lerInt("Escolha o ID da biblioteca que deseja apagar: ", false, null);
+
+        for (Biblioteca biblioteca : bibliotecas) {
+            if (biblioteca.getCodBiblioteca() == idEditar) {
+                Biblioteca bibAdd = inserirDadosBiblioteca(idEditar);
+                biblioteca.setNome(bibAdd.getNome());
+                biblioteca.setMorada(bibAdd.getMorada());
+                System.out.println("Biblioteca editada com sucesso!");
+                gravarArrayBibliotecas();
+                return;
+            }
+        }
+        
+        System.out.println("ID não encontrado!");
+    }
+
+    /**
+     * Método que apaga biblioteca consoante o input do utilizador.
+     * Após a remoção, os dados são guardados no ficheiro CSV correspondente.
+     *
+     * @throws IOException Se ocorrer um erro ao gravar os dados.
+     */
+    public static void apagarBiblioteca() throws IOException {
+        if (bibliotecas.isEmpty()) {
+            System.out.println("Não existem bibliotecas configuradas.");
+            return;
+        }
+        
+        //Mostra as bibliotecas existentes
+        listaTodasBibliotecas();
+        int idApagar = lerInt("Escolha o ID da biblioteca que deseja apagar: ", false, null);
+
+        //Procura o objeto Biblioteca pelo ID fornecido
+        Biblioteca bibliotecaApagar = null;
+        for (Biblioteca biblioteca : bibliotecas) {
+            if (biblioteca.getCodBiblioteca() == idApagar) {
+                bibliotecaApagar = biblioteca;
+                break;
+            }
+        }
+        
+        //Verifica se a biblioteca foi encontrada e remove-a 
+        if (bibliotecaApagar != null) {
+            bibliotecas.remove(bibliotecaApagar);
+            System.out.println("Biblioteca apagada com sucesso!");
+            gravarArrayBibliotecas();
+        } else {
+            System.out.println("Não foi possível apagar a biblioteca. Id não válido.");
+        }
+    }
+    
     /**
      * Método responsável por criar um ficheiro CSV e gravar os dados de uma biblioteca.
      *
@@ -288,7 +345,7 @@ public class TratamentoDados {
             break;
         } while (true);
 
-        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
+        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto, codBibliotecaSessao);
     }
 
     /**
@@ -1268,7 +1325,7 @@ public class TratamentoDados {
         } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
 
         estado = Constantes.Estado.RESERVADO;
-        return new Reserva(1, id, dataInicio, dataFim, cliente, null, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
+        return new Reserva(codBibliotecaSessao, id, dataInicio, dataFim, cliente, null, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
@@ -1555,8 +1612,8 @@ public class TratamentoDados {
                     }
                 }
                 if (cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
-                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
+                Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
                 reservas.add(reserva);
             }
         } catch (IOException e) {
@@ -1768,9 +1825,9 @@ public class TratamentoDados {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
 
-                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
+                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
                 emprestimos.add(emprestimo);
             }while ((linha = readFile.readLine()) != null);
         }
@@ -1898,7 +1955,7 @@ public class TratamentoDados {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
+            return new Emprestimo(codBibliotecaSessao, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);
         }
         else{
             do {
@@ -1909,7 +1966,7 @@ public class TratamentoDados {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
+            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);
         }
     }
 
@@ -2538,33 +2595,32 @@ public class TratamentoDados {
      * */
     public static void mostraTabelaBibliotecas(List<Biblioteca> listaBibliotecas)
     {
+        int idMaxLen = "Id".length();
         int nomeMaxLen = "Nome".length();
         int moradaMaxLen = "Morada".length();
-        int idMaxLen = "Id".length();
-
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Biblioteca biblioteca : listaBibliotecas) {
+            idMaxLen = Math.max(idMaxLen, String.valueOf(biblioteca.getCodBiblioteca()).length());
             nomeMaxLen = Math.max(nomeMaxLen, biblioteca.getNome().length());
             moradaMaxLen = Math.max(moradaMaxLen, String.valueOf(biblioteca.getMorada()).length());
-            idMaxLen = Math.max(idMaxLen, String.valueOf(biblioteca.getCodBiblioteca()).length());
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + nomeMaxLen + "s | %-" + moradaMaxLen  + "s | %-" + idMaxLen + "s |\n";
+        String formato = "| %-" + idMaxLen + "s | %-" + nomeMaxLen  + "s | %-" + moradaMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(nomeMaxLen) + "-+-" + "-".repeat(moradaMaxLen) + "-+-" + "-".repeat(idMaxLen)  + "-+";
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(nomeMaxLen) + "-+-" + "-".repeat(moradaMaxLen)  + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Nome", "Morada", "Id");
+        System.out.printf(formato, "Id", "Nome", "Morada");
         //Imprime a linha de separação
         System.out.println(separador);
 
         //Imprime os dados dos clientes
         for (Biblioteca biblioteca : listaBibliotecas) {
-            System.out.printf(formato, biblioteca.getNome(), biblioteca.getMorada(), biblioteca.getCodBiblioteca());
+            System.out.printf(formato, biblioteca.getCodBiblioteca(), biblioteca.getNome(), biblioteca.getMorada());
         }
 
         System.out.println(separador);
