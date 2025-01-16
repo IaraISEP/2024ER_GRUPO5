@@ -1420,8 +1420,6 @@ public static void apagarJornalRevista(Constantes.TipoItem tipoItem) throws IOEx
 /*
  * ############################### TRATAMENTO DE DADOS DETALHES RESERVAS - INICIO ##############################################
  * */
-
-
     /**
      * Método para inserir os detalhes de uma reserva atribuída a um cliente.
      * Este método solicita ao utilizador que insira o ID do item a ser reservado e verifica se o item já está reservado ou emprestado.
