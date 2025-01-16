@@ -117,7 +117,7 @@ public class TratamentoDados {
      * @return Um objeto do tipo Biblioteca contendo as informações inseridas.
      * @throws IOException Se ocorrer um erro ao ler a entrada do utilizador.
      */
-    public static Biblioteca inserirDadosBiblioteca() throws IOException
+    public static Biblioteca inserirDadosBiblioteca()
     {
         String nome;
         int idBiblioteca;
