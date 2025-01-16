@@ -2231,96 +2231,102 @@ public static void AtualizarAtrasoEmprestimo() throws IOException {
 /*
  * ############################### TRATAMENTO DE DADOS EMPRESTIMO - FIM ##############################################
  */
+/*
+ * ############################### TRATAMENTO DE DADOS LISTAGENS - INICIO ##############################################
+ * */
 
-    /*
-     * ############################### TRATAMENTO DE DADOS LISTAGENS - INICIO ##############################################
-     * */
+/**
+ * Lista todas as reservas e empréstimos de um cliente.
+ * Este método verifica se há clientes cadastrados, solicita o ID do cliente e lista todas as reservas e empréstimos associados a esse cliente.
+ * Exibe mensagens informativas se não houver clientes, reservas ou empréstimos.
+ */
+public static void listarTodasReservasEmprestimoCliente() {
+    if (clientes.isEmpty()) {
+        System.out.println("Não existem Clientes !");
+    } else {
+        mostraTabelaClientes(clientes);
+    }
+    int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas / empréstimos: ", false, null);
 
-    public static void listarTodasReservasEmprestimoCliente() {
-        if (clientes.isEmpty())
-        {
-            System.out.println("Não existem Clientes !");
-        }else
-        {
-            mostraTabelaClientes(clientes);
-        }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Resservas / emprestimos: ",false,null);
+    List<Reserva> listagemReserva = new ArrayList<>();
+    List<Emprestimo> listagemEmprestimo = new ArrayList<>();
 
-        List<Reserva> listagemReserva = new ArrayList<>();
-        List<Emprestimo> listagemEmprestimo = new ArrayList<>();
+    for (Reserva reserva : reservas) {
+        if (reserva.getCliente().getId() == idCliente) {
+            listagemReserva.add(reserva);
+        }
+    }
+    for (Emprestimo emprestimo : emprestimos) {
+        if (emprestimo.getCliente().getId() == idCliente) {
+            listagemEmprestimo.add(emprestimo);
+        }
+    }
+    if (listagemReserva.isEmpty()) {
+        System.out.println("Não existem Reservas desse cliente!");
+    } else {
+        mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+    }
+    if (listagemEmprestimo.isEmpty()) {
+        System.out.println("Não existem Empréstimos desse cliente!");
+    } else {
+        mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
+    }
+}
 
-        for (Reserva reserva : reservas){
-            if (reserva.getCliente().getId() == idCliente) {
-                listagemReserva.add(reserva);
-            }
-        }
-        for (Emprestimo emprestimo : emprestimos){
-            if (emprestimo.getCliente().getId() == idCliente) {
-                listagemEmprestimo.add(emprestimo);
-            }
-        }
-        if (listagemReserva.isEmpty()){
-            System.out.println("Não existem Reservas desse cliente!");
-        }else{
-            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
-        }
-        if (listagemEmprestimo.isEmpty()){
-            System.out.println("Não existem Emprestimos desse cliente!");
-        }else{
-            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
-        }
+/**
+ * Lista todas as reservas e empréstimos de um cliente dentro de um intervalo de datas.
+ * Este método verifica se há clientes cadastrados, solicita o ID do cliente e o intervalo de datas,
+ * e lista todas as reservas e empréstimos associados a esse cliente dentro do intervalo especificado.
+ * Exibe mensagens informativas se não houver clientes, reservas ou empréstimos dentro do intervalo.
+ */
+public static void listarTodasReservasEmprestimoClienteData() {
+    if (clientes.isEmpty()) {
+        System.out.println("Não existem Clientes !");
+    } else {
+        mostraTabelaClientes(clientes);
+    }
+    int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Empréstimos: ", false, null);
 
+    List<Reserva> listagemReserva = new ArrayList<>();
+    List<Emprestimo> listagemEmprestimo = new ArrayList<>();
+
+    LocalDate dataInicio = lerData("Insira a data início do intervalo: ");
+    LocalDate dataFim = lerData("Insira a data fim do intervalo: ");
+
+    if (dataFim.isBefore(dataInicio)) {
+        System.out.println("Data fim não pode ser inferior à data início!");
+        return;
     }
 
-    public static void listarTodasReservasEmprestimoClienteData() {
-        if (clientes.isEmpty())
-        {
-            System.out.println("Não existem Clientes !");
-        }else
-        {
-            mostraTabelaClientes(clientes);
+    for (Reserva reserva : reservas) {
+        if (reserva.getCliente().getId() == idCliente &&
+            (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio)) &&
+            (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim))) {
+            listagemReserva.add(reserva);
         }
-        int idCliente = lerInt("Insira o Id do Cliente que deseja ver as Reservas e Emprestimos",false,null);
-
-        List<Reserva> listagemReserva = new ArrayList<>();
-        List<Emprestimo> listagemEmprestimo = new ArrayList<>();
-
-        LocalDate dataInicio = lerData("Insira a data inicio do intervalo: ");
-        LocalDate dataFim = lerData("Insira a data fim do intervalo: ");
-
-        if(dataFim.isBefore(dataInicio)){
-            System.out.println("Data fim não pode ser inferior à data inicio!");
-            return;
-        }
-
-        for (Reserva reserva : reservas){
-            if (reserva.getCliente().getId() == idCliente && (reserva.getDataInicio().isAfter(dataInicio) || reserva.getDataInicio().isEqual(dataInicio) )&& (reserva.getDataFim().isBefore(dataFim) || reserva.getDataFim().isEqual(dataFim) )) {
-                listagemReserva.add(reserva);
-            }
-        }
-        for (Emprestimo emprestimo : emprestimos){
-            if (emprestimo.getCliente().getId() == idCliente && (emprestimo.getDataInicio().isAfter(dataInicio) || emprestimo.getDataInicio().isEqual(dataInicio) )&& (emprestimo.getDataFim().isBefore(dataFim) || emprestimo.getDataFim().isEqual(dataFim) )) {
-                listagemEmprestimo.add(emprestimo);
-            }
-        }
-        if (listagemReserva.isEmpty()){
-            System.out.println("Não existem Reservas desse cliente nessas datas!");
-        }else{
-            mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
-        }
-        if (listagemEmprestimo.isEmpty()){
-            System.out.println("Não existem Emprestimos desse cliente nessas datas!");
-        }else{
-            mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
-        }
-
     }
+    for (Emprestimo emprestimo : emprestimos) {
+        if (emprestimo.getCliente().getId() == idCliente &&
+            (emprestimo.getDataInicio().isAfter(dataInicio) || emprestimo.getDataInicio().isEqual(dataInicio)) &&
+            (emprestimo.getDataFim().isBefore(dataFim) || emprestimo.getDataFim().isEqual(dataFim))) {
+            listagemEmprestimo.add(emprestimo);
+        }
+    }
+    if (listagemReserva.isEmpty()) {
+        System.out.println("Não existem Reservas desse cliente nessas datas!");
+    } else {
+        mostraTabelaReservas(listagemReserva, Constantes.Etapa.LISTAR);
+    }
+    if (listagemEmprestimo.isEmpty()) {
+        System.out.println("Não existem Empréstimos desse cliente nessas datas!");
+    } else {
+        mostraTabelaEmprestimos(listagemEmprestimo, Constantes.Etapa.LISTAR);
+    }
+}
 
-    /*
-     * ############################### TRATAMENTO DE DADOS LISTAGENS - FIM ##############################################
-     * */
-
-
+/*
+ * ############################### TRATAMENTO DE DADOS LISTAGENS - FIM ##############################################
+ * */
 
     /*
      * ######################################## HELPERS - INICIO #######################################################
