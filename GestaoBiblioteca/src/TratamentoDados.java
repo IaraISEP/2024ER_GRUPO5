@@ -346,7 +346,7 @@ public class TratamentoDados {
             }
             if(!clientes.isEmpty() && flag){
                 for (Cliente cliente : clientes) {
-                    if (cliente.getNif() == Integer.parseInt(nif) && cliente.getId() != id) {
+                    if (cliente.getNif() == Integer.parseInt(nif) && cliente.getId() != id && cliente.getCodBiblioteca() == codBibliotecaSessao) {
                         System.out.println("Contribuinte já existente! Tente novamente.");
                         flag = false;
                     }
@@ -874,7 +874,7 @@ public class TratamentoDados {
      */
     private static String pesquisarIsbn(String isbn, int id) {
         for (Livro livro : livros) {
-            if (livro.getIsbn().equals(isbn) && livro.getId() != id) {
+            if (livro.getIsbn().equals(isbn) && livro.getId() != id && livro.getCodBiblioteca() == codBibliotecaSessao) {
                 return isbn;
             }
         }
@@ -979,7 +979,7 @@ public class TratamentoDados {
             }
             for(JornalRevista jornal : jornais)
             {
-                if(jornal.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR)
+                if(jornal.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR  && jornal.getCodBiblioteca() == codBibliotecaSessao)
                 {
                     flag=false;
                 }
@@ -990,7 +990,7 @@ public class TratamentoDados {
             }
             for(JornalRevista revista : revistas )
             {
-                if(revista.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR)
+                if(revista.getIssn().equals(issn) && etapa == Constantes.Etapa.CRIAR  && revista.getCodBiblioteca() == codBibliotecaSessao)
                 {
                     flag=false;
                 }
