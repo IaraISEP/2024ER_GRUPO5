@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Classe responsável pelo tratamento de dados no sistema de gestão de bibliotecas.
  * Esta classe gere a criação e manipulação de ficheiros e dados relacionados com bibliotecas, clientes, livros, jornais, revistas, empréstimos e reservas.
- *
+ * <p>
  * As suas principais funcionalidades incluem:
  * - Criação de novos objetos das classes relacionadas.
  * - Criação e manutenção da estrutura de ficheiros para armazenamento de dados persistentes.
@@ -110,13 +110,30 @@ public class TratamentoDados {
      * ########################### TRATAMENTO DE DADOS LOGIN - INICIO #################################################
      * */
 
+    /**
+     * Método responsável pelo início de sessão.
+     *
+     * O método valida se existe bibliotecas. 
+     * Caso exista, lista todas as bibliotecas e solicita ao utilizador que escolha uma.
+     * Caso contrário, cria uma nova biblioteca e inicia sessão automaticamente.
+     *
+     * @throws IOException Se ocorrer um erro ao criar os ficheiros ou diretórios.
+     */
     public static void inicioSessao() throws IOException {
+        //Se não houver bibliotecas configuradas, cria uma nova e inicia sessão automaticamente.
         if(bibliotecas.isEmpty()) {
+            System.out.println("Não existem bibliotecas configuradas.\nA iniciar a configuração...");
             criarBiblioteca();
+            codBibliotecaSessao = bibliotecas.getFirst().getCodBiblioteca();
+            System.out.println("Início de sessão automático...");
+            CriarMenu.menuPrincipal();
+            return;
         }
-        
+
+        //Lista todas as bibliotecas
         listaTodasBibliotecas();
         
+        //Escolhe a biblioteca a iniciar sessão
         int opcao = lerInt("Escolha a Biblioteca: ", false, null);
         for (Biblioteca biblioteca : bibliotecas) {
             if (biblioteca.getCodBiblioteca() == opcao){
@@ -292,14 +309,9 @@ public class TratamentoDados {
      */
     public static void gravarArrayBibliotecas() throws IOException
     {
-        if (bibliotecas.isEmpty()) {
-            System.out.println("Array de bibliotecas vazio.");
-        }
         // Percorre todas as bibliotecas e grava cada uma no ficheiro CSV
-        for (int i = 0; i < bibliotecas.size(); i++) {
-            Biblioteca biblioteca = bibliotecas.get(i);
-            criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), biblioteca, i != 0);
-        }
+        for (int i = 0; i < bibliotecas.size(); i++) 
+            criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), bibliotecas.get(i), i != 0);
     }
 
     /*
@@ -603,18 +615,9 @@ public class TratamentoDados {
      * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
     public static void gravarArrayClientes() throws IOException {
-        // Verifica se a lista de clientes está vazia
-        if(clientes.isEmpty()){
-/*            File file = new File("Biblioteca_1/Clientes/clientes.csv");
-            file.delete();*/
-            System.out.println("Array vazio");
-        }
-
         // Itera pela lista de clientes e grava cada um no ficheiro
-        for(int i = 0; i < clientes.size(); i++) {
-            Cliente cliente = clientes.get(i);
-            criarFicheiroCsvCliente(Constantes.Path.CLIENTE.getValue(), cliente, i != 0);
-        }
+        for(int i = 0; i < clientes.size(); i++) 
+            criarFicheiroCsvCliente(Constantes.Path.CLIENTE.getValue(), clientes.get(i), i != 0);
     }
 
     /**
@@ -1670,9 +1673,8 @@ public class TratamentoDados {
      * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
     public static void gravarArrayReservas() throws IOException {
-        for (int i = 0; i < reservas.size(); i++) {
+        for (int i = 0; i < reservas.size(); i++)
             criarFicheiroCsvReservas(Constantes.Path.RESERVA.getValue(), reservas.get(i), i != 0);
-        }
     }
 
     /*
@@ -1821,9 +1823,8 @@ public static void lerFicheiroCsvReservasLinha(String ficheiro) {
  * @throws IOException Se ocorrer um erro de I/O durante as operações.
  */
 public static void gravarArrayReservaLinha() throws IOException {
-    for (int i = 0; i < reservasLinha.size(); i++) {
+    for (int i = 0; i < reservasLinha.size(); i++) 
         criarFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue(), reservasLinha.get(i), i != 0);
-    }
 }
 
 /*
@@ -2770,7 +2771,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         //Imprime os dados dos clientes
         for (Cliente cliente : listaClientes) {
-            System.out.printf(formato, cliente.getId(), cliente.getNif(), cliente.getNome(), Constantes.Genero.fromGenero(cliente.getGenero()), cliente.getContacto());
+            if(cliente.getCodBiblioteca() == codBibliotecaSessao)
+                System.out.printf(formato, cliente.getId(), cliente.getNif(), cliente.getNome(), Constantes.Genero.fromGenero(cliente.getGenero()), cliente.getContacto());
         }
 
         System.out.println(separador);
@@ -2816,7 +2818,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         //Imprime os dados dos livros
         for (Livro livro : listaLivros) {
-            System.out.printf(formato, livro.getId(), livro.getTitulo(), livro.getEditora(), livro.getCategoria(), livro.getAnoEdicao(), livro.getIsbn(), livro.getAutor());
+            if(livro.getCodBiblioteca() == codBibliotecaSessao) 
+                System.out.printf(formato, livro.getId(), livro.getTitulo(), livro.getEditora(), livro.getCategoria(), livro.getAnoEdicao(), livro.getIsbn(), livro.getAutor());
         }
 
         System.out.println(separador);
@@ -2857,7 +2860,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         //Imprime os dados dos jornais/revistas
         for (JornalRevista jornalRevista : listaJornalRevista) {
-            System.out.printf(formato, jornalRevista.getId(), jornalRevista.getTitulo(), jornalRevista.getEditora(), jornalRevista.getCategoria(), jornalRevista.getDataPublicacao(), jornalRevista.getIssn());
+            if(jornalRevista.getCodBiblioteca() == codBibliotecaSessao)
+                System.out.printf(formato, jornalRevista.getId(), jornalRevista.getTitulo(), jornalRevista.getEditora(), jornalRevista.getCategoria(), jornalRevista.getDataPublicacao(), jornalRevista.getIssn());
         }
 
         System.out.println(separador);
@@ -2866,7 +2870,6 @@ public static void listarTodasReservasEmprestimoClienteData() {
     public static void mostraTabelaReservas(List<Reserva> listaReservas, Constantes.Etapa etapa)
     {
         int idMaxLen = "Id".length();
-        int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
         int dataFimLen = "Data Fim".length();
         int clienteMaxLen = "Cliente".length();
@@ -2874,7 +2877,6 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Reserva reservas : listaReservas) {
-            bibliotecaMaxLen = Math.max(bibliotecaMaxLen, String.valueOf(reservas.getCodBiblioteca()).length());
             idMaxLen = Math.max(idMaxLen, String.valueOf(reservas.getNumMovimento()).length());
             dataInicioLen = Math.max(dataInicioLen, String.valueOf(reservas.getDataInicio()).length());
             dataFimLen = Math.max(dataFimLen, String.valueOf(reservas.getDataFim()).length());
@@ -2883,14 +2885,14 @@ public static void listarTodasReservasEmprestimoClienteData() {
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataFimLen  + "s | %-" + clienteMaxLen + "s | %-" + estadoMaxLen + "s |\n";
+        String formato = "| %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataFimLen  + "s | %-" + clienteMaxLen + "s | %-" + estadoMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+-" + "-".repeat(estadoMaxLen) +"-+";
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+-" + "-".repeat(estadoMaxLen) +"-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Biblioteca", "Id", "Data Início", "Data Fim", "Cliente", "Estado");
+        System.out.printf(formato, "Id", "Data Início", "Data Fim", "Cliente", "Estado");
         //Imprime a linha de separação
         System.out.println(separador);
 
@@ -2898,8 +2900,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
         for (Reserva reserva : listaReservas) {
             boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
             boolean notCanceladoConcluido = reserva.getEstado() != Constantes.Estado.CONCLUIDO && reserva.getEstado() != Constantes.Estado.CANCELADO;
-            if (!isEditCancelConclude || notCanceladoConcluido)
-                System.out.printf(formato, reserva.getCodBiblioteca(), reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
+            if (reserva.getCodBiblioteca() == codBibliotecaSessao && (!isEditCancelConclude || notCanceladoConcluido))
+                System.out.printf(formato, reserva.getNumMovimento(), reserva.getDataInicio(), reserva.getDataFim(), reserva.getClienteNome(), reserva.getEstado());
         }
 
         System.out.println(separador);
@@ -2907,9 +2909,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
     public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos, Constantes.Etapa etapa)
     {
-
         int idMaxLen = "Id".length();
-        int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
         int dataPrevFimLen = "Data Final Prevista".length();
         int clienteMaxLen = "Cliente".length();
@@ -2917,7 +2917,6 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         //percorre a lista, e retorna o tamanho máximo de cada item, caso seja diferente do cabeçalho
         for (Emprestimo emprestimo : listaEmprestimos) {
-            bibliotecaMaxLen = Math.max(bibliotecaMaxLen, String.valueOf(emprestimo.getCodBiblioteca()).length());
             idMaxLen = Math.max(idMaxLen, String.valueOf(emprestimo.getNumMovimento()).length());
             dataInicioLen = Math.max(dataInicioLen, String.valueOf(emprestimo.getDataInicio()).length());
             dataPrevFimLen = Math.max(dataPrevFimLen, String.valueOf(emprestimo.getDataFim()).length());
@@ -2926,14 +2925,14 @@ public static void listarTodasReservasEmprestimoClienteData() {
         }
 
         //Esta string cria as linhas baseado no tamanho máximo de cada coluna
-        String formato = "| %-" + bibliotecaMaxLen + "s | %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s | %-" + estadoMaxLen + "s |\n";
+        String formato = "| %-" + idMaxLen  + "s | %-" + dataInicioLen + "s | %-" + dataPrevFimLen  + "s | %-" + clienteMaxLen + "s | %-" + estadoMaxLen + "s |\n";
         //Esta string cria a linha de separação
-        String separador = "+-" + "-".repeat(bibliotecaMaxLen) + "-+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+-" + "-".repeat(estadoMaxLen) + "-+";
+        String separador = "+-" + "-".repeat(idMaxLen) + "-+-" + "-".repeat(dataInicioLen) + "-+-" + "-".repeat(dataPrevFimLen) + "-+-" + "-".repeat(clienteMaxLen) + "-+-" + "-".repeat(estadoMaxLen) + "-+";
 
         //Imprime a linha de separação (+---+---+ ...)
         System.out.println(separador);
         //Imprime o cabeçalho da tabela
-        System.out.printf(formato, "Biblioteca", "Id", "Data Início", "Data Final Prevista", "Cliente", "Estado");
+        System.out.printf(formato, "Id", "Data Início", "Data Final Prevista", "Cliente", "Estado");
         //Imprime a linha de separação
         System.out.println(separador);
 
@@ -2944,8 +2943,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
             boolean notCanceladoConcluido = emprestimo.getEstado() != Constantes.Estado.CONCLUIDO && emprestimo.getEstado() != Constantes.Estado.CANCELADO;
         
             //Caso seja Edição/Cancelamento/Conclusão só mostra os emprestados, caso contrário mostra tudo 
-            if (!isEditCancelConclude || notCanceladoConcluido) 
-                System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
+            if (emprestimo.getCodBiblioteca() == codBibliotecaSessao && (!isEditCancelConclude || notCanceladoConcluido)) 
+                System.out.printf(formato, emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
         
         System.out.println(separador);
@@ -3005,21 +3004,21 @@ public static void listarTodasReservasEmprestimoClienteData() {
         System.out.println("O item mais requisitado foi um(a) " + tipoItem.toString().toLowerCase() + " com um total de "+diasMax+" requisições:");
         if (tipoItem == Constantes.TipoItem.LIVRO) {
             for (Livro livro : livros) {
-                if (livro.getId() == idItem) {
+                if (livro.getId() == idItem && livro.getCodBiblioteca() == codBibliotecaSessao) {
                     mostraTabelaLivros(Collections.singletonList(livro));
                     break;
                 }
             }
         } else if (tipoItem == Constantes.TipoItem.JORNAL) {
             for (JornalRevista jornal : jornais) {
-                if (jornal.getId() == idItem) {
+                if (jornal.getId() == idItem && jornal.getCodBiblioteca() == codBibliotecaSessao) {
                     mostraTabelaJornalRevista(Collections.singletonList(jornal));
                     break;
                 }
             }
         } else{
             for (JornalRevista revista : revistas) {
-                if (revista.getId() == idItem) {
+                if (revista.getId() == idItem && revista.getCodBiblioteca() == codBibliotecaSessao) {
                     mostraTabelaJornalRevista(Collections.singletonList(revista));
                     break;
                 }
@@ -3044,7 +3043,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
         int dias=0, i=0;
         for(Emprestimo emprestimo : emprestimos)
-            if(emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim)){
+            if(emprestimo.getCodBiblioteca() == codBibliotecaSessao && emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim)){
                 dias+= (int) ChronoUnit.DAYS.between(emprestimo.getDataInicio(), emprestimo.getDataFim());
                 i++;
             }
@@ -3070,10 +3069,10 @@ public static void listarTodasReservasEmprestimoClienteData() {
         List<Reserva> listagemReserva = new ArrayList<>();
         List<Emprestimo> listagemEmprestimo = new ArrayList<>();
         for(Reserva reserva : reservas)
-            if(reserva.getDataInicio().isAfter(dataInicio) && reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataInicio) || reserva.getDataInicio().isEqual(dataFim))
+            if(reserva.getCodBiblioteca() == codBibliotecaSessao && reserva.getDataInicio().isAfter(dataInicio) && reserva.getDataInicio().isBefore(dataFim) || reserva.getDataInicio().isEqual(dataInicio) || reserva.getDataInicio().isEqual(dataFim))
                 listagemReserva.add(reserva);
         for(Emprestimo emprestimo : emprestimos)
-            if(emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim))
+            if(emprestimo.getCodBiblioteca() == codBibliotecaSessao && emprestimo.getDataInicio().isAfter(dataInicio) && emprestimo.getDataInicio().isBefore(dataFim) || emprestimo.getDataInicio().isEqual(dataInicio) || emprestimo.getDataInicio().isEqual(dataFim))
                 listagemEmprestimo.add(emprestimo);
 
         System.out.println("Reservas");
@@ -3084,7 +3083,6 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-
         int idReservaLinhaMaxLen = "Id Reserva Linha".length();
         int idReservaMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
@@ -3218,7 +3216,6 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
     public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-
         int idMaxLen = "Id Emprestimo".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
@@ -3458,7 +3455,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
         switch (validacaoCliente) {
             case ID:
                 for (Cliente cliente : clientes) {
-                    if (cliente.getId() == valor) {
+                    if (cliente.getId() == valor && cliente.getCodBiblioteca() == codBibliotecaSessao) {
                         return cliente;
                     }
                 }
@@ -3466,7 +3463,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
 
             case NIF:
                 for (Cliente cliente : clientes) {
-                    if (cliente.getNif() == valor) {
+                    if (cliente.getNif() == valor && cliente.getCodBiblioteca() == codBibliotecaSessao) {
                         return cliente;
                     }
                 }
@@ -3475,7 +3472,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
             case CONTACTO:
                 List<Cliente> clientesComMesmoContacto = new ArrayList<>();
                 for (Cliente cliente : clientes) {
-                    if (cliente.getContacto() == valor) {
+                    if (cliente.getContacto() == valor && cliente.getCodBiblioteca() == codBibliotecaSessao) {
                         clientesComMesmoContacto.add(cliente);
                     }
                 }
@@ -3491,7 +3488,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
                     mostraTabelaClientes(clientesComMesmoContacto);
                     int id = lerInt("Por favor, insira o ID do cliente: ", false, null);
                     for (Cliente cliente : clientesComMesmoContacto) {
-                        if (cliente.getId() == id) {
+                        if (cliente.getId() == id && cliente.getCodBiblioteca() == codBibliotecaSessao) {
                             return cliente;
                         }
                     }
@@ -3514,7 +3511,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
         boolean hasReserva  = false;
 
         for(Reserva reserva : reservas){
-            if(reserva.getEstado() == Constantes.Estado.RESERVADO){
+            if(reserva.getEstado() == Constantes.Estado.RESERVADO && reserva.getCodBiblioteca() == codBibliotecaSessao){
                 hasReserva = true;
                 break;
             }
