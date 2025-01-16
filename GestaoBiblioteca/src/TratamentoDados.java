@@ -1357,7 +1357,6 @@ public class TratamentoDados {
                             }
                             opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
                         } while (opcao != 2);
-                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
                         gravarArrayReservaLinha();
                         break;
                     default:
