@@ -169,7 +169,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O ficheiro está vazio.");
                 return;
             }
             do {
@@ -541,7 +540,6 @@ public class TratamentoDados {
         try(BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             String csvDivisor = ";";
@@ -723,7 +721,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             String csvDivisor = ";";
@@ -813,7 +810,6 @@ public class TratamentoDados {
         try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
             String linha = readFile.readLine();
             if (linha == null) {
-                System.out.println("O arquivo está vazio.");
                 return;
             }
             do {
@@ -1739,7 +1735,6 @@ public static void lerFicheiroCsvReservasLinha(String ficheiro) {
         String linha = readFile.readLine();
 
         if (linha == null) {
-            System.out.println("O ficheiro está vazio.");
             return;
         }
 
@@ -1788,7 +1783,6 @@ public static void lerFicheiroCsvEmprestimos(String ficheiro) {
     try (BufferedReader readFile = new BufferedReader(new FileReader(ficheiro))) {
         String linha = readFile.readLine();
         if (linha == null) {
-            System.out.println("O arquivo está vazio.");
             return;
         }
         do {
@@ -1842,7 +1836,6 @@ public static void lerFicheiroCsvEmprestimosLinha(String ficheiro) {
         String linha = readFile.readLine();
 
         if (linha == null) {
-            System.out.println("O ficheiro está vazio.");
             return;
         }
 
