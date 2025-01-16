@@ -72,8 +72,7 @@ public class TratamentoDados {
      *
      * @throws IOException Se ocorrer um erro ao criar os ficheiros ou diretórios.
      */
-    public static void criarSistemaFicheiros() throws IOException
-    {
+    public static void criarSistemaFicheiros() throws IOException {
         File[] dirs = new File[]{
                 new File("Dados/Bibliotecas"),
                 new File("Dados/Clientes"),

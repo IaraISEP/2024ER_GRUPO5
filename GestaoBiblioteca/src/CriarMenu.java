@@ -313,14 +313,15 @@ public class CriarMenu {
             keyPress();
         }));
         menuReservas.adicionarOpcao(new OpcaoMenu("Cancelar Reserva", () -> {
-            try {
                 boolean flag = TratamentoDados.listaTodasReservas(Constantes.Etapa.CANCELAR);
                 if (flag) {
-                    TratamentoDados.cancelarReserva( Constantes.Estado.CANCELADO);
+                    try {
+                        TratamentoDados.cancelarReserva( Constantes.Estado.CANCELADO);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
             keyPress();
         }));
 
@@ -406,14 +407,16 @@ public class CriarMenu {
             keyPress();
         }));
         menuListarReservas.adicionarOpcao(new OpcaoMenu("Reserva Detalhada", () -> {
-            try {
+
                 boolean flag = TratamentoDados.listaTodasReservas(null);
                 if (flag) {
-                    TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
+                    try {
+                        TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
             keyPress();
         }));
 
