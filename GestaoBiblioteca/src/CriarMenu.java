@@ -411,7 +411,7 @@ public class CriarMenu {
                 boolean flag = TratamentoDados.listaTodasReservas(null);
                 if (flag) {
                     try {
-                        TratamentoDados.listarDetalhesReserva(TratamentoDados.lerInt("Insira o Id da reserva: ", false, null));
+                        TratamentoDados.listarDetalhesReserva(0, Constantes.Etapa.LISTAR);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

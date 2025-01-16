@@ -1311,6 +1311,7 @@ public class TratamentoDados {
      * @throws IOException Se ocorrer um erro durante a gravação dos dados.
      */
     public static void editarReserva() throws IOException {
+
         // Verifica se a lista de reservas está vazia
         if (reservas.isEmpty()) {
             System.out.println("Não há reservas nesta biblioteca.");
@@ -1319,60 +1320,89 @@ public class TratamentoDados {
 
         // Lista todas as reservas
         listaTodasReservas(Constantes.Etapa.EDITAR);
-
-        // Lê o ID da reserva a ser editada
-        int idEditar = lerInt("Escolha o ID da reserva que deseja editar: ", false, null);
-        for (Reserva reserva : reservas) {
-            if (reserva.getNumMovimento() == idEditar && reserva.getEstado() == Constantes.Estado.CANCELADO) {
-                System.out.println("Não é possivel editar a reserva.");
+        boolean flag = false;
+        do{
+            // Lê o ID da reserva a ser editada
+            int idEditar = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
+            if (idEditar == 0)
                 return;
+            for (Reserva reserva : reservas) {
+                if (reserva.getNumMovimento() == idEditar ) {
+                    flag=true;
+                    break;
+                }
             }
-        }
-        listarDetalhesReserva(idEditar);
-
-        int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n", false, null);
-        switch (opcao) {
-            case 1:
-                criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
-                gravarArrayReservaLinha();
-                break;
-            case 2:
-                opcao = 1;
-                do {
-                    if (opcao != 1)
-                        System.out.println("Número Inválido!");
-                    else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
-                        System.out.println("Não existem mais itens para remover!");
+            if (!flag){
+                System.out.println("Id Inválido!");
+            }else {
+                listarDetalhesReserva(idEditar, Constantes.Etapa.EDITAR);
+            }
+            if (flag){
+                int opcao = lerInt("Escolha uma opção :\n1 - Adicionar Item\n2 - Remover Item\n0 - Voltar\n", false, null);
+                switch (opcao) {
+                    case 0:
+                        return;
+                    case 1:
+                        criarDetalheEmprestimoReserva(idEditar, Constantes.TipoItem.RESERVA);
+                        gravarArrayReservaLinha();
                         break;
-                    }
-                    opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
-                } while (opcao != 2);
-                RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
-                gravarArrayReservaLinha();
-                break;
-            default:
-                System.out.println("Escolha invalida! Tente novamente.");
-        }
+                    case 2:
+                        opcao = 1;
+                        do {
+                            if (opcao != 1)
+                                System.out.println("Número Inválido!");
+                            else if (!RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA)) {
+                                System.out.println("Não existem mais itens para remover!");
+                                break;
+                            }
+                            opcao = lerInt("Deseja remover mais algum item? (1 - Sim, 2 - Não)", false, null);
+                        } while (opcao != 2);
+                        RemoverItemReservaEmprestimo(idEditar, Constantes.TipoItem.RESERVA);
+                        gravarArrayReservaLinha();
+                        break;
+                    default:
+                        System.out.println("Escolha invalida! Tente novamente.");
+
+                }
+            }
+        }while(!flag);
     }
 
     /**
      * Metodo para listar os detalhes de uma reserva.
      * Procura a reserva pelo ID e exibe os detalhes da reserva.
      *
-     * @param idReserva O ID da reserva.
      * @throws IOException Se ocorrer um erro durante a leitura dos dados.
      */
-    public static void listarDetalhesReserva(int idReserva) throws IOException {
+    public static void listarDetalhesReserva(int idReserva, Constantes.Etapa etapa) throws IOException {
         // Lista de apoio para editar os detalhes
         List<ReservaLinha> reservaLinhaDetails = new ArrayList<>();
+        boolean flag = false;
 
-        // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
-        for (ReservaLinha reservaLinha : reservasLinha) {
-            if (reservaLinha.getIdReserva() == idReserva) {
-                reservaLinhaDetails.add(reservaLinha);
+        do {
+            boolean hasReservas = hasReservas();
+
+            if (!hasReservas) return;
+            if (etapa == Constantes.Etapa.LISTAR) {
+                idReserva = lerInt("Escolha o id da reserva (0 - para voltar): ", false, null);
+
+                if (idReserva == 0) {
+                    return;
+                }
             }
-        }
-        mostraDetalhesReservas(reservaLinhaDetails, 0, null);
+            // Procura a reserva pelo ID e acrescenta a Lista de Detalhes para apresentar a reserva completa
+            for (ReservaLinha reservaLinha : reservasLinha) {
+                if (reservaLinha.getIdReserva() == idReserva) {
+                    reservaLinhaDetails.add(reservaLinha);
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                System.out.println("Id Inválido!");
+            } else {
+                mostraDetalhesReservas(reservaLinhaDetails, 0, null);
+            }
+        }while(!flag);
     }
 
     /**
