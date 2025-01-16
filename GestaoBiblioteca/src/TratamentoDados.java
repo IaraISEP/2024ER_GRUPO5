@@ -22,7 +22,6 @@ public class TratamentoDados {
 
     private static Scanner input = new Scanner(System.in);
     private static List<Biblioteca> bibliotecas = new ArrayList<>();
-    private static List<Cliente> clientes = new ArrayList<>();
     private static List<Livro> livros = new ArrayList<>();
     private static List<Emprestimo> emprestimos = new ArrayList<>();
     private static List<EmprestimoLinha> emprestimosLinha = new ArrayList<>();
@@ -197,6 +196,7 @@ public class TratamentoDados {
         for (int i = 0; i < bibliotecas.size(); i++) {
             Biblioteca biblioteca = bibliotecas.get(i);
             criarFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue(), biblioteca, i != 0);
+            gravarArrayClientes(biblioteca.getClientes());
         }
     }
 
@@ -273,8 +273,9 @@ public class TratamentoDados {
      */
     public static void criarCliente() throws IOException
     {
-        clientes.add(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1)));
-        gravarArrayClientes();
+        Biblioteca biblioteca = bibliotecas.get(0);
+        biblioteca.addCliente(inserirDadosCliente(getIdAutomatico(Constantes.TipoItem.CLIENTE, -1)));
+        gravarArrayBibliotecas();
     }
 
     /**
@@ -500,7 +501,7 @@ public class TratamentoDados {
      *
      * @throws IOException Se ocorrer um erro de I/O durante as operações.
      */
-    public static void gravarArrayClientes() throws IOException {
+    public static void gravarArrayClientes(ArrayList<Cliente> clientes) throws IOException {
         // Verifica se a lista de clientes está vazia
         if(clientes.isEmpty()){
             System.out.println("Array vazio");

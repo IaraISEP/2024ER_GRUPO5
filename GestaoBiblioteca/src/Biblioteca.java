@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -109,6 +110,11 @@ public class Biblioteca {
      */
     public void setClientes(List<Cliente> cliente) {
         this.cliente = cliente;
+    }
+
+    public void addCliente(Cliente cliente) throws IOException
+    {
+        this.cliente.add(cliente);
     }
 
     /**
