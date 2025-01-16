@@ -2429,8 +2429,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
             }
         }else{
             try{
-            reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
-            return true;
+                reservasLinha.add(inserirDetalhesReserva(id, tipoItem, reservas.getLast().getDataInicio(), reservas.getLast().getDataFim()));
+                return true;
             }catch (IllegalArgumentException e){
                 System.out.println(e.getMessage());
                 return false;
@@ -2522,8 +2522,8 @@ public static void listarTodasReservasEmprestimoClienteData() {
         String campo;
         boolean flag;
         do {
-        System.out.print(mensagem);
-        campo = input.nextLine().trim();
+            System.out.print(mensagem);
+            campo = input.nextLine().trim();
             if (campo.isEmpty()) {
                 System.out.println("Campo não pode estar vazio");
                 flag = false;
@@ -2552,10 +2552,10 @@ public static void listarTodasReservasEmprestimoClienteData() {
                 valor = input.nextInt();
                 input.nextLine(); // necessário para limpar buffer
                 if (isDate) {
-                    if (valor > 0 && 
-                        ((valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO) || 
-                        (valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL) ||
-                        (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
+                    if (valor > 0 &&
+                            ((valor >= 1455 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.LIVRO) ||
+                                    (valor >= 1605 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.JORNAL) ||
+                                    (valor >= 1731 && valor <= LocalDateTime.now().getYear() && tipoItem == Constantes.TipoItem.REVISTA)))
                         isInt = true;
                     else if(valor > 0 && valor <= 1455 && tipoItem == Constantes.TipoItem.LIVRO)
                         System.out.print("O primeiro livro impresso, assim como os conhecemos, foi A Bíblia de Gutenberg, impresso em 1455, Mainz, Alemanha... Por favor, insira um ano válido (>= 1455).\n");
@@ -2856,12 +2856,12 @@ public static void listarTodasReservasEmprestimoClienteData() {
             //Valida se é edição, cancelamento ou conclusão de empréstimo e se está emprestado, para simplificar a sintaxe no if
             boolean isEditCancelConclude = etapa == Constantes.Etapa.EDITAR || etapa == Constantes.Etapa.CANCELAR || etapa == Constantes.Etapa.CONCLUIR;
             boolean notCanceladoConcluido = emprestimo.getEstado() != Constantes.Estado.CONCLUIDO && emprestimo.getEstado() != Constantes.Estado.CANCELADO;
-        
+
             //Caso seja Edição/Cancelamento/Conclusão só mostra os emprestados, caso contrário mostra tudo 
-            if (!isEditCancelConclude || notCanceladoConcluido) 
+            if (!isEditCancelConclude || notCanceladoConcluido)
                 System.out.printf(formato, emprestimo.getCodBiblioteca(), emprestimo.getNumMovimento(), emprestimo.getDataInicio(), emprestimo.getDataPrevFim(), emprestimo.getClienteNome(), emprestimo.getEstado());
         }
-        
+
         System.out.println(separador);
     }
 
@@ -3416,7 +3416,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
                 throw new IllegalArgumentException("Campo desconhecido: " + validacaoCliente);
         }
     }
-    
+
     private static boolean hasReservas()
     {
         if(reservas.isEmpty())
@@ -3438,7 +3438,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
             System.out.println("Não existem reservas para mostrar.");
             return false;
         }
-        
+
         return true;
     }
 
@@ -3446,7 +3446,7 @@ public static void listarTodasReservasEmprestimoClienteData() {
         System.out.println("\nPressione Enter para continuar...");
         input.nextLine();
     }
-        
+
     /*
      * ########################################## HELPERS - FIM ########################################################
      * */
