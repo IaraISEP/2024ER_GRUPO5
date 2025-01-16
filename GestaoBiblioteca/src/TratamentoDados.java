@@ -72,8 +72,7 @@ public class TratamentoDados {
      *
      * @throws IOException Se ocorrer um erro ao criar os ficheiros ou diretórios.
      */
-    public static void criarSistemaFicheiros() throws IOException
-    {
+    public static void criarSistemaFicheiros() throws IOException {
         File[] dirs = new File[]{
                 new File("Dados/Bibliotecas"),
                 new File("Dados/Clientes"),
@@ -117,7 +116,7 @@ public class TratamentoDados {
      * @return Um objeto do tipo Biblioteca contendo as informações inseridas.
      * @throws IOException Se ocorrer um erro ao ler a entrada do utilizador.
      */
-    public static Biblioteca inserirDadosBiblioteca() throws IOException
+    public static Biblioteca inserirDadosBiblioteca()
     {
         String nome;
         int idBiblioteca;
