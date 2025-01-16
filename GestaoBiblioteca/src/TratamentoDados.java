@@ -31,6 +31,25 @@ public class TratamentoDados {
     private static List<Reserva> reservas = new ArrayList<>();
     private static List<ReservaLinha> reservasLinha = new ArrayList<>();
 
+    public static void inicializador(){
+        try {
+            criarSistemaFicheiros();
+            lerFicheiroCsvBiblioteca(Constantes.Path.BIBLIOTECA.getValue());
+            lerFicheiroCsvClientes(Constantes.Path.CLIENTE.getValue());
+            lerFicheiroCsvLivros(Constantes.Path.LIVRO.getValue());
+            lerFicheiroCsvJornaisRevistas(Constantes.Path.JORNAL.getValue(), Constantes.TipoItem.JORNAL);
+            lerFicheiroCsvJornaisRevistas(Constantes.Path.REVISTA.getValue(), Constantes.TipoItem.REVISTA);
+            lerFicheiroCsvReservas(Constantes.Path.RESERVA.getValue());
+            lerFicheiroCsvReservasLinha(Constantes.Path.RESERVALINHA.getValue());
+            lerFicheiroCsvEmprestimos(Constantes.Path.EMPRESTIMO.getValue());
+            lerFicheiroCsvEmprestimosLinha(Constantes.Path.EMPRESTIMOLINHA.getValue());
+            AtualizarAtrasoEmprestimo();
+        } catch (IOException e) {
+            System.err.println("Erro durante a execução: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Método responsável por criar a estrutura de ficheiros necessária para o armazenamento de dados de forma persistente.
      *
