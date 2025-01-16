@@ -261,7 +261,7 @@ public class TratamentoDados {
             break;
         } while (true);
 
-        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1);
+        return new Cliente(id, nome, genero, Integer.parseInt(nif), contacto,1); //TODO : codBiblioteca a ser desenvolvido posteriormente
     }
 
     /**
@@ -724,7 +724,7 @@ public static void lerFicheiroCsvLivros(String ficheiro)
             String isbn = dados[5];
             String autor = dados[6];
             int codBiblioteca = Integer.parseInt(dados[7]);
-            Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);
+            Livro livro = new Livro(id, codBiblioteca, titulo, editora, categoria, anoEdicao, isbn, autor);//TODO : codBiblioteca a ser desenvolvido posteriormente
             livros.add(livro);
         }while ((linha = readFile.readLine()) != null);
     } catch (IOException e) {
@@ -761,7 +761,7 @@ private static Livro inserirDadosLivro(int id) {
     }while(!flag);
     String autor = lerString("Insira o Autor do livro: ");
 
-    return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);
+    return new Livro(id, 1, titulo, editora, categoria, anoEdicao, isbn, autor);//TODO : codBiblioteca a ser desenvolvido posteriormente
 }
 
 /**
@@ -813,7 +813,7 @@ public static void lerFicheiroCsvJornaisRevistas(String ficheiro, Constantes.Tip
             String issn = dados[5];
             Constantes.TipoItem tipo = Constantes.TipoItem.valueOf(dados[6]);
             int codBiblioteca = Integer.parseInt(dados[7]);
-            JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);
+            JornalRevista jornalRevista = new JornalRevista(id, titulo, editora, issn, anoPub, codBiblioteca, tipo, categoria);//TODO : codBiblioteca a ser desenvolvido posteriormente
             if (tipoItem == Constantes.TipoItem.JORNAL)
                 jornais.add(jornalRevista);
             else
@@ -878,7 +878,7 @@ private static JornalRevista inserirDadosJornalRevista(int id, Constantes.TipoIt
             System.out.println("ISSN já existe! Tente novamente.");
         }
         else
-            return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);
+            return new JornalRevista(id, titulo, editora, issn, anoPub, 1, tipoItem, categoria);//TODO : codBiblioteca a ser desenvolvido posteriormente
     }while(true);
 }
 
@@ -1129,7 +1129,7 @@ public static Reserva inserirDadosReserva(int id) {
     } while (dataFim.isBefore(dataInicio) || dataFim.isAfter(dataInicio.plusDays(Constantes.TempoMaxReservaDias)));
 
     estado = Constantes.Estado.RESERVADO;
-    return new Reserva(1, id, dataInicio, dataFim, cliente, null, estado);
+    return new Reserva(1, id, dataInicio, dataFim, cliente, null, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
 }
 
 /**
@@ -1416,8 +1416,8 @@ public static void lerFicheiroCsvReservas(String ficheiro) {
                 }
             }
             if (cliente == null)
-                cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
-            Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);
+                cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
+            Reserva reserva = new Reserva(codBiblioteca, codMovimento, dataInicio, dataFim, cliente, reservaLinha, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
             reservas.add(reserva);
         }
     } catch (IOException e) {
@@ -1602,9 +1602,9 @@ public static void gravarArrayReservas() throws IOException {
                     }
                 }
                 if(cliente == null)
-                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);
+                    cliente = new Cliente(0, "APAGADO", Constantes.Genero.INDEFINIDO, 0, 0, codBiblioteca);//TODO : codBiblioteca a ser desenvolvido posteriormente
 
-                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);
+                Emprestimo emprestimo = new Emprestimo(codBiblioteca, codMovimento, dataInicio, dataPrevFim, dataFim, cliente, estado);//TODO : codBiblioteca a ser desenvolvido posteriormente
                 emprestimos.add(emprestimo);
             }while ((linha = readFile.readLine()) != null);
         }
@@ -1734,7 +1734,7 @@ public static void gravarArrayReservas() throws IOException {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);
+            return new Emprestimo(1, idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, cliente, Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
         }
         else{
             do {
@@ -1745,7 +1745,7 @@ public static void gravarArrayReservas() throws IOException {
                     System.out.println("A empréstimo não pode ser superior a 30 dias.");
                 }
             } while (dataPrevFim.isBefore(Constantes.getDatahoje()) || dataPrevFim.isAfter(Constantes.getDatahoje().plusDays(30)));
-            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);
+            return new Emprestimo(reserva.getCodBiblioteca(), idEmprestimo, Constantes.getDatahoje(), dataPrevFim, dataPrevFim, reserva.getCliente(), Constantes.Estado.EMPRESTADO);//TODO : codBiblioteca a ser desenvolvido posteriormente
         }
     }
 
@@ -2210,7 +2210,7 @@ public static void gravarArrayReservas() throws IOException {
                 }
                 break;
             default:
-                // TODO: Mensagem de erro/evitar que a app crashe quando se passa algo errado para aqui
+                System.out.println("Erro ao gerar o ID automático");
                 break;
         }
 
@@ -2527,7 +2527,7 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraTabelaEmprestimos(List<Emprestimo> listaEmprestimos, Constantes.Etapa etapa)
     {
-        //TODO : Implementar a função de mostrar a tabela de emprestimos, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idMaxLen = "Id".length();
         int bibliotecaMaxLen = "Biblioteca".length();
         int dataInicioLen = "Data Início".length();
@@ -2704,7 +2704,7 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraDetalhesReservas(List<ReservaLinha> listaDetalhesReservas, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idReservaLinhaMaxLen = "Id Reserva Linha".length();
         int idReservaMaxLen = "Id Reserva".length();
         int tipoItem = "Tipo Item".length();
@@ -2838,7 +2838,7 @@ public static void gravarArrayReservas() throws IOException {
 
     public static void mostraDetalhesEmprestimos(List<EmprestimoLinha> listaDetalhesEmprestimos, int idEmprestimo, Constantes.TipoItem itemMostrar)
     {
-        //TODO : Implementar a função de mostrar a tabela de reservas, com opção de mostrar detalhadamente o que cada reserva contém
+
         int idMaxLen = "Id Emprestimo".length();
         int tipoItem = "Tipo Item".length();
         int idItemMaxLen = "Id Item".length();
